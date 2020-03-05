@@ -1,0 +1,85 @@
+Moje osobni predstava, jak by ta appka mohla fungovat.
+Samozrejme je to jen nastrel, ale tak at se mame aspon od ceho odrazit,
+napiste pripominky, napady, zmeny, co je uplna blbost, etc, at to nejak 
+dame dokupy.
+
+
+1) Server
+
+Na serveru bych drzel klasicky nejakou SQL databazi (osbni preference je mySQL, ale je to v podstate
+uplne jedno), v ktery budou drzeny ucty uzivatelu. Struktura DB je presneji popsana v dbStructure.txt.
+
+Aby byla zajistena jedinecnost prihlasovacich udaju, je potreba se dohodnout, jak to bude zajisteny.
+Zaroven si myslim, ze je pekny, kdyz ti appka dovoli zobrazovat si jiny jmeno, nez je to prihlasovacich
+(to uz je dneska taky standart snad vsude). Vidim tri rychly, jendoduchy moznosti jak to udelat:
+    - user si zvoli unikatni username (klasicka buzerace typu "this name is already taken) a k tomu displayName
+    - user se bude logovat pomoci unikatniho mailu
+    - user se bude logovat pomoci unikatniho telefonniho cisla
+
+Osobni preferenci zadnou asi nemam, kdybych mel pistoli u hlavy a musel si vybrat, beru telefonni cislo.
+
+
+Premyslel jsem o moznosti mit komunikaci mezi uzivatelema peer-to-peer, ale moc se mi to nezalibilo, volil
+bych proto klasickej model client-server. To znamena, ze by server zajistoval i "routing" (proste by kazda
+zprava sla cestou odesilatel-server-prijemce).
+
+
+2) Klient
+
+Klient by toho v podstate nemusel delat moc, jen by komunikoval se serverem, klasika. Osobne bych pro 
+komunikaci client-server volil http requesty, pokud mate lepsi zkusenost s necim jinym, sem s tim.
+
+
+
+3) Obecny princip
+
+Kdyz jsem premyslel o tom, jak cela ta vec bude fungovat, jaka bude workflow pouziti, nejlepsi, co jsem
+dokazal vyplodit je tohle (i kdyz to samozrejme muze byt uplna kravina):
+
+ - create/delete/changePwd/resetPwd
+ tady asi neni moc co resit co se tyce principu, proste klasicka sifrovana komunikace client-server.
+ Co je potreba vymyslet:
+    - jaky pouzit funkce pro hashovani hesel (nebo hesla obecne drzet uplne jinak??) a sifrovani komunikace
+    - jak resit reset hesla??
+
+
+ - signIn/signOut
+ tady uz je toho k reseni celkem vic. Napriklad jak udrzovat uzivatele online? Osobne mam jen nejaky zkusenosti
+ se sessions a cookies, ale vzhledem k tomu, ze jedem mimo browser a pisem to cely od zacatku nevim, jestli a jak
+ by se to dalo pouzit. (ideas?).
+
+ - sendMessage
+ odeslani zpravy zas az takovej problem nebude, spis premyslim obecne o uchovavani zprav. Jak to delat? To jsem 
+ nevymyslel vubec, premyslel jsem o tom, ale s kazdou variantou jsem byl nespokojenej. Jediny co jsem si rikal je,
+ ze je blbost drzet vsechny zpravy lokalne na klientovi, takze by to chtelo nejakej princip postupnyho nacitani
+ (viz messenger) a na klientovi drzet treba jen poslednich 24 hodin, nebo neco, aby to bylo rychly.
+
+ - findAccout
+ nic slozityho, tim jsem mel na mysli proste vyhledavani lidi pro navazani kontaktu, klasickej request-response
+ mechanismus
+
+ - sendContactRequest
+ opet klasicky okopirovany ze snad kazdyho jinyho IM produktu -> posles request na navazani kontaktu nejakymu
+ jinymu uctu. Server to veme a strci to do notifications toho uctu, kterej zadas o kontakt.
+
+ - pullNotifications
+ Takhle me napadlo, ze by se daly vyresit notifikace. Proste pokazdy, kdyz neco prijde (request ke kontaktu,
+ nova zprava, watever), server to strci prijemci do notifications. Kdyz je prijemce online, tak se periodicky
+ pta serveru na svoje notifikace. Server mu je vzdycky vsechny posle, klient to spravne zobrazi a posle serveru
+ potvrzeni, ktery vsechny notifikace videl a muzou se smazat (neco jak SYN-ACK system). Tim by melo byt zaruceny,
+ ze kazdy klient vzdycky dostane nakonec vsechny notifikace a nemelo by to mit race conditions.
+
+ - pullMessages
+ souvisi s uchovavanim messages, nevim jak to delat, ale bylo jasny, ze na to bude muset byt nejaka metoda.
+
+
+4) Veci, co je potreba fakt vymyslet (ted)
+
+ - jak provozovat komunikaci client-server? (navazuje na to nakresleni nejakyho fakt peknyho a fcniho API,
+ vymysleni toho, jak budou fungovat endpointy etc).
+
+ - jak uchovavat zpravy (obvious reasons)
+
+ - jak udrzovat komunikaci s klientem (cookies? sessions? neco takovyho, ale uplne jinyho...)
+
+ - bunch of other stuff, cokoli vas napadne..
