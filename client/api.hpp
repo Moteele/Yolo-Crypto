@@ -17,14 +17,21 @@
  * @param password	password
  * @return positive id if successfull, 0 otherwise
  */
-size_t createAccount(std::string &mail, std::string &password, std::string &name);
+size_t createAccount(std::string &mail, std::string &name, std::string &password);
 
 /**
  * deletes an account
  * @param id		id of an account
  * @return 0 if successfull
  */
-bool deleteAccount(size_t id);
+int deleteAccount(size_t id);
+
+/**
+ * deletes an account
+ * @param mail		mail of an account
+ * @return 0 if successfull
+ */
+int deleteAccount(std::string &mail);
 
 /**
  * changes password of an user
@@ -36,10 +43,10 @@ bool deleteAccount(size_t id);
 int changePassword(size_t id, std::string &oldp, std::string &newp);
 
 /**
- * lists users into stream
+ * lists users into users parameter
  * @param users		where to write users
  */
-void listUsers(std::ostream &os);
+void listUsers(std::vector<std::string> &users);
 
 /**
  * find an account with name
@@ -86,16 +93,16 @@ void pullMessages(size_t id);
 void pullNotifications(size_t id);
 
 /**
- * signs in an user that is not online
+ * signs in an user
  * @param mail		mail of an user
  * @param password	password of the user
- * @return true if successfull
+ * @return 0 if successfull
  */
-bool signIn(std::string &mail, std::string &password);
+int signIn(std::string &mail, std::string &password);
 
 /**
  * signs out an user
  * @param mail		mail of an user
- * @return true if successfull
+ * @return 0 if successfull
  */
-bool signOut(std::string &mail);
+int signOut(std::string &mail);
