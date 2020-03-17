@@ -40,8 +40,8 @@ This protection is ment to be against attackers trying to steal/damage the datab
 First step of protecting accounts should be proper password hashing and not sending nor storing them in opened version. I suggest using SHA-256 as the hashing function.\
 Second step in protecting accounts is to have some kind of session control (e.g. insipired by google account policy). I would suggest having a list of open connections to accounts on the server. Being active on one account from more than one device could be marked down as suspicious. Being active on one account from more than two devices could be considered being an attack. All devices should be logged off and new login with password will be required. In this case I would also think about forcing the user to type in some activation code which would be sent to him to the email used for registration. This will protect the account even in case that the password got stolen/guessed/whatever.\
 As suggested last week, the server will periodically ask the client **"are you alive"**. I would force user logout in these two cases:
-    * client is not responding whatsoever (device is off, app is turned off)
-    * client is responding but the time of the last activity (sending a message, clicking through the app) is older then 30 minutes.
+* client is not responding whatsoever (device is off, app is turned off)
+* client is responding but the time of the last activity (sending a message, clicking through the app) is older then 30 minutes.
 This protection is ment to be against attackers who are trying (or actually succeeded) to steal an account by guessing a password, stealing a device with the app etc.
 
 ### Protect messages
