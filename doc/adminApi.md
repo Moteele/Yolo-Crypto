@@ -39,3 +39,11 @@ Server                                          Client
         <-hash(hash(pwd) + challenge + token)-
         -ack--------------------------------->
 ```
+### adding contact
+```
+Server                                          Client
+	<------------------account_identifier- client_1
+        --ack--------------------------------> client_1
+        --request----------------------------> client_2
+        <-------------------------accept/deny- client_2
+        -(if accept):ack---------------------> client_1
