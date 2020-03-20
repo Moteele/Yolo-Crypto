@@ -3,6 +3,9 @@
 * challenge ... random number
 * hash() ... hashing function, SHA-256 should be sufficient
 * asymmetric crypto ... curve25519 would be ideal, it is supported in mbedtls and can be used for a part of the signal protocol
+We will _most likely_ use [protocol buffers](https://developers.google.com/protocol-buffers/) for
+communication between client and server, as the C library for Signal protocol uses it. It's
+aviliable in many languages, including [C](https://github.com/protobuf-c/protobuf-c)
 
 ### Registration
 ```
