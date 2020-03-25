@@ -17,10 +17,10 @@ Here is a suggestion how our *.proto* file can look like. If we come to an agree
 
 <a href="./message.proto">message.proto</a>
 
-**senId**: id of the sender of the message
-**recId**: id of the reciever of the message
-**textContent**: the actual content of the message, string, probably limited to some length
-**kdfKeys**: array of needed keys for the double-ratchet algorith used by signal protocol (should be an array of 512b long strings)
+* **senId**: id of the sender of the message
+* **recId**: id of the reciever of the message
+* **textContent**: the actual content of the message, string, probably limited to some length
+* **kdfKeys**: array of needed keys for the double-ratchet algorith used by signal protocol (should be an array of 512b long strings)
 
 ### Using the .proto file
 
