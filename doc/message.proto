@@ -1,0 +1,7 @@
+message Message {
+  required int32 senId;
+  required int32 recId;
+
+  required string textContent;
+  required repeated string kdfKeys;
+}
