@@ -65,6 +65,6 @@ Messages will be send to server via HTTP requests, encrypted.
 
 ### Storing the messages
 
-According to <a href="../designIdeas/dbStructure.md"> dbStructure.md </a> messages will be stored on server in the table **CONVERSATION**.
+According to <a href="../design_ideas/dbStructure.md"> dbStructure.md </a> messages will be stored on server in the table **CONVERSATION**.
 After the last call (friday 20. 3. 2020) I assume that the specific design of the database is not important right now.
 TODO:
