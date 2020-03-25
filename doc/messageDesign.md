@@ -15,13 +15,7 @@ https://developers.google.com/protocol-buffers/docs/overview
 
 Here is a suggestion how our *.proto* file can look like. If we come to an agreement we can start implementing it (which should be really easy using the provided google library).
 
-*message Message {*
-  *required int32 senId;*
-  *required int32 recId;*
-
-  *required string textContent;*
-  *required repeated string kdfKeys;*
-*}*
+<a href="./message.proto">message.proto</a>
 
 **senId**: id of the sender of the message
 **recId**: id of the reciever of the message
