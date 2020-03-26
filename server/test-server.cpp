@@ -1,6 +1,7 @@
 #include <string>
 #include "catch.hpp"
 #include "server.hpp"
+#include "util.hpp"
 
 TEST_CASE("basic server tests")
 {
@@ -12,6 +13,16 @@ TEST_CASE("basic server tests")
 	db.emplace(std::make_pair(3, Account(3, "3abc@def.org", "3hashpwd", "3name")));
 	Server server(db);
 	server.setId(4);
+
+	void *lib = dlopen(LIB_PATH, RTLD_LAZY);
+
+	SECTION("playground")
+	{
+		std::cout << "=============Playground=============" << std::endl;
+		server.test();
+		std::cout << "=============Playground=============" << std::endl;
+	}
+
 
 	SECTION("Registration")
 	{
@@ -67,52 +78,60 @@ TEST_CASE("basic server tests")
 	SECTION("Login/logout")
 	{
 		REQUIRE(server.getOnline().size() == 0);
-		REQUIRE(server.signIn("1abc@def.org", "1hashpwd"));
+		REQUIRE_FALSE(server.signIn("1abc@def.org", "1hashpwd", 42));
 
-		REQUIRE(server.getOnline().size() == 1);
+		REQUIRE(server.getOnline().size() == 0);
 
 		server.listUsers(std::cout);
 		server.listOnline(std::cout);
 
+		std::string hash;
+		std::string toHash;
+
 		std::string id;
 		for (unsigned int i = 4; i < 120; ++i) {
 			id = std::to_string(i);
-			server.getDatabase().emplace(std::make_pair(i, Account(i, id + "abc@def.org", id + "hashpwd", id + "name")));
+			Util::hash512(id + "hashpwd", 7 + id.size(), hash, lib);
+			server.getDatabase().emplace(std::make_pair(i, Account(i, id + "abc@def.org", hash, id + "name")));
+			hash.clear();
 		}
+
 
 		// login
 		for (unsigned int i = 4; i < 120; ++i) {
 			id = std::to_string(i);
-			REQUIRE(server.signIn(id + "abc@def.org", id + "hashpwd"));
+			toHash = id + "hashpwd";
+
+			Util::hash512(toHash, toHash.size(), hash, lib);
+			toHash = hash;
+			Util::hash512(toHash + "42", toHash.size() + 2, hash, lib);
+			REQUIRE(server.signIn(id + "abc@def.org", hash, 42));
+			REQUIRE_FALSE(server.signIn(id + "abc@def.org", hash, 42));
+			hash.clear();
 		}
 
-		REQUIRE(server.getOnline().size() == 117);
-
-		for (unsigned int i = 4; i < 120; ++i) {
-			id = std::to_string(i);
-			REQUIRE_FALSE(server.signIn(id + "abc@def.org", id + "hashpwd"));
-		}
-
-		REQUIRE(server.getOnline().size() == 117);
-
+		REQUIRE(server.getOnline().size() == 116);
 
 		// logout
 		for (unsigned int i = 4; i < 120; ++i) {
 			REQUIRE(server.signOut(i));
 		}
 
-		REQUIRE(server.getOnline().size() == 1);
+		REQUIRE(server.getOnline().size() == 0);
 
 		for (unsigned int i = 4; i < 120; ++i) {
 			REQUIRE_FALSE(server.signOut(i));
 		}
 
-		REQUIRE(server.getOnline().size() == 1);
+		REQUIRE(server.getOnline().size() == 0);
 
 		// login wrong password
 		for (unsigned int i = 4; i < 120; ++i) {
 			id = std::to_string(i);
-			REQUIRE_FALSE(server.signIn(id + "abc@def.org", id + "WRONG"));
+			REQUIRE_FALSE(server.signIn(id + "abc@def.org", id + "WRONG", 42));
 		}
 	}
+
+
+	dlclose(lib);
 }

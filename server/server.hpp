@@ -1,12 +1,18 @@
+#define LIB_PATH "./libs/libmbedcrypto.so"
+
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
 #include <map>
 #include <vector>
 #include <string>
+#include <memory>
 #include <iostream>
 #include <ostream>
 #include <set>
+#include <dlfcn.h>
+#include <iomanip>
+
 
 
 class Account
@@ -105,13 +111,30 @@ private:
 	unsigned int id_ = 1;
 	std::map<unsigned int, Account> database_;
 	std::set<unsigned int> online_;
+	void *cryptoLib_;
 
 public:
 	/**
 	 * Constructor
 	 * @param database		std::set<Account>
 	 */
-	Server(std::map<unsigned int, Account> &database) : database_(database) {}
+	Server(std::map<unsigned int, Account> &database) : database_(database)
+	{
+		cryptoLib_ = dlopen(LIB_PATH, RTLD_LAZY);
+
+		if (!cryptoLib_) {
+			std::cerr << dlerror();
+			throw std::runtime_error(dlerror());
+		}
+	}
+
+	/**
+	 * Destructor
+	 */
+	~Server()
+	{
+		dlclose(cryptoLib_);
+	}
 
 	/**
 	 * getter
@@ -165,9 +188,10 @@ public:
 	 * signs in a registered user that is not already signed in
 	 * @param login		login email
 	 * @param pwdHash	password hash
+	 * @param challenge	random number challenge
 	 * @return		true if successful, false otherwise
 	 */
-	bool signIn(const std::string &login, const std::string &pwdHash);
+	bool signIn(const std::string &login, const std::string &pwdHash, const unsigned int challenge);
 
 	/**
 	 * signs out an user that is online
@@ -187,6 +211,11 @@ public:
 	 * @param os		stream to write into
 	 */
 	void listOnline(std::ostream &os) const;
+
+	/**
+	 * test function
+	 */
+	void test();
 };
 
 #endif // SERVER_HPP
