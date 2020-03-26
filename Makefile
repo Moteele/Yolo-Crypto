@@ -1,9 +1,9 @@
-CXXFLAGS=-ldl
-SOURCES_SERVER=server/server.cpp
+CXXFLAGS=-pthread -lprotobuf -ldl
+SOURCES_SERVER=server/server.cpp server/message.pb.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
-DEPS=server/server.hpp
+DEPS=server/server.hpp server/util.hpp server/message.pb.h
 
 all: test
 
