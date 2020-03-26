@@ -1,7 +1,9 @@
-message Message {
-  required int32 senId;
-  required int32 recId;
+syntax = "proto2";
 
-  required string textContent;
-  required repeated string kdfKeys;
+message Message {
+  required int32 senId = 1;
+  required int32 recId = 2;
+
+  required string textContent = 3;
+  repeated string kdfKeys = 4;
 }
