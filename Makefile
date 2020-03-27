@@ -1,4 +1,4 @@
-CXXFLAGS=-std=c++14 -pthread -lprotobuf -ldl
+CXXFLAGS=-std=c++14 -pthread -Wl,--no-as-needed -lprotobuf -ldl
 SOURCES_SERVER=server/server.cpp server/message.pb.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER)
