@@ -1,9 +1,9 @@
 ## Administrative api
 * token ... random number or random string of fixed length
 * challenge ... random number
-* hash() ... hashing function, SHA-256 should be sufficient
+* hash() ... hashing function, SHA-512
 * asymmetric crypto ... curve25519 would be ideal, it is supported in mbedtls and can be used for a part of the signal protocol
-We will _most likely_ use [protocol buffers](https://developers.google.com/protocol-buffers/) for
+* We will _most likely_ use [protocol buffers](https://developers.google.com/protocol-buffers/) for
 communication between client and server, as the C library for Signal protocol uses it. It's
 aviliable in many languages, including [C](https://github.com/protobuf-c/protobuf-c)
 
@@ -30,6 +30,18 @@ Server                                          Client
         -ack--------------------------------->
 ```
 
+### Change password
+* user is authenticated
+```
+Server                                          Client
+	<-------------password change request-
+        -one time pubkey--------------------->
+        <---------------------------challenge-
+        -encrypted challenge----------------->
+        <-----------hash encypted with pubkey-
+        -ack--------------------------------->
+```
+
 ### Password reset
 * same as registration
 
@@ -50,3 +62,11 @@ Server                                          Client
         --request----------------------------> client_2
         <-------------------------accept/deny- client_2
         -(if accept):ack---------------------> client_1
+```
+
+### Find user
+```
+Server                                          Client
+        <-------------------------------email-
+        -user id----------------------------->
+```
