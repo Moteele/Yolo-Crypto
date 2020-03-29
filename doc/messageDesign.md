@@ -17,10 +17,13 @@ Here is a suggestion how our *.proto* file can look like. If we come to an agree
 
 <a href="./message.proto">message.proto</a>
 
+* **messNum**: message number in the sending chain
+* **prevNum**: length (number of message keys) in the previous sending chain
+* **senRKey**: sender's current ratchet public key
 * **senId**: id of the sender of the message
 * **recId**: id of the reciever of the message
-* **textContent**: the actual content of the message, string, probably limited to some length
-* **kdfKeys**: array of needed keys for the double-ratchet algorith used by signal protocol (should be an array of 512b long strings)
+* **textContent**: the actual content of the message, string, probably limited to some length. In future will probably be a struct, so we support different message types (like response to some message), attachements etc. see [this](https://github.com/signalapp/Signal-Server/wiki/API-Protocol) for inspiration.
+* **timestamp**: time of sending
 
 ### Using the .proto file
 
