@@ -3,3 +3,4 @@ This shall be an instant messaging app implementing the Signal protocol made by 
 
 ## Compilation dependencies
 * Google [Protocol buffers](https://github.com/protocolbuffers/protobuf/releases)
+* [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
