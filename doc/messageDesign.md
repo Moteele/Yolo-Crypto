@@ -17,6 +17,42 @@ Here is a suggestion how our *.proto* file can look like. If we come to an agree
 
 <a href="./message.proto">message.proto</a>
 
+#### type: publishKeys
+client --> server
+* **type**: type of message
+* **senId**: id of the sender of the message
+* **senIdKey**: senders's identity key
+* **senPreKey**: sender's signed prekey
+* **senPreKeySig**: sender's prekey signature
+* **senOTP**: a set of sender's one-time prekeys
+
+#### type: fetch keys request
+client --> server
+* **type**: type of message
+* **senId**: id of the sender of the message
+* **reqID**: id of requested user
+
+#### type: fetch keys
+server --> client
+* **type**: type of message
+* **reqId**: id of required user
+* **reqIdKey**: requested identity key IKB
+* **reqPreKey**: requested signed prekey
+* **reqPreKeySig**: requested prekey signature
+* **reqOTP**: (optionally) required one-time prekey
+
+#### type: init message
+client --> server
+* **type**: type of message
+* **senId**: id of the sender of the message
+* **senIdKey**: senders's identity key
+* **senEpKey**: senders's ephemeral key
+* **OTPid**: identifier of which OTP was used
+* **CT**: ciphertext containing _asociated data_ **AD** and encrypted using the shared secret
+
+#### type: message
+client <--> server
+* **type**: type of message
 * **messNum**: message number in the sending chain
 * **prevNum**: length (number of message keys) in the previous sending chain
 * **senRKey**: sender's current ratchet public key
