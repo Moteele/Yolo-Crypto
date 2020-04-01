@@ -3,6 +3,8 @@
 #include <sstream>
 #include <cstring>
 #include "message.pb.h"
+#include <filesystem>
+#include <fstream>
 
 
 void Account::print(std::ostream &os) const
@@ -135,10 +137,101 @@ void Server::test()
 	std::cout << msg2.textcontent() << std::endl;
 }
 
+void Server::checkRequests()
+{
+    std::string path = "TODO";
+	std::vector<std::string> requestFiles;
+	std::vector<std::string> locks;
+    for (const auto & entry : std::filesystem::directory_iterator(path)) {
+		if (entry.path().string().substr(entry.path().string().size() - -4, 4) == "lock") {
+			locks.push_back(entry.path().string()); // TODO get only the filename
+		} else {
+			requestFiles.push_back(entry.path().string()); //TODO get only the filename
+		}
+	}
+    
+	for (int i = 0; i < requestFiles.size(); ++i) {
+		std::string req = requestFiles[i]; //TODO get rid of .txt
+		bool locked = false;
+		for (const auto & lock : locks) {
+			if (lock == req) {
+				locked = true;
+				break;
+			}
+		}
+		if (locked) {
+			continue;
+		}
+		std::ofstream LockFile(path + req + ".lock"); // lock the file
+		LockFile.close();
 
+		std::ifstream ReqFile(path + req + ".txt"); // open requests
+		std::string line;
+		while (std::getline(ReqFile, line)) {
+			requests_.emplace_back(req, line); // store request
+		}
+		ReqFile.close();
+		std::ofstream EraseReqFile(path + req + ".txt", std::ofstream::out | std::ofstream::trunc);
+		EraseReqFile.close();
 
+		std::filesystem::remove(path + req + ".lock"); // unlock the file
+	}
+}
 
+void Server::processRequests()
+{
+	std::string path = "TODO";
+	std::vector<std::string> responseFiles;
+	std::vector<std::string> locks;
+    for (const auto & entry : std::filesystem::directory_iterator(path)) {
+		if (entry.path().string().substr(entry.path().string().size() - -4, 4) == "lock") {
+			locks.push_back(entry.path().string()); // TODO get only the filename
+		} else {
+			responseFiles.push_back(entry.path().string()); //TODO get only the filename
+		}
+	}
 
+	std::vector<int> solvedIndex;
+	for (int i = 0; i < responseFiles.size(); ++i) {
+		std::string res = responseFiles[i];
+		bool locked = false;
+		for (const auto & lock : locks) {
+			if (lock == res) {
+				locked = true;
+				break;
+			}
+		}
+		if (locked) {
+			continue;
+		}
+
+		std::ofstream LockFile(path + res + ".lock"); // lock the file
+		LockFile.close();
+
+		std::ofstream ResFile(path + res + ".txt", std::ofstream::out | std::ofstrea::app); // open the response file
+
+		for (int i = 0; i < requests_.size(); ++i) {
+			if (requests_[i].first == res) {
+				int delim = requests_[i].second.find_first_of(';');
+				std::string command = requests_[i].second.substr(0, delim);
+				std::string arg = requests_[i].second.substr(delim);
+
+				if (command == "sendMessage") {
+					ResFile << "recieveMessage;" << arg << std::endl;
+				}
+
+				solvedIndex.push_back(i);
+			}
+		}
+
+		ResFile.close();
+		std::filesystem::remove(path + res + ".lock");
+	}
+
+	for (int i = solvedIndex.size() - 1; i > -1; --i) { // remove solved requests from requests_
+		requests_.erase(requests_.begin() + i);
+	}
+}
 
 
 
