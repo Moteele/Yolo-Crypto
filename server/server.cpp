@@ -208,7 +208,7 @@ void Server::processRequests()
 		std::ofstream LockFile(path + res + ".lock"); // lock the file
 		LockFile.close();
 
-		std::ofstream ResFile(path + res + ".txt", std::ofstream::out | std::ofstrea::app); // open the response file
+		std::ofstream ResFile(path + res + ".txt", std::ofstream::out | std::ofstream::app); // open the response file
 
 		for (int i = 0; i < requests_.size(); ++i) {
 			if (requests_[i].first == res) {
