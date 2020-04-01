@@ -6,6 +6,7 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <fstream>
+#include <cstdio>
 
 
 void Account::print(std::ostream &os) const
@@ -175,35 +176,47 @@ void Server::checkRequests()
 		if (locked) {
 			continue;
 		}
-		std::cout << "creating lock\n";
-		std::ofstream LockFile(path + req + ".lock"); // lock the file
+		std::ofstream LockFile(path + "/" + req + ".lock"); // lock the file
 		LockFile.close();
 
-		std::ifstream ReqFile(path + req); // open requests
+		std::ifstream ReqFile(path + "/" + req); // open requests
 		std::string line;
 		while (std::getline(ReqFile, line)) {
 			requests_.emplace_back(req, line); // store request
 		}
 		ReqFile.close();
-		std::ofstream EraseReqFile(path + req, std::ofstream::out | std::ofstream::trunc);
+		std::ofstream EraseReqFile(path + "/" + req, std::ofstream::out | std::ofstream::trunc);
 		EraseReqFile.close();
 
-		//std::boost::filesystem::remove(path + req + ".lock"); // unlock the file
+		std::string a = path + "/" + req + ".lock";
+		std::remove(a.c_str()); // unlock the file
 	}
 }
 
 void Server::processRequests()
 {
-	/*std::string path = "TODO";
+	std::string path = "tmp_files/res";
 	std::vector<std::string> responseFiles;
 	std::vector<std::string> locks;
-    for (const auto & entry : std::boost::filesystem::directory_iterator(path)) {
-		if (entry.path().string().substr(entry.path().string().size() - -4, 4) == "lock") {
-			locks.push_back(entry.path().string()); // TODO get only the filename
-		} else {
-			responseFiles.push_back(entry.path().string()); //TODO get only the filename
+
+	struct dirent *entry;
+    DIR *dir = opendir("tmp_files/res");
+    if (dir == NULL) {
+        return;
+    }
+    while ((entry = readdir(dir)) != NULL) {
+		std::string fname = entry->d_name;
+
+		if (fname == "." || fname == ".." || fname == "_test") {
+			continue;
 		}
-	}
+		if (fname.substr(fname.size() - 4, 4) == "lock") {
+			locks.push_back(fname);
+		} else {
+			responseFiles.push_back(fname);
+		}
+    }
+    closedir(dir);
 
 	std::vector<int> solvedIndex;
 	for (int i = 0; i < responseFiles.size(); ++i) {
@@ -219,11 +232,10 @@ void Server::processRequests()
 			continue;
 		}
 
-		std::ofstream LockFile(path + res + ".lock"); // lock the file
+		std::ofstream LockFile(path + "/" + res + ".lock"); // lock the file
 		LockFile.close();
 
-		std::ofstream ResFile(path + res + ".txt", std::ofstream::out | std::ofstream::app); // open the response file
-
+		std::ofstream ResFile(path + "/" + res, std::ofstream::out | std::ofstream::app); // open the response file
 		for (int i = 0; i < requests_.size(); ++i) {
 			if (requests_[i].first == res) {
 				int delim = requests_[i].second.find_first_of(';');
@@ -239,10 +251,12 @@ void Server::processRequests()
 		}
 
 		ResFile.close();
-		std::boost::filesystem::remove(path + res + ".lock");
+
+		std::string a = path + "/" + res + ".lock";
+		std::remove(a.c_str()); // unlock the file
 	}
 
 	for (int i = solvedIndex.size() - 1; i > -1; --i) { // remove solved requests from requests_
 		requests_.erase(requests_.begin() + i);
-	}*/
+	}
 }
