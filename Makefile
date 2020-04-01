@@ -8,19 +8,27 @@ LDFLAGS:=-ldl $(LIBLDFLAGS)
 SOURCES_SERVER=server/server.cpp server/message.pb.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER)
+SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
+OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
 DEPS=server/server.hpp server/util.hpp server/message.pb.h
 
-all: test
-
+#all: test
+all: server-build
 
 test: test-server
 	./test-server
+
+server-build: serverApp
+#	./main
 
 debug:
 	echo $(CXXFLAGS); echo $(LDFLAGS)
 
 test-server: $(OBJECTS_SERVER_TEST)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+serverApp: $(OBJECTS_SERVER_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp $(DEPS)

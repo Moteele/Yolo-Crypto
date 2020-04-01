@@ -2,6 +2,7 @@
 
 #include "server.hpp"
 #include <thread>
+#include <chrono>
 
 int main()
 {
@@ -9,9 +10,10 @@ int main()
 	Server theServer(db);
 
 	// check & process requests every five seconds
+	using namespace std::chrono_literals;
 	while (true) {
 		theServer.checkRequests();
 		theServer.processRequests();
-		std::this_thread.sleep_for(5s);
+		std::this_thread::sleep_for(5s);
 	}
 }

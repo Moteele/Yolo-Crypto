@@ -9,6 +9,7 @@
 #include <utility>
 #include <memory>
 #include <iostream>
+#include <fstream>
 #include <ostream>
 #include <set>
 #include <dlfcn.h>
