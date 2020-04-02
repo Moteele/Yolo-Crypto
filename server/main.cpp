@@ -14,6 +14,6 @@ int main()
 	while (true) {
 		theServer.checkRequests();
 		theServer.processRequests();
-		std::this_thread::sleep_for(5s);
+		std::this_thread::sleep_for(1s);
 	}
 }

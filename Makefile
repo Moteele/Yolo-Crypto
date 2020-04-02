@@ -11,16 +11,23 @@ SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER
 SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
 OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
-DEPS=server/server.hpp server/util.hpp server/message.pb.h
+DEPS=server/server.hpp server/util.hpp server/message.pb.h client/client.hpp
+
+SOURCES_CLIENT=client/client.cpp
+OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
+SOURCES_CLIENT_MAIN=client/main.cpp $(SOURCES_CLIENT)
+OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)
 
 #all: test
-all: server-build
+all: server-build client-build
 
 test: test-server
 	./test-server
 
 server-build: serverApp
 #	./main
+
+client-build: clientApp
 
 debug:
 	echo $(CXXFLAGS); echo $(LDFLAGS)
@@ -29,6 +36,9 @@ test-server: $(OBJECTS_SERVER_TEST)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 serverApp: $(OBJECTS_SERVER_MAIN)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+clientApp: $(OBJECTS_CLIENT_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp $(DEPS)

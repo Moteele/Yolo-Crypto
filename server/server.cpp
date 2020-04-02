@@ -156,6 +156,10 @@ void Server::checkRequests()
 		if (fname == "." || fname == ".." || fname == "_test") {
 			continue;
 		}
+		if (fname.size() < 5) {
+			requestFiles.push_back(fname);
+			continue;
+		}
 		if (fname.substr(fname.size() - 4, 4) == "lock") {
 			locks.push_back(fname);
 		} else {
@@ -176,12 +180,12 @@ void Server::checkRequests()
 		if (locked) {
 			continue;
 		}
-		std::ofstream LockFile(path + "/" + req + ".lock"); // lock the file
-		LockFile.close();
+		std::ofstream lockFile(path + "/" + req + ".lock"); // lock the file
+		lockFile.close();
 
-		std::ifstream ReqFile(path + "/" + req); // open requests
+		std::ifstream reqFile(path + "/" + req); // open requests
 		std::string line;
-		while (std::getline(ReqFile, line)) {
+		while (std::getline(reqFile, line)) {
 			int delim = line.find_first_of(';');
 			std::string command = line.substr(0, delim);
 
@@ -196,9 +200,9 @@ void Server::checkRequests()
 
 			requests_.emplace_back(reciever, line); // store request
 		}
-		ReqFile.close();
-		std::ofstream EraseReqFile(path + "/" + req, std::ofstream::out | std::ofstream::trunc);
-		EraseReqFile.close();
+		reqFile.close();
+		std::ofstream eraseReqFile(path + "/" + req, std::ofstream::out | std::ofstream::trunc);
+		eraseReqFile.close();
 
 		std::string a = path + "/" + req + ".lock";
 		std::remove(a.c_str()); // unlock the file
@@ -220,6 +224,10 @@ void Server::processRequests()
 		std::string fname = entry->d_name;
 
 		if (fname == "." || fname == ".." || fname == "_test") {
+			continue;
+		}
+		if (fname.size() < 5) {
+			responseFiles.push_back(fname);
 			continue;
 		}
 		if (fname.substr(fname.size() - 4, 4) == "lock") {
