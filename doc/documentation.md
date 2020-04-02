@@ -1,5 +1,10 @@
 # Documentation
-This file describes the inner workings of the program
+This file describes the inner workins of the program
+
+## Table of contents
+* [Messages](./documentation.md#messages)
+* [Administrative api](./documentation.md#administrative-api)
+* [Build](./documentation.md#build)
 
 ## Messages
 The application uses [Protocol Buffers](https://developers.google.com/protocol-buffers) for serializing messages between client and server.
