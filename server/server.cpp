@@ -182,7 +182,19 @@ void Server::checkRequests()
 		std::ifstream ReqFile(path + "/" + req); // open requests
 		std::string line;
 		while (std::getline(ReqFile, line)) {
-			requests_.emplace_back(req, line); // store request
+			int delim = line.find_first_of(';');
+			std::string command = line.substr(0, delim);
+
+			std::string tmp = line.substr(delim + 1, line.size() - 1 - delim);
+
+			delim = tmp.find_first_of(';');
+
+			std::string recieverAndMessage = tmp.substr(delim + 1, tmp.size() - 1 - delim);
+
+			delim = recieverAndMessage.find_first_of(';');
+			std::string reciever = recieverAndMessage.substr(0, delim);
+
+			requests_.emplace_back(reciever, line); // store request
 		}
 		ReqFile.close();
 		std::ofstream EraseReqFile(path + "/" + req, std::ofstream::out | std::ofstream::trunc);
@@ -240,10 +252,17 @@ void Server::processRequests()
 			if (requests_[i].first == res) {
 				int delim = requests_[i].second.find_first_of(';');
 				std::string command = requests_[i].second.substr(0, delim);
-				std::string arg = requests_[i].second.substr(delim);
+
+				std::string tmp = requests_[i].second.substr(delim + 1);
+
+				delim = tmp.find_first_of(';');
+				std::string sender = tmp.substr(0, delim);
+				tmp = tmp.substr(delim + 1);
+				delim = tmp.find_first_of(';');
+				std::string message = tmp.substr(delim + 1);
 
 				if (command == "sendMessage") {
-					ResFile << "recieveMessage;" << arg << std::endl;
+					ResFile << "recieveMessage;" << sender << ";" << message << std::endl;
 				}
 
 				solvedIndex.push_back(i);
