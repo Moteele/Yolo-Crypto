@@ -6,8 +6,10 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <utility>
 #include <memory>
 #include <iostream>
+#include <fstream>
 #include <ostream>
 #include <set>
 #include <dlfcn.h>
@@ -103,6 +105,7 @@ public:
 	 */
 	void print(std::ostream &os) const;
 
+
 };
 
 class Server
@@ -112,6 +115,10 @@ private:
 	std::map<unsigned int, Account> database_;
 	std::set<unsigned int> online_;
 	void *cryptoLib_;
+
+	// temporary atribute just for recieving requests
+	// TODO: delete later
+	std::vector<std::pair<std::string, std::string>> requests_;
 
 public:
 	/**
@@ -216,6 +223,11 @@ public:
 	 * test function
 	 */
 	void test();
+
+
+	void checkRequests();
+
+	void processRequests();
 };
 
 #endif // SERVER_HPP
