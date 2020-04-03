@@ -11,3 +11,4 @@ before_install:
 - make
 - sudo make install
 - sudo ldconfig
+- cd ..
