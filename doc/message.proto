@@ -1,9 +1,15 @@
 syntax = "proto2";
 
 message Message {
-  required int32 senId = 1;
-  required int32 recId = 2;
-
-  required string textContent = 3;
-  repeated string kdfKeys = 4;
+  required MsgType type = 1;
+  optional int32 senId = 2;
+  optional string senIdKey = 3;
+  
+  optional string CT = 14;
+  optional int32 messNum = 15;
+  optional int32 prevNum = 16;
+  optional string senRKey = 17;
+  optional int32 recId = 18;
+  optional string textContent = 19;
+  optional string timestamp = 20;
 }
