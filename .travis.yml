@@ -2,13 +2,4 @@ language: c
 compiler: gcc
 script: make && make test
 before_install:
-- sudo apt-get -y install autoconf automake libtool curl make g++ unzip pkg-config
-- git clone https://github.com/protocolbuffers/protobuf.git
-- cd protobuf
-- git submodule update --init --recursive
-- ./autogen.sh
-- ./configure
-- make
-- sudo make install
-- sudo ldconfig
-- cd ..
+- sudo apt-get -y install autoconf automake libtool curl make g++ unzip pkg-config protobuf-compiler libprotobuf-dev libprotoc-dev
