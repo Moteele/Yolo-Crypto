@@ -3,3 +3,4 @@ compiler: gcc
 script: make && make test
 before_install:
 - sudo apt-get -y install autoconf automake libtool curl make g++ unzip pkg-config protobuf-compiler libprotobuf-dev libprotoc-dev
+- sudo ldconfig
