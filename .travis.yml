@@ -2,4 +2,4 @@ language: c
 compiler: gcc
 script: make && make test
 before_install:
-- sudo apt-get -y install autoconf automake libtool curl make g++ unzip libprotobuf-dev pkg-config
+- sudo apt-get -y install autoconf automake libtool curl make g++ unzip libprotobuf-dev ibprotoc-dev pkg-config
