@@ -127,20 +127,22 @@ public:
 	 */
 	Server(std::map<unsigned int, Account> &database) : database_(database)
 	{
-		cryptoLib_ = dlopen(LIB_PATH, RTLD_LAZY);
+		//cryptoLib_ = dlopen(LIB_PATH, RTLD_LAZY);
 
-		if (!cryptoLib_) {
-			std::cerr << dlerror();
-			throw std::runtime_error(dlerror());
-		}
+		//if (!cryptoLib_) {
+		//	std::cerr << dlerror();
+		//	throw std::runtime_error(dlerror());
+		//}
 	}
+
+	Server() {}
 
 	/**
 	 * Destructor
 	 */
 	~Server()
 	{
-		dlclose(cryptoLib_);
+		//dlclose(cryptoLib_);
 	}
 
 	/**
