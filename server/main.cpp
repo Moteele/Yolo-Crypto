@@ -12,8 +12,10 @@ int main()
 	// check & process requests every five seconds
 	using namespace std::chrono_literals;
 	while (true) {
+		theServer.loadUsers();
 		theServer.checkRequests();
 		theServer.processRequests();
+		theServer.writeUsers();
 		std::this_thread::sleep_for(1s);
 	}
 }

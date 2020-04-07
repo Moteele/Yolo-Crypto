@@ -1,10 +1,129 @@
-#include "client.hpp"
 #include <iostream>
+#include "client.hpp"
+
+#include <thread>
+#include <chrono>
+#include "../utils/functions.h"
+#include "../utils/constants.h"
 
 
 bool Client::develFileExists(const std::string &path) {
     std::ifstream file(path);
     return file.good();
+}
+
+void Client::writeToReq(const std::string &req) {
+    while (isFileLocked(REQEST_FILE_PATH)) {
+        //waiting
+    }
+
+    // lock requests
+    lockFile(REQEST_FILE_PATH);
+
+    std::ofstream reqFile(REQEST_FILE_PATH, std::ofstream::out | std::ofstream::app);
+    reqFile << req << std::endl;
+    reqFile.close();
+    gotResponse_ = false;
+    unlockFile(REQEST_FILE_PATH);
+}
+
+void Client::develAuth() {
+    std::cout << "Login:" << std::endl;
+    std::string name;
+    std::getline(std::cin, name);
+    std::cout << "Password:" << std::endl;
+    std::string pwd;
+    std::getline(std::cin, pwd);
+    std::cout << std::endl;
+
+    std::string reqText = name + ";auth;" + pwd + "\n";
+    name_ = name;
+    writeToReq(reqText);
+}
+
+void Client::develCreateAcc() {
+    std::cout << "Username:" << std::endl;
+    std::string name;
+    std::getline(std::cin, name);
+    std::cout << "Password:" << std::endl;
+    std::string pwd;
+    std::getline(std::cin, pwd);
+    std::cout << std::endl;
+
+    lockFile("tmp_files/req/" + name);
+    std::ofstream req("tmp_files/req/" + name);
+    req << pwd << std::endl;
+    req.close();
+    unlockFile("tmp_files/req/" + name);
+
+    name_ = name;
+}
+
+void Client::develAwaitCreation() {
+    std::string expectedResponsePath = "tmp_files/res/" + name_;
+    while (!develFileExists(expectedResponsePath)) {
+        // wait for the response
+    }
+    lockFile(expectedResponsePath);
+    std::ifstream resFile(expectedResponsePath);
+    std::string line;
+    std::getline(resFile, line);
+    if (line == "Success") {
+        std::cout << "Account created\n" << std::endl;
+        isAuthenticated_ = true;
+    } else {
+        std::cout << "Something went wrong: " << line << "\n" << std::endl;
+    }
+    resFile.close();
+    std::remove(expectedResponsePath.c_str());
+    unlockFile(expectedResponsePath);
+}
+
+void Client::readResponse() {
+    while (isFileLocked(RESPONSE_FILE_PATH)) {
+        // waiting
+    }
+    lockFile(RESPONSE_FILE_PATH);
+    std::ifstream resFile(RESPONSE_FILE_PATH);
+    std::string line;
+    std::string newName = RESPONSE_FILE_PATH + "_new";
+    std::ofstream newRes(newName);
+    while (std::getline(resFile, line)) {
+        int delim = line.find_first_of(';');
+        std::string resRec = line.substr(0, delim);
+        if (resRec == name_) {
+            gotResponse_ = true;
+            std::string tmp = line.substr(delim + 1);
+            delim = tmp.find_first_of(';');
+            std::string command = tmp.substr(0, delim);
+            std::string message = tmp.substr(delim + 1);
+            if (command == "auth") {
+                if (message == "Success") {
+                    isAuthenticated_ = true;
+                } else {
+                    std::cout << "Authentication failed: " << message << std::endl;
+                    return;
+                }
+            }
+            if (command == "sendMessage") {
+                std::cout << message << std::endl;
+            }
+            if (command == "fetchMessages") {
+                Mess msg;
+                msg.ParseFromString(message);
+                std::cout << "msg: " << message;
+                messages_.push_back(msg);
+            }
+        } else {
+            newRes << line << std::endl;
+        }
+    }
+    resFile.close();
+    newRes.close();
+    std::remove(RESPONSE_FILE_PATH.c_str());
+    std::rename(newName.c_str(), RESPONSE_FILE_PATH.c_str());
+    std::remove(newName.c_str());
+    unlockFile(RESPONSE_FILE_PATH);
 }
 
 void Client::develSendMessage()
@@ -17,71 +136,21 @@ void Client::develSendMessage()
     std::getline(std::cin, message);
     std::cout << std::endl;
 
-    std::string reqPath = "tmp_files/req/" + name_;
-    std::string lockPath = reqPath + ".lock";
-
-    while (develFileExists(lockPath)) {
-        //waiting
-    }
-
-    // lock requests
-    std::ifstream lock(lockPath);
-    lock.close();
-
-    std::ofstream req(reqPath, std::ofstream::out | std::ofstream::app);
-    req << "sendMessage;" << name_ << ";" << reciever << ";" << message << "\n";
-    req.close();
-
-    std::remove(lockPath.c_str());
+    std::string reqText = name_ + ";sendMessage;" + reciever + ";" + message;
+    writeToReq(reqText);
 }
 
 void Client::develReadMessages()
 {
-    std::string resPath = "tmp_files/res/" + name_;
-    std::string lockPath = resPath + ".lock";
-
-    while (develFileExists(lockPath)) {
-        //waiting
-    }
-
-    std::ifstream lock(lockPath);
-    lock.close();
-
-    std::ifstream res(resPath);
-    std::string line;
-    while (std::getline(res, line)) {
-        int delim = line.find_first_of(';');
-        std::string command = line.substr(0, delim);
-
-        std::string senderAndMessage = line.substr(delim + 1, line.size() - 1 - delim);
-        delim = senderAndMessage.find_first_of(';');
-
-        std::string sender = senderAndMessage.substr(0, delim);
-        std::string message = senderAndMessage.substr(delim + 1, senderAndMessage.size() - 1 - delim);
-
-        if (command == "recieveMessage") {
-            messages_.emplace_back(sender, message);
-        }
-    }
-    res.close();
-    std::ofstream eraseRes(resPath, std::ofstream::out | std::ofstream::trunc);
-    eraseRes.close();
-
-    std::remove(lockPath.c_str());
-
-    printMessages();
+    std::string reqText = name_ + ";fetchMessages";
+    writeToReq(reqText);
 }
 
 void Client::printMessages()
 {
-    if (messages_.size() == 0) {
-        std::cout << "\nNo new messages\n" << std::endl;
-        return;
-    }
-
-    for (const auto & pair : messages_) {
-        std::cout << "\nMessage from: " << pair.first << std::endl;
-        std::cout << pair.second << "\n" << std::endl;
+    for (const auto & message : messages_) {
+        std::cout << "\nMessage from: " << message.sender() << " to: " << message.reciever() << std::endl;
+        std::cout << message.text() << "\n" << std::endl;
     }
 
     messages_.clear();
@@ -90,19 +159,48 @@ void Client::printMessages()
 
 void Client::develRunClient()
 {
+    using namespace std::chrono_literals;
     while (true) {
+        if (!isAuthenticated_) {
+            std::string chosen;
 
-        std::string chosen;
+            std::cout << "Welcome, choose action:" << std::endl;
+            std::cout << "1 - Create account" << std::endl;
+            std::cout << "2 - Sign in" << std::endl;
+            std::getline(std::cin, chosen);
 
-        std::cout << "Choose an action:" << std::endl;
-        std::cout << "1 - send a message" << std::endl;
-        std::cout << "2 - read messages" << std::endl;
-        std::getline(std::cin, chosen);
+            if (chosen == "1") {
+                develCreateAcc();
+                develAwaitCreation();
+            } else if (chosen == "2") {
+                develAuth();
+                while (!gotResponse_) {
+                    readResponse();
+                    std::this_thread::sleep_for(1s);
+                }
+            }
+        } else {
+            std::string chosen;
 
-        if (chosen == "1") {
-            develSendMessage();
-        } else if (chosen == "2") {
-            develReadMessages();
+            std::cout << "Choose an action:" << std::endl;
+            std::cout << "1 - send a message" << std::endl;
+            std::cout << "2 - read messages" << std::endl;
+            std::getline(std::cin, chosen);
+
+            if (chosen == "1") {
+                develSendMessage();
+                while (!gotResponse_) {
+                    readResponse();
+                    std::this_thread::sleep_for(1s);
+                }
+            } else if (chosen == "2") {
+                develReadMessages();
+                while (!gotResponse_) {
+                    readResponse();
+                    std::this_thread::sleep_for(1s);
+                }
+                printMessages();
+            }
         }
     }
 }

@@ -15,6 +15,8 @@
 #include <dlfcn.h>
 #include <iomanip>
 
+#include "../utils/userAcc.pb.h"
+#include "../utils/mess.pb.h"
 
 
 class Account
@@ -118,7 +120,10 @@ private:
 
 	// temporary atribute just for recieving requests
 	// TODO: delete later
-	std::vector<std::pair<std::string, std::string>> requests_;
+	std::vector<std::string> requests_;
+	std::vector<std::string> responses_;
+
+	std::vector<userAcc> users_;
 
 public:
 	/**
@@ -228,6 +233,20 @@ public:
 	void checkRequests();
 
 	void processRequests();
+
+	void loadUsers();
+
+	void writeUsers();
+
+	int tryCreateAccount(const std::string &name);
+
+	const std::pair<std::string, std::string> getRequesterAndCommand(const std::string &request);
+
+	void performSendMessage(const std::string &req);
+
+	void performAuth(const std::string &req);
+
+	void performFetchMessages(const std::string &req);
 };
 
 #endif // SERVER_HPP

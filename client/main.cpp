@@ -3,11 +3,7 @@
 
 int main()
 {
-    std::cout << "Client name:" << std::endl;
-    std::string name;
-    std::cin >> name;
+    Client leClient;
 
-    Client client(name);
-
-    client.develRunClient();
+    leClient.develRunClient();
 }

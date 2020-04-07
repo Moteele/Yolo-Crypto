@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+message Mess {
+  required string sender = 1;
+  required string reciever = 2;
+  required string text = 3;
+}
+
