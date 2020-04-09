@@ -160,46 +160,74 @@ void Client::printMessages()
 void Client::develRunClient()
 {
     using namespace std::chrono_literals;
+    std::string chosen;
     while (true) {
         if (!isAuthenticated_) {
-            std::string chosen;
 
             std::cout << "Welcome, choose action:" << std::endl;
             std::cout << "1 - Create account" << std::endl;
             std::cout << "2 - Sign in" << std::endl;
             std::getline(std::cin, chosen);
 
-            if (chosen == "1") {
-                develCreateAcc();
+
+	    try {
+		stoi(chosen);
+	    } catch(...) {
+		std::cout << "Invalid choice" << std::endl;
+		continue;
+	    }
+
+	    switch (std::stoi(chosen)) {
+	    case 1:
+		develCreateAcc();
                 develAwaitCreation();
-            } else if (chosen == "2") {
+		break;
+	    case 2:
                 develAuth();
+		    std::cout << "here" << std::endl;
                 while (!gotResponse_) {
+		    std::cout << "waiting.." << std::endl;
                     readResponse();
                     std::this_thread::sleep_for(1s);
+		    std::cout << "waiting.." << std::endl;
                 }
+		break;
+	    default:
+		std::cout << "Invalid choice" << std::endl;
+
             }
         } else {
-            std::string chosen;
 
-            std::cout << "Choose an action:" << std::endl;
+	    std::cout << "Choose an action:" << std::endl;
             std::cout << "1 - send a message" << std::endl;
             std::cout << "2 - read messages" << std::endl;
             std::getline(std::cin, chosen);
 
-            if (chosen == "1") {
+	    try {
+		stoi(chosen);
+	    } catch(...) {
+		std::cout << "Invalid choice" << std::endl;
+		continue;
+	    }
+
+	    switch (stoi(chosen)) {
+	    case 1:
                 develSendMessage();
                 while (!gotResponse_) {
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
-            } else if (chosen == "2") {
+		break;
+	    case 2:
                 develReadMessages();
                 while (!gotResponse_) {
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
                 printMessages();
+		break;
+	    default:
+		std::cout << "Invalid choice" << std::endl;
             }
         }
     }
