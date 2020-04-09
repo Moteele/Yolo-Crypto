@@ -1,3 +1,6 @@
+SHELL := bash
+.SHELLFLAGS := -eu -o pipefail -c
+
 # adds protobuf default installation path for pkg-config
 LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
@@ -19,19 +22,19 @@ OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_CLIENT_MAIN=client/main.cpp $(SOURCES_CLIENT)
 OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)
 
+
 #all: test
 all: server-build client-build
 
 test: test-server
 	./test-server
 
+debug: CXXFLAGS += -DDEBUG -g
+debug: server-build client-build
+
 server-build: serverApp
 #	./main
-
 client-build: clientApp
-
-debug:
-	echo $(CXXFLAGS); echo $(LDFLAGS)
 
 test-server: $(OBJECTS_SERVER_TEST)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
