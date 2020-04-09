@@ -214,8 +214,12 @@ void Server::test()
 	std::cout << "PEER2:" << std::endl;
 	Util::printKeys(peer2);
 
-	Util::ecdh(key1, peer2);
-	Util::ecdh(key2, peer1);
+	unsigned char secret1[64];
+	unsigned char secret2[64];
+	size_t ssize1;
+	size_t ssize2;
+	Util::ecdh(key1, peer2, secret1, &ssize1);
+	Util::ecdh(key2, peer1, secret2, &ssize2);
 
 	unsigned char tbs[32] = "Message42sfjdlasjkljkl";
 	unsigned char sig[128];
@@ -230,6 +234,15 @@ void Server::test()
 	EVP_PKEY_free(peer1);
 	EVP_PKEY_free(peer2);
 	EVP_PKEY_free(key3);
+
+	std::cout << "==========================kdf===============================" << std::endl;
+	unsigned char derived[64];
+	size_t delength = 64;
+	Util::kdf(secret1, ssize1, derived, &delength);
+	Util::printUnsignedChar(derived, delength);
+	Util::kdf(secret2, ssize2, derived, &delength);
+	Util::printUnsignedChar(derived, delength);
+	std::cout << "=========================/kdf===============================" << std::endl;
 }
 
 void Server::checkRequests()

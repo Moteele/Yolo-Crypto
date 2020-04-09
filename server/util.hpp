@@ -17,10 +17,19 @@
 
 
 
+/**
+ * class with cryptographic functions
+ * TODO: add checks
+ */
 class Util {
 private:
 	Util() {}
 public:
+	/**
+	 * prints an unsigned char as hexadecimal to std::cout
+	 * @param array		array of unsigned chars
+	 * @param len		length of array
+	 */
 	static void printUnsignedChar(unsigned char *array, size_t len)
 	{
 		std::cout << std::hex;
@@ -81,7 +90,7 @@ public:
 	}
 
 	/**
-	 * generates a X25519 keypair and writes it to @param key
+	 * generates an X25519 keypair and writes it to @param key
 	 * @param key		EVP_PKEY ** structure
 	 */
 	static void genKeyX25519(EVP_PKEY **key)
@@ -96,7 +105,7 @@ public:
 	}
 
 	/**
-	 * generates a ED25519 keypair and writes it to @param key
+	 * generates an ED25519 keypair and writes it to @param key
 	 * @param key		EVP_PKEY ** structure
 	 */
 	static void genKeyED25519(EVP_PKEY **key)
@@ -115,37 +124,36 @@ public:
 	 * calculates shared secret from two X25519 keys.
 	 * @param key		complete keypair
 	 * @param peer		public key of the other side
+	 * @param secret	shared secret
+	 * @param ssize		size of shared secret
 	 */
-	static void ecdh(EVP_PKEY *key, EVP_PKEY *peer)
+	static void ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize)
 	{
-		EVP_PKEY_CTX *ctx;
-		unsigned char secret[1024];
-		size_t len = 0;
+	        EVP_PKEY_CTX *ctx;
 
-		ctx = EVP_PKEY_CTX_new(key, NULL);
+	        ctx = EVP_PKEY_CTX_new(key, NULL);
 
-		if (EVP_PKEY_derive_init(ctx) != 1) {
-			std::cout << "ctx initialization failed" << std::endl;
-			return;
-		}
+	        if (EVP_PKEY_derive_init(ctx) != 1) {
+	                std::cout << "ctx initialization failed" << std::endl;
+	                return;
+	        }
 
-		if (EVP_PKEY_derive_set_peer(ctx, peer) != 1) {
-			std::cout << "setting peer failed" << std::endl;
-			return;
-		}
+	        if (EVP_PKEY_derive_set_peer(ctx, peer) != 1) {
+	                std::cout << "setting peer failed" << std::endl;
+	                return;
+	        }
 
-		if (EVP_PKEY_derive(ctx, NULL, &len) != 1) {
-			std::cout << "getting length failed" << std::endl;
-			return;
-		}
+	        if (EVP_PKEY_derive(ctx, NULL, ssize) != 1) {
+	                std::cout << "getting length failed" << std::endl;
+	                return;
+	        }
 
-		std::cout << "Length of secret = " << len << std::endl;
+	        std::cout << "Length of secret = " << *ssize << std::endl;
 
-		EVP_PKEY_derive(ctx, secret, &len);
+	        EVP_PKEY_derive(ctx, secret, ssize);
+	        printUnsignedChar(secret, *ssize);
 
-		printUnsignedChar(secret, len);
-
-		EVP_PKEY_CTX_free(ctx);
+	        EVP_PKEY_CTX_free(ctx);
 	}
 
 	/**
@@ -214,6 +222,117 @@ public:
 		}
 
 		EVP_MD_CTX_free(mdctx);
+	}
+
+	/**
+	 * derives a key from shared secret with sha512
+	 * @param secret		shared secret
+	 * @param ssize			length of shared secret
+	 * @param key			derived key
+	 * @param keylen		length of key
+	 */
+	static void kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen)
+	{
+		while (ERR_get_error() != 0) {}
+		EVP_KDF *kdf;
+		EVP_KDF_CTX *kctx = NULL;
+		unsigned char derived[64];
+		OSSL_PARAM params[5], *p = params;
+
+
+		kdf = EVP_KDF_fetch(NULL, "hkdf", NULL);
+		if (kdf == NULL) {
+			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+			return;
+		}
+
+		kctx = EVP_KDF_CTX_new(kdf);
+
+		if (kctx == NULL) {
+			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+			return;
+		}
+
+		// for X25519 it is sequence of 32 0xFF bytes
+		// for X448 it is sequence of 57 0xFF bytes
+		unsigned char FKM[32 + ssize];
+		std::memset(FKM, 0xFF, 32);
+		std::memcpy(&FKM[32], secret, ssize);
+
+		// salt is zero-filled byte sequence with same length as hash output
+		unsigned char salt[64];
+		std::memset(salt, 0, 64);
+		// not particularly nice
+		*p++ = OSSL_PARAM_construct_utf8_string("digest", const_cast<char *>("sha512"), static_cast<size_t>(7));
+		*p++ = OSSL_PARAM_construct_octet_string("salt", salt, static_cast<size_t>(64));
+		*p++ = OSSL_PARAM_construct_octet_string("key", FKM, ssize + 32);
+		*p++ = OSSL_PARAM_construct_octet_string("info", (void *)("yolo"), static_cast<size_t>(4));
+		*p = OSSL_PARAM_construct_end();
+
+		EVP_KDF_CTX_set_params(kctx, params);
+
+		EVP_KDF_derive(kctx, key, 64);
+
+		EVP_KDF_free(kdf);
+		EVP_KDF_CTX_free(kctx);
+	}
+
+	/**
+	 * encrypts text using aes-256 in cbc mode
+	 * @param plain		plaintext to be encrypted
+	 * @param plen		length of the plaintext
+	 * @param key		key used for encryption, must be 32 bytes long
+	 * @param iv		initialization vector, must be 16 bytes long
+	 * @param ciphertext	buffer where the ciphertext is written
+	 * @return length of ciphertext
+	 */
+	static int aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext)
+	{
+		int len = plen;
+		int clen = 0;
+		EVP_CIPHER_CTX *ctx;
+
+		ctx = EVP_CIPHER_CTX_new();
+
+		EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+
+		EVP_EncryptUpdate(ctx, ciphertext, &len, plain, plen);
+		clen = len;
+
+		EVP_EncryptFinal_ex(ctx, ciphertext + len, &len);
+		clen += len;
+
+		EVP_CIPHER_CTX_free(ctx);
+		return clen;
+	}
+
+	/**
+	 * decrypts ciphertext from aes-256 in cbc mode
+	 * @param ciphertext	encrypted text
+	 * @param clen		length of ciphertext
+	 * @param key		key used for decryption, must be 32 bytes long
+	 * @param iv		initialization vector, must be 16 bytes long
+	 * @param plain		buffer, where the decrypted text is written
+	 * @return length of decrypted plaintext
+	 */
+	static int aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *key, unsigned char *iv, unsigned char *plain)
+	{
+		int len;
+		int plen;
+		EVP_CIPHER_CTX *ctx;
+
+		ctx = EVP_CIPHER_CTX_new();
+
+		EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+
+		EVP_DecryptUpdate(ctx, plain, &len, ciphertext, clen);
+		plen = len;
+
+		EVP_DecryptFinal_ex(ctx, plain + len, &len);
+		plen += len;
+
+		EVP_CIPHER_CTX_free(ctx);
+		return plen;
 	}
 };
 
