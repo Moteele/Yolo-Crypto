@@ -1,5 +1,6 @@
 #include "server.hpp"
 #include "util.hpp"
+#include <array>
 #include <sstream>
 #include <cstring>
 #include "message.pb.h"
@@ -116,167 +117,119 @@ void Server::listOnline(std::ostream &os) const
 
 void Server::test()
 {
-	//Message msg;
-	//Message msg2;
-	//msg.set_recid(42);
-	//msg.set_senid(32);
-	//msg.clear_textcontent();
-	//msg.set_textcontent("this is some text");
-	//msg.add_kdfkeys("key0");
-	//msg.add_kdfkeys("key1");
-	//msg.add_kdfkeys("key2");
-	//msg.add_kdfkeys("key3");
+	EVP_KDF *kdf;
 
-	//std::cout << msg.DebugString() << std::endl;
+	Message msg;
+	Message msg2;
+	msg.set_recid(42);
+	msg.set_senid(32);
+	msg.clear_textcontent();
+	msg.set_textcontent("this is some text");
+	msg.add_kdfkeys("key0");
+	msg.add_kdfkeys("key1");
+	msg.add_kdfkeys("key2");
+	msg.add_kdfkeys("key3");
 
-	//std::string str;
+	std::cout << msg.DebugString() << std::endl;
 
-	//msg.SerializeToString(&str);
+	std::string str;
 
-	//std::cout << "serialized message = " << str << std::endl;
+	msg.SerializeToString(&str);
 
-	//msg2.ParseFromString(str);
+	std::cout << "serialized message = " << str << std::endl;
 
-	//std::cout << std::endl;
+	msg2.ParseFromString(str);
 
-	//std::cout << msg2.DebugString() << std::endl;
-	//std::cout << msg2.textcontent() << std::endl;
+	std::cout << std::endl;
 
-
-	/* mbedtls static include tests */
-
-	//unsigned char hash[64];
-
-	//unsigned char toHash[6] = { 'a', 'a', 'k', 'k', 'a', 'a' };
-
-	//mbedtls_sha512_ret(toHash, 6, hash, 0);
-
-	//std::stringstream buff;
-
-	//buff << std::hex;
-
-	//for (size_t i = 0; i < 64; ++i) {
-	//        buff << std::setfill('0') << std::setw(2) << static_cast<unsigned>(hash[i]);
-	//}
-
-	//buff << std::dec;
-
-	//std::cout << buff.str() << std::endl;
-	std::cout << "It works!" << std::endl;
-
-	//mbedtls_ecp_group grp;
-	//mbedtls_ecp_group_init(&grp);
-	//mbedtls_ecp_group_load(&grp, mbedtls_ecp_group_id::MBEDTLS_ECP_DP_CURVE25519);
-
-	//mbedtls_mpi priv;
-	//mbedtls_ecp_point point;
-	//mbedtls_ecp_point_init(&point);
-	//mbedtls_mpi_init(&priv);
-
-	mbedtls_ctr_drbg_context ctr_drbg;
-	mbedtls_entropy_context entropy;
+	std::cout << msg2.DebugString() << std::endl;
+	std::cout << msg2.textcontent() << std::endl;
 
 
-	mbedtls_ctr_drbg_init(&ctr_drbg);
-	mbedtls_entropy_init(&entropy);
+	/* openssl static include tests */
 
-	mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, (const unsigned char *) "RANDOM_GEN", 10);
+	EVP_PKEY *key1 = NULL;
+	EVP_PKEY *key2 = NULL;
+	EVP_PKEY *peer1 = EVP_PKEY_new();
+	EVP_PKEY *peer2 = EVP_PKEY_new();
 
+	EVP_PKEY *key3 = NULL;
 
-	//mbedtls_ecp_gen_keypair(&grp, &priv, &point, mbedtls_ctr_drbg_random, &ctr_drbg);
+	Util::genKeyX25519(&key1);
+	Util::genKeyX25519(&key2);
+	Util::genKeyED25519(&key3);
 
-	//size_t len;
-	//char private_buff[512];
-	//char public_x_buff[512];
-	//char public_y_buff[512];
-	//char public_z_buff[512];
+	if (key1 == nullptr || key1 == NULL) {
+		std::cout << "key is null!" << std::endl;
+		return;
+	}
 
-	//mbedtls_mpi_write_string(&priv, 10, private_buff, 512, &len);
-	//mbedtls_mpi_write_string(&point.X, 10, public_x_buff, 512, &len);
-	//mbedtls_mpi_write_string(&point.Y, 10, public_y_buff, 512, &len);
-	//mbedtls_mpi_write_string(&point.Z, 10, public_z_buff, 512, &len);
-
-	//std::cout << "some private key:  " << private_buff << std::endl;
-	//std::cout << "some public key x: " << public_x_buff << std::endl;
-	//std::cout << "some public key y: " << public_y_buff << std::endl;
-	//std::cout << "some public key z: " << public_z_buff << std::endl;
-
-	//mbedtls_ecp_keypair pair0;
-	//pair0.d = priv;
-	//pair0.Q = point;
-	//pair0.grp = grp;
-
-	//Util::printKeyPair(&pair0);
-
-	//mbedtls_ecp_keypair_free(&pair0);
+	std::cout << "==============================ED25519 keypair====================================" << std::endl;
+	Util::printKeys(key3);
+	std::cout << "==============================/ED25519 keypair====================================" << std::endl;
 
 
-	/* cleanup */
-	//mbedtls_ecp_group_free(&grp);
-	//mbedtls_ecp_point_free(&point);
-	//mbedtls_mpi_free(&priv);
-	//mbedtls_ctr_drbg_free(&ctr_drbg);
-	//mbedtls_entropy_free(&entropy);
+	//printKeys(key1);
+
+	std::FILE *fp = std::fopen("key.pub", "w");
+	std::FILE *fpr = std::fopen("key.pub", "r");
+	if (fp == nullptr) {
+		std::cout << "bad file descriptor" << std::endl;
+		return;
+	}
+
+	if (PEM_write_PUBKEY(fp, key1) != 1) {
+		std::cout << "writing key failed" << std::endl;
+	}
+	std::fflush(fp);
+	std::rewind(fp);
+
+	if (PEM_read_PUBKEY(fpr, &peer1, NULL, NULL) == NULL) {
+		std::cout << "reading key failed" << std::endl;
+	}
+
+	std::rewind(fpr);
+
+	PEM_write_PUBKEY(fp, key2);
+	std::fflush(fp);
+	PEM_read_PUBKEY(fpr, &peer2, NULL, NULL);
 
 
-	mbedtls_ecp_keypair pair1;
-	mbedtls_ecp_keypair pair2;
+	if (key2 == nullptr) {
+		std::cout << "key2 is null!" << std::endl;
+		return;
+	}
 
-	mbedtls_ecp_keypair_init(&pair1);
-	mbedtls_ecp_keypair_init(&pair2);
+	std::cout << "read pubkey" << std::endl;
 
+	std::fclose(fp);
+	std::fclose(fpr);
 
-	Util::generateKeyPair(&pair1);
-	Util::generateKeyPair(&pair2);
+	std::cout << "KEY1:" << std::endl;
+	Util::printKeys(key1);
+	std::cout << "PEER1:" << std::endl;
+	Util::printKeys(peer1);
+	std::cout << "KEY2:" << std::endl;
+	Util::printKeys(key2);
+	std::cout << "PEER2:" << std::endl;
+	Util::printKeys(peer2);
 
-	Util::printKeyPair(&pair1);
-	Util::printKeyPair(&pair2);
+	Util::ecdh(key1, peer2);
+	Util::ecdh(key2, peer1);
 
+	unsigned char tbs[32] = "Message42sfjdlasjkljkl";
+	unsigned char sig[128];
+	size_t siglen = 128;
+	Util::sign(key3, tbs, 32, sig, &siglen);
+	std::cout << "signature length = " << siglen << std::endl;
 
-	mbedtls_mpi shared1;
-	mbedtls_mpi shared2;
+	Util::verify(key3, tbs, 32, sig, &siglen);
 
-	mbedtls_mpi_init(&shared1);
-	mbedtls_mpi_init(&shared2);
-
-	/* dh exchange */
-
-
-
-	int r;
-	r = mbedtls_ecdh_compute_shared(&pair1.grp, &shared1, &pair2.Q, &pair1.d, mbedtls_ctr_drbg_random, &ctr_drbg);
-	std::cout << "retval = " << r << std::endl;
-	r = mbedtls_ecdh_compute_shared(&pair2.grp, &shared2, &pair1.Q, &pair2.d, mbedtls_ctr_drbg_random, &ctr_drbg);
-	std::cout << "retval = " << r << std::endl;
-
-
-	size_t len;
-	char shared1_buf[256];
-	char shared2_buf[256];
-
-	mbedtls_mpi_write_string(&shared1, 10, shared1_buf, 256, &len);
-	mbedtls_mpi_write_string(&shared2, 10, shared2_buf, 256, &len);
-
-	std::cout << "shared1: " << shared1_buf << std::endl;
-	std::cout << "shared2: " << shared2_buf << std::endl;
-
-	/* signing */
-	mbedtls_ecp_keypair sig;
-	mbedtls_ecp_keypair_init(&sig);
-
-	Util::signPubKey(&pair1, &sig);
-
-
-	/* cleanup */
-	mbedtls_ctr_drbg_free(&ctr_drbg);
-	mbedtls_entropy_free(&entropy);
-
-	mbedtls_mpi_free(&shared1);
-	mbedtls_mpi_free(&shared2);
-
-	mbedtls_ecp_keypair_free(&pair1);
-	mbedtls_ecp_keypair_free(&pair2);
-	mbedtls_ecp_keypair_free(&sig);
+	EVP_PKEY_free(key1);
+	EVP_PKEY_free(key2);
+	EVP_PKEY_free(peer1);
+	EVP_PKEY_free(peer2);
+	EVP_PKEY_free(key3);
 }
 
 void Server::checkRequests()

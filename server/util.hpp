@@ -8,13 +8,12 @@
 #include <memory>
 #include <vector>
 #include <cstdint>
-//#include <mbedtls/sha512.h>
-#include <mbedtls/sha512.h>
-#include <mbedtls/ecp.h>
-#include <mbedtls/ecdh.h>
-#include <mbedtls/ecdsa.h>
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/entropy.h>
+
+#include "../libs/include/openssl/sha.h"
+#include "../libs/include/openssl/evp.h"
+#include "../libs/include/openssl/kdf.h"
+#include "../libs/include/openssl/pem.h"
+#include "../libs/include/openssl/err.h"
 
 
 
@@ -22,6 +21,16 @@ class Util {
 private:
 	Util() {}
 public:
+	static void printUnsignedChar(unsigned char *array, size_t len)
+	{
+		std::cout << std::hex;
+		for (size_t i = 0; i < len; ++i) {
+			std::cout << std::setfill('0') << std::setw(2) << static_cast<unsigned>(array[i]);
+		}
+
+		std::cout << std::dec << std::endl;
+	}
+
 	/**
 	 * hashes the input with sha512
 	 * @param in    input string
@@ -34,7 +43,8 @@ public:
 	        unsigned char hash[64];
 		std::vector<unsigned char> toHash(in.begin(), in.end());
 
-	        mbedtls_sha512_ret(&toHash[0], in.size(), hash, 0);
+		SHA512(&toHash[0], len, hash);
+	        //mbedtls_sha512_ret(&toHash[0], in.size(), hash, 0);
 
 		std::stringstream buff;
 
@@ -60,156 +70,150 @@ public:
 	 */
 	static int hash512(const unsigned char *in, size_t len, unsigned char *out)
 	{
-	        mbedtls_sha512_ret(in, len, out, 0);
+	        SHA512(in, len, out);
 	        return 0;
 	}
 
-	static int generateKeyPair(mbedtls_ecp_keypair *pair)
+	static void printKeys(EVP_PKEY *key)
 	{
-		//if (pair == nullptr) {
-		//	std::cerr << MBEDTLS_ERR_ECP_BAD_INPUT_DATA << " - \'mbedtls_ecp_keypair *pair\' is nullptr!" << std::endl;
-		//	return 1;
-		//}
-
-		/* needed structures */
-		mbedtls_ecp_group grp;
-		mbedtls_mpi priv;
-		mbedtls_ecp_point point;
-		mbedtls_ctr_drbg_context ctr_drbg;
-		mbedtls_entropy_context entropy;
-
-		/* initialization */
-		mbedtls_ctr_drbg_init(&ctr_drbg);
-		mbedtls_entropy_init(&entropy);
-		mbedtls_ecp_group_init(&grp);
-		mbedtls_ecp_point_init(&point);
-		mbedtls_mpi_init(&priv);
-		mbedtls_ecp_group_load(&grp, mbedtls_ecp_group_id::MBEDTLS_ECP_DP_CURVE25519);
-		/* TODO: seed could be better */
-		mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, (const unsigned char *) "RANDOM_GEN", 10);
-
-
-		/* generate keypair */
-		mbedtls_ecp_gen_keypair(&grp, &priv, &point, mbedtls_ctr_drbg_random, &ctr_drbg);
-
-		/* write */
-		pair->grp = grp;
-		pair->d = priv;
-		pair->Q = point;
-
-		/* cleanup */
-		//mbedtls_ecp_group_free(&grp);
-		//mbedtls_ecp_point_free(&point);
-		//mbedtls_mpi_free(&priv);
-		//mbedtls_ctr_drbg_free(&ctr_drbg);
-		//mbedtls_entropy_free(&entropy);
-
-		return 0;
+		PEM_write_PUBKEY(stdout, key);
+		PEM_write_PrivateKey(stdout, key, NULL, NULL, 0, NULL, NULL);
 	}
 
-	static void printKeyPair(mbedtls_ecp_keypair *pair)
+	/**
+	 * generates a X25519 keypair and writes it to @param key
+	 * @param key		EVP_PKEY ** structure
+	 */
+	static void genKeyX25519(EVP_PKEY **key)
 	{
-		if (pair == nullptr) {
-			std::cerr << "ERROR: missing keypair" << std::endl;
+		*key = EVP_PKEY_new();
+		EVP_PKEY_CTX *kctx = EVP_PKEY_CTX_new_id(EVP_PKEY_X25519, NULL);
+		EVP_PKEY_keygen_init(kctx);
+		EVP_PKEY_keygen(kctx, key);
+
+		EVP_PKEY_CTX_free(kctx);
+		std::cout << "end of generation" << std::endl;
+	}
+
+	/**
+	 * generates a ED25519 keypair and writes it to @param key
+	 * @param key		EVP_PKEY ** structure
+	 */
+	static void genKeyED25519(EVP_PKEY **key)
+	{
+		*key = EVP_PKEY_new();
+		EVP_PKEY_CTX *kctx = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, NULL);
+		EVP_PKEY_keygen_init(kctx);
+		EVP_PKEY_keygen(kctx, key);
+
+		EVP_PKEY_CTX_free(kctx);
+		std::cout << "end of generation" << std::endl;
+	}
+
+	/**
+	 * TODO: add error return codes
+	 * calculates shared secret from two X25519 keys.
+	 * @param key		complete keypair
+	 * @param peer		public key of the other side
+	 */
+	static void ecdh(EVP_PKEY *key, EVP_PKEY *peer)
+	{
+		EVP_PKEY_CTX *ctx;
+		unsigned char secret[1024];
+		size_t len = 0;
+
+		ctx = EVP_PKEY_CTX_new(key, NULL);
+
+		if (EVP_PKEY_derive_init(ctx) != 1) {
+			std::cout << "ctx initialization failed" << std::endl;
 			return;
 		}
 
-		size_t len;
-		char private_buff[256];
-		char public_x_buff[256];
-		char public_y_buff[256];
-		char public_z_buff[256];
-		mbedtls_mpi *priv = &pair->d;
-		mbedtls_ecp_point *point = &pair->Q;
+		if (EVP_PKEY_derive_set_peer(ctx, peer) != 1) {
+			std::cout << "setting peer failed" << std::endl;
+			return;
+		}
 
-		mbedtls_mpi_write_string(priv, 10, private_buff, 256, &len);
-		mbedtls_mpi_write_string(&point->X, 10, public_x_buff, 256, &len);
-		mbedtls_mpi_write_string(&point->Y, 10, public_y_buff, 256, &len);
-		mbedtls_mpi_write_string(&point->Z, 10, public_z_buff, 256, &len);
+		if (EVP_PKEY_derive(ctx, NULL, &len) != 1) {
+			std::cout << "getting length failed" << std::endl;
+			return;
+		}
 
-		std::cout << "some private key:  " << private_buff << std::endl;
-		std::cout << "some public key x: " << public_x_buff << std::endl;
-		std::cout << "some public key y: " << public_y_buff << std::endl;
-		std::cout << "some public key z: " << public_z_buff << std::endl;
+		std::cout << "Length of secret = " << len << std::endl;
+
+		EVP_PKEY_derive(ctx, secret, &len);
+
+		printUnsignedChar(secret, len);
+
+		EVP_PKEY_CTX_free(ctx);
 	}
 
-	static int signPubKey(mbedtls_ecp_keypair *pair, mbedtls_ecp_keypair *sig)
+	/**
+	 * TODO: add error return codes
+	 * signs a message with give ED25519 key
+	 * @param key		key used for signing
+	 * @param tbs		message to be signed
+	 * @param tbslen	length of the message to be signed
+	 * @param sig		signature of the message
+	 * @param siglen	length of thesignature
+	 */
+	static void sign(EVP_PKEY *key, unsigned char *tbs, size_t tbslen, unsigned char *sig, size_t *siglen)
 	{
-		/* pile of garbage doing nothing useful */
-		mbedtls_ecdsa_context ctx;
-		mbedtls_ecdsa_init(&ctx);
+		// clear errors
+		while (ERR_get_error() != 0) {}
 
-		mbedtls_ecdsa_from_keypair(&ctx, pair);
+		printKeys(key);
+		EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
 
-		size_t len;
-		unsigned char exported[512];
-		std::string hash;
+		if (EVP_DigestSignInit(mdctx, NULL, NULL, NULL, key) != 1) {
+			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+			return;
+		}
 
-		mbedtls_ecp_point_write_binary(&pair->grp, &pair->Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &len, exported, 512);
+		EVP_DigestSign(mdctx, sig, siglen, tbs, tbslen);
 
-		unsigned char buffer[64];
-		std::memset(&buffer, 0, 64);
-
-		hash512(exported, len, buffer);
-
-		//std::cout << "DEBUG: hash of exported pubkey = " << buffer << std::endl;
-
-		std::stringstream buff;
-
-	        buff << std::hex;
-
-	        for (size_t i = 0; i < 64; ++i) {
-	                buff << std::setfill('0') << std::setw(2) << static_cast<unsigned>(buffer[i]);
-	        }
-
-	        buff << std::dec;
+		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
 
 
-		std::cout << buff.str() << std::endl;
+		std::cout << "SIGNATURE:" << std::endl;
+		printUnsignedChar(sig, *siglen);
 
-		printKeyPair(pair);
-
-		printEcpErrorMessages();
-		int r;
-		r = mbedtls_ecp_check_privkey(&pair->grp, &pair->d);
-		std::cout << "retval = " << r << std::endl;
-
-		unsigned char signature[128];
-
-		len = 0;
-		r = mbedtls_ecdsa_write_signature_det(&ctx, buffer, 64, signature, &len, mbedtls_md_type_t::MBEDTLS_MD_SHA512);
-
-		std::cout << "retval = " << r << ", len = " << len << std::endl;
-
-		char part1_buff[512];
-		char part2_buff[512];
-
-
-
-
-
-		/* cleanup */
-		mbedtls_ecp_keypair_free(&ctx);
-
-
-		return 0;
+		EVP_MD_CTX_free(mdctx);
 	}
 
-	static int verifySignature()
+	/**
+	 * TODO: add error return codes
+	 * verifies an ED25519 signature of a message
+	 * @param key		key used for checking the signature
+	 * @param tbv		message to be verified
+	 * @param tbvlen	length of message to be verified
+	 * @param sig		signature of the message
+	 * @param siglen	length of the signature
+	 */
+	static void verify(EVP_PKEY *key, unsigned char *tbv, size_t tbvlen, unsigned char *sig, size_t *siglen)
 	{
-		return 0;
-	}
+		// clear errors
+		while (ERR_get_error() != 0) {}
 
-	static void printEcpErrorMessages()
-	{
-		std::cout << MBEDTLS_ERR_ECP_BAD_INPUT_DATA << " -  Bad input parameters to function." << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL << " -  The buffer is too small to write to" << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE << " -  The requested feature is not available, for example, the requested curve is not supported." << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_VERIFY_FAILED << " -  The signature is not valid." << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_ALLOC_FAILED << " -  Memory allocation failed." << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_RANDOM_FAILED << " -  Generation of random value, such as ephemeral key, failed." << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_INVALID_KEY << " -  Invalid private or public key." << std::endl;
-		std::cout << MBEDTLS_ERR_ECP_SIG_LEN_MISMATCH << " -  The buffer contains a valid signature followed by more data." << std::endl;
+		printKeys(key);
+		EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+
+		if (EVP_DigestVerifyInit(mdctx, NULL, NULL, NULL, key) != 1) {
+			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+			return;
+		}
+
+		int r = EVP_DigestVerify(mdctx, sig, *siglen, tbv, tbvlen);
+
+		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+
+		if (r == 1) {
+			std::cout << "verification successfull!" << std::endl;
+		} else {
+			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+		}
+
+		EVP_MD_CTX_free(mdctx);
 	}
 };
 
