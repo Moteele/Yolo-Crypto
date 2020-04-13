@@ -1,7 +1,7 @@
 #include <string>
-#include "catch.hpp"
+#include "../libs/catch.hpp"
+#include "../libs/util.hpp"
 #include "server.hpp"
-#include "util.hpp"
 
 TEST_CASE("basic server tests")
 {

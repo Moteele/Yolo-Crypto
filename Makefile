@@ -2,8 +2,8 @@
 LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
-CXXFLAGS:=-std=c++14 -Ilibs/include -Llibs -pthread $(LIBCXXFLAGS)
-LDFLAGS:=-lcrypto -ldl $(LIBLDFLAGS)
+CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
+LDFLAGS:=$(LIBLDFLAGS) -lcrypto -lssl -ldl
 
 SOURCES_SERVER=server/server.cpp server/message.pb.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
@@ -11,7 +11,8 @@ SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER
 SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
 OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
-DEPS=server/server.hpp server/util.hpp client/client.hpp server/message.pb.h
+OPENSSL_EXTRACTED=libs/openssl_internals/curve25519.h
+DEPS=$(OPENSSL_EXTRACTED) server/server.hpp libs/util.hpp client/client.hpp server/message.pb.h
 
 SOURCES_CLIENT=client/client.cpp
 OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
@@ -53,4 +54,4 @@ clientApp: $(OBJECTS_CLIENT_MAIN)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJECTS_SERVER_TEST)
+	rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN)

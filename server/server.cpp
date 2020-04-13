@@ -1,5 +1,6 @@
 #include "server.hpp"
-#include "util.hpp"
+#include "../libs/util.hpp"
+#include "../libs/key.hpp"
 #include <array>
 #include <sstream>
 #include <cstring>
@@ -9,7 +10,6 @@
 #include <fstream>
 #include <cstdio>
 
-//#define __cplusplus
 
 
 
@@ -117,8 +117,6 @@ void Server::listOnline(std::ostream &os) const
 
 void Server::test()
 {
-	EVP_KDF *kdf;
-
 	Message msg;
 	Message msg2;
 	msg.set_recid(42);
@@ -130,119 +128,10 @@ void Server::test()
 	msg.add_kdfkeys("key2");
 	msg.add_kdfkeys("key3");
 
-	std::cout << msg.DebugString() << std::endl;
-
-	std::string str;
-
-	msg.SerializeToString(&str);
-
-	std::cout << "serialized message = " << str << std::endl;
-
-	msg2.ParseFromString(str);
-
-	std::cout << std::endl;
-
-	std::cout << msg2.DebugString() << std::endl;
-	std::cout << msg2.textcontent() << std::endl;
-
 
 	/* openssl static include tests */
 
-	EVP_PKEY *key1 = NULL;
-	EVP_PKEY *key2 = NULL;
-	EVP_PKEY *peer1 = EVP_PKEY_new();
-	EVP_PKEY *peer2 = EVP_PKEY_new();
 
-	EVP_PKEY *key3 = NULL;
-
-	Util::genKeyX25519(&key1);
-	Util::genKeyX25519(&key2);
-	Util::genKeyED25519(&key3);
-
-	if (key1 == nullptr || key1 == NULL) {
-		std::cout << "key is null!" << std::endl;
-		return;
-	}
-
-	std::cout << "==============================ED25519 keypair====================================" << std::endl;
-	Util::printKeys(key3);
-	std::cout << "==============================/ED25519 keypair====================================" << std::endl;
-
-
-	//printKeys(key1);
-
-	std::FILE *fp = std::fopen("key.pub", "w");
-	std::FILE *fpr = std::fopen("key.pub", "r");
-	if (fp == nullptr) {
-		std::cout << "bad file descriptor" << std::endl;
-		return;
-	}
-
-	if (PEM_write_PUBKEY(fp, key1) != 1) {
-		std::cout << "writing key failed" << std::endl;
-	}
-	std::fflush(fp);
-	std::rewind(fp);
-
-	if (PEM_read_PUBKEY(fpr, &peer1, NULL, NULL) == NULL) {
-		std::cout << "reading key failed" << std::endl;
-	}
-
-	std::rewind(fpr);
-
-	PEM_write_PUBKEY(fp, key2);
-	std::fflush(fp);
-	PEM_read_PUBKEY(fpr, &peer2, NULL, NULL);
-
-
-	if (key2 == nullptr) {
-		std::cout << "key2 is null!" << std::endl;
-		return;
-	}
-
-	std::cout << "read pubkey" << std::endl;
-
-	std::fclose(fp);
-	std::fclose(fpr);
-
-	std::cout << "KEY1:" << std::endl;
-	Util::printKeys(key1);
-	std::cout << "PEER1:" << std::endl;
-	Util::printKeys(peer1);
-	std::cout << "KEY2:" << std::endl;
-	Util::printKeys(key2);
-	std::cout << "PEER2:" << std::endl;
-	Util::printKeys(peer2);
-
-	unsigned char secret1[64];
-	unsigned char secret2[64];
-	size_t ssize1;
-	size_t ssize2;
-	Util::ecdh(key1, peer2, secret1, &ssize1);
-	Util::ecdh(key2, peer1, secret2, &ssize2);
-
-	unsigned char tbs[32] = "Message42sfjdlasjkljkl";
-	unsigned char sig[128];
-	size_t siglen = 128;
-	Util::sign(key3, tbs, 32, sig, &siglen);
-	std::cout << "signature length = " << siglen << std::endl;
-
-	Util::verify(key3, tbs, 32, sig, &siglen);
-
-	EVP_PKEY_free(key1);
-	EVP_PKEY_free(key2);
-	EVP_PKEY_free(peer1);
-	EVP_PKEY_free(peer2);
-	EVP_PKEY_free(key3);
-
-	std::cout << "==========================kdf===============================" << std::endl;
-	unsigned char derived[64];
-	size_t delength = 64;
-	Util::kdf(secret1, ssize1, derived, &delength);
-	Util::printUnsignedChar(derived, delength);
-	Util::kdf(secret2, ssize2, derived, &delength);
-	Util::printUnsignedChar(derived, delength);
-	std::cout << "=========================/kdf===============================" << std::endl;
 }
 
 void Server::checkRequests()
