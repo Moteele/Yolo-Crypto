@@ -1,10 +1,6 @@
-#include <iostream>
 #include "client.hpp"
 
-#include <thread>
-#include <chrono>
-#include "../utils/functions.h"
-#include "../utils/constants.h"
+
 
 
 bool Client::develFileExists(const std::string &path) {
