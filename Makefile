@@ -3,7 +3,7 @@ LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; 
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
 CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
-LDFLAGS:=$(LIBLDFLAGS) -lcrypto -lssl -ldl
+LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
 SOURCES_SERVER=server/server.cpp server/message.pb.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
