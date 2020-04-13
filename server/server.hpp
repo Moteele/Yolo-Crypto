@@ -15,8 +15,19 @@
 #include <dlfcn.h>
 #include <iomanip>
 
+#include "util.hpp"
+#include <sstream>
+#include <cstring>
+#include "message.pb.h"
+#include <dirent.h>
+#include <sys/types.h>
+#include <cstdio>
+
 #include "../utils/userAcc.pb.h"
 #include "../utils/mess.pb.h"
+
+#include "../utils/functions.hpp"
+#include "../utils/constants.hpp"
 
 
 class Account
@@ -37,7 +48,7 @@ public:
 	 * @param displayName		name to be displayed
 	 */
 	Account(unsigned int id, const std::string &login, const std::string &pwdHash, const std::string &displayName) :
-		id_(id), login_(login), pwdHash_(pwdHash), displayName_(displayName) {}
+		id_(id), login_(login), displayName_(displayName), pwdHash_(pwdHash) {}
 
 	/**
 	 * getter

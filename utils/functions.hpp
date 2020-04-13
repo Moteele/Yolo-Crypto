@@ -12,3 +12,5 @@ void unlockFile(const std::string &path);
 bool isFileLocked(const std::string &path);
 
 std::vector<std::string> getUnlockedFiles(const std::string &dirPath);
+
+void initServer();
