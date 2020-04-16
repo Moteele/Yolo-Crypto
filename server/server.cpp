@@ -1,6 +1,6 @@
 #include "server.hpp"
-#include "../libs/util.hpp"
-#include "../libs/key.hpp"
+#include "../utils/util.hpp"
+#include "../utils/key.hpp"
 #include <array>
 #include <sstream>
 #include <cstring>
@@ -117,20 +117,6 @@ void Server::listOnline(std::ostream &os) const
 
 void Server::test()
 {
-	Message msg;
-	Message msg2;
-	msg.set_recid(42);
-	msg.set_senid(32);
-	msg.clear_textcontent();
-	msg.set_textcontent("this is some text");
-	msg.add_kdfkeys("key0");
-	msg.add_kdfkeys("key1");
-	msg.add_kdfkeys("key2");
-	msg.add_kdfkeys("key3");
-
-
-	/* openssl static include tests */
-
 
 }
 

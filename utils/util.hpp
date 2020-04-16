@@ -9,13 +9,13 @@
 #include <vector>
 #include <cstdint>
 
-#include "include/openssl/sha.h"
-#include "include/openssl/evp.h"
-#include "include/openssl/kdf.h"
-#include "include/openssl/pem.h"
-#include "include/openssl/err.h"
+#include "../libs/include/openssl/sha.h"
+#include "../libs/include/openssl/evp.h"
+#include "../libs/include/openssl/kdf.h"
+#include "../libs/include/openssl/pem.h"
+#include "../libs/include/openssl/err.h"
 
-#include "openssl_internals/curve25519.h"
+#include "../libs/openssl_internals/curve25519.h"
 
 
 
@@ -129,7 +129,7 @@ public:
 	 * @param secret	shared secret
 	 * @param ssize		size of shared secret
 	 */
-	static void ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize)
+	static int ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize)
 	{
 	        EVP_PKEY_CTX *ctx;
 
@@ -137,25 +137,25 @@ public:
 
 	        if (EVP_PKEY_derive_init(ctx) != 1) {
 	                std::cout << "ctx initialization failed" << std::endl;
-	                return;
+	                return 1;
 	        }
 
 	        if (EVP_PKEY_derive_set_peer(ctx, peer) != 1) {
 	                std::cout << "setting peer failed" << std::endl;
-	                return;
+	                return 1;
 	        }
 
 	        if (EVP_PKEY_derive(ctx, NULL, ssize) != 1) {
 	                std::cout << "getting length failed" << std::endl;
-	                return;
+	                return 1;
 	        }
 
-	        std::cout << "Length of secret = " << *ssize << std::endl;
+	        //std::cout << "Length of secret = " << *ssize << std::endl;
 
 	        EVP_PKEY_derive(ctx, secret, ssize);
-	        printUnsignedChar(secret, *ssize);
 
 	        EVP_PKEY_CTX_free(ctx);
+		return 0;
 	}
 
 	/**
@@ -164,8 +164,9 @@ public:
 	 * @param ssize			length of shared secret
 	 * @param key			derived key
 	 * @param keylen		length of key
+	 * @return 0 on success
 	 */
-	static void kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen)
+	static int kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen)
 	{
 		while (ERR_get_error() != 0) {}
 		EVP_KDF *kdf;
@@ -177,14 +178,14 @@ public:
 		kdf = EVP_KDF_fetch(NULL, "hkdf", NULL);
 		if (kdf == NULL) {
 			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
-			return;
+			return 1;
 		}
 
 		kctx = EVP_KDF_CTX_new(kdf);
 
 		if (kctx == NULL) {
 			std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
-			return;
+			return 1;
 		}
 
 		// for X25519 it is sequence of 32 0xFF bytes
@@ -209,6 +210,7 @@ public:
 
 		EVP_KDF_free(kdf);
 		EVP_KDF_CTX_free(kctx);
+		return 0;
 	}
 
 	/**
@@ -294,6 +296,7 @@ public:
 
 		fe_tobytes(out, y);
 	}
+
 
 	/**
 	 * creates edwards25519 keypair from curve25519 private key
@@ -420,6 +423,43 @@ public:
 		std::memset(h, 0, 32);
 		std::memset(R, 0, 32);
 		std::memset(Rc, 0, 32);
+
+		/* 27742317777372353535851937790883648493 in little endian format */
+		const uint8_t l_low[16] = {
+		    0xED, 0xD3, 0xF5, 0x5C, 0x1A, 0x63, 0x12, 0x58, 0xD6, 0x9C, 0xF7, 0xA2,
+		    0xDE, 0xF9, 0xDE, 0x14
+		};
+
+		const char allzeroes[15] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+		/*
+		 * Check 0 <= s < L where L = 2^252 + 27742317777372353535851937790883648493
+		 *
+		 * If not the signature is publicly invalid. Since it's public we can do the
+		 * check in variable time.
+		 *
+		 * First check the most significant byte
+		 */
+		int i;
+		if (s[31] > 0x10)
+		    return 0;
+		if (s[31] == 0x10) {
+		    /*
+		     * Most significant byte indicates a value close to 2^252 so check the
+		     * rest
+		     */
+		    if (memcmp(s + 16, allzeroes, sizeof(allzeroes)) != 0)
+		        return 1;
+		    for (i = 15; i >= 0; i--) {
+		        if (s[i] < l_low[i])
+		            break;
+		        if (s[i] > l_low[i])
+		            return 1;
+		    }
+		    if (i < 0)
+		        return 1;
+		}
+
 
 		convert_mont(A, pub);
 		// TODO: check if A is on curve

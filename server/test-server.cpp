@@ -1,6 +1,6 @@
 #include <string>
-#include "../libs/catch.hpp"
-#include "../libs/util.hpp"
+#include "../utils/catch.hpp"
+#include "../utils/util.hpp"
 #include "server.hpp"
 
 TEST_CASE("basic server tests")
@@ -20,7 +20,7 @@ TEST_CASE("basic server tests")
 	SECTION("playground")
 	{
 		std::cout << "=============Playground=============" << std::endl;
-		server.test();
+		//server.test();
 		std::cout << "=============Playground=============" << std::endl;
 	}
 
