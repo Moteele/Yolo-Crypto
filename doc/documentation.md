@@ -102,7 +102,7 @@ optional int32 senId = 2;
 optional string senIdKey = 3;
 optional string senPreKey = 4;
 optional string senPreKeySig = 5;
-repeating string senOTP = 6;
+repeated string senOTP = 6;
 ```
 * type - type of the message
 * senId - id of the sender of the message
@@ -132,7 +132,7 @@ optional int32 reqId = 7;
 required MsgType type = 1;
 optional int32 senId = 2;
 ...
-repeating string senOTP = 6
+repeated string senOTP = 6
 optional int32 reqId = 7;
 optional string reqIdKey = 8;
 optional string reqPreKey = 9;
