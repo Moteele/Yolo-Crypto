@@ -1,0 +1,9 @@
+syntax = "proto2";
+message userAcc {
+  required int32 id = 1;
+  required string name = 2;
+  optional string displayName = 3;
+  required string pwdhash = 4;
+
+  repeated string messages = 5;
+}

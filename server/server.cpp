@@ -1,12 +1,5 @@
 #include "server.hpp"
-#include "util.hpp"
-#include <sstream>
-#include <cstring>
-#include "message.pb.h"
-#include <dirent.h>
-#include <sys/types.h>
-#include <fstream>
-#include <cstdio>
+
 
 
 void Account::print(std::ostream &os) const
@@ -142,148 +135,224 @@ void Server::test()
 void Server::checkRequests()
 {
 	std::string path = "tmp_files/req";
-	std::vector<std::string> requestFiles;
-	std::vector<std::string> locks;
+	std::vector<std::string> requestFiles = getUnlockedFiles(path);
 
-	struct dirent *entry;
-    DIR *dir = opendir("tmp_files/req");
-    if (dir == NULL) {
-        return;
-    }
-    while ((entry = readdir(dir)) != NULL) {
-		std::string fname = entry->d_name;
-
-		if (fname == "." || fname == ".." || fname == "_test") {
-			continue;
-		}
-		if (fname.size() < 5) {
-			requestFiles.push_back(fname);
-			continue;
-		}
-		if (fname.substr(fname.size() - 4, 4) == "lock") {
-			locks.push_back(fname);
-		} else {
-			requestFiles.push_back(fname);
-		}
-    }
-    closedir(dir);
-
+	// process createAcc requests
 	for (int i = 0; i < requestFiles.size(); ++i) {
-		std::string req = requestFiles[i];
-		bool locked = false;
-		for (const auto & lock : locks) {
-			if (lock == req) {
-				locked = true;
-				break;
-			}
-		}
-		if (locked) {
+		if (requestFiles[i] == "req_master") {
 			continue;
 		}
-		std::ofstream lockFile(path + "/" + req + ".lock"); // lock the file
-		lockFile.close();
-
-		std::ifstream reqFile(path + "/" + req); // open requests
-		std::string line;
-		while (std::getline(reqFile, line)) {
-			int delim = line.find_first_of(';');
-			std::string command = line.substr(0, delim);
-
-			std::string tmp = line.substr(delim + 1, line.size() - 1 - delim);
-
-			delim = tmp.find_first_of(';');
-
-			std::string recieverAndMessage = tmp.substr(delim + 1, tmp.size() - 1 - delim);
-
-			delim = recieverAndMessage.find_first_of(';');
-			std::string reciever = recieverAndMessage.substr(0, delim);
-
-			requests_.emplace_back(reciever, line); // store request
+		int accCreation = tryCreateAccount(requestFiles[i]);
+		lockFile("tmp_files/res/" + requestFiles[i]);
+		std::ofstream resFile("tmp_files/res/" + requestFiles[i], std::ofstream::out | std::ofstream::trunc);
+		if (accCreation == -1) {
+			resFile << "Error while creating account" << std::endl;
+		} else {
+			resFile << "Success" << std::endl;
 		}
-		reqFile.close();
-		std::ofstream eraseReqFile(path + "/" + req, std::ofstream::out | std::ofstream::trunc);
-		eraseReqFile.close();
-
-		std::string a = path + "/" + req + ".lock";
-		std::remove(a.c_str()); // unlock the file
+		resFile.close();
+		unlockFile("tmp_files/res/" + requestFiles[i]);
 	}
+
+	while (isFileLocked(REQEST_FILE_PATH)) {
+		// waiting
+	}
+
+	lockFile(REQEST_FILE_PATH);
+
+	// read and store requests
+	std::ifstream reqFile(REQEST_FILE_PATH);
+	std::string line;
+	while (std::getline(reqFile, line)) {
+		requests_.emplace_back(line);
+	}
+	reqFile.close();
+
+	// erase requests from request file
+	std::ofstream eraseReqFile(REQEST_FILE_PATH, std::ofstream::out | std::ofstream::trunc);
+	eraseReqFile.close();
+
+	unlockFile(REQEST_FILE_PATH);
+}
+
+int Server::tryCreateAccount(const std::string &name) {
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == name) {
+			// duplicit name
+			return -1;
+		}
+	}
+	std::string path = "tmp_files/req/" + name;
+	std::ifstream req(path);
+	std::string reqText;
+	std::getline(req, reqText);
+	userAcc newUser;
+	newUser.set_name(name);
+	newUser.set_pwdhash(reqText);
+	newUser.set_id(users_.size());
+	users_.push_back(newUser);
+	req.close();
+	std::remove(path.c_str());
+	return 0;
 }
 
 void Server::processRequests()
 {
-	std::string path = "tmp_files/res";
-	std::vector<std::string> responseFiles;
-	std::vector<std::string> locks;
-
-	struct dirent *entry;
-    DIR *dir = opendir("tmp_files/res");
-    if (dir == NULL) {
-        return;
-    }
-    while ((entry = readdir(dir)) != NULL) {
-		std::string fname = entry->d_name;
-
-		if (fname == "." || fname == ".." || fname == "_test") {
-			continue;
+	for (int i = 0; i < requests_.size(); ++i) {
+		const std::pair<std::string, std::string> requesterAndCommand = getRequesterAndCommand(requests_[i]);
+		if (requesterAndCommand.second == "sendMessage") {
+			performSendMessage(requests_[i]);
+		} else if (requesterAndCommand.second == "auth") {
+			performAuth(requests_[i]);
+		} else if (requesterAndCommand.second == "fetchMessages") {
+			performFetchMessages(requests_[i]);
 		}
-		if (fname.size() < 5) {
-			responseFiles.push_back(fname);
-			continue;
-		}
-		if (fname.substr(fname.size() - 4, 4) == "lock") {
-			locks.push_back(fname);
-		} else {
-			responseFiles.push_back(fname);
-		}
-    }
-    closedir(dir);
-
-	std::vector<int> solvedIndex;
-	for (int i = 0; i < responseFiles.size(); ++i) {
-		std::string res = responseFiles[i];
-		bool locked = false;
-		for (const auto & lock : locks) {
-			if (lock == res) {
-				locked = true;
-				break;
-			}
-		}
-		if (locked) {
-			continue;
-		}
-
-		std::ofstream LockFile(path + "/" + res + ".lock"); // lock the file
-		LockFile.close();
-
-		std::ofstream ResFile(path + "/" + res, std::ofstream::out | std::ofstream::app); // open the response file
-		for (int i = 0; i < requests_.size(); ++i) {
-			if (requests_[i].first == res) {
-				int delim = requests_[i].second.find_first_of(';');
-				std::string command = requests_[i].second.substr(0, delim);
-
-				std::string tmp = requests_[i].second.substr(delim + 1);
-
-				delim = tmp.find_first_of(';');
-				std::string sender = tmp.substr(0, delim);
-				tmp = tmp.substr(delim + 1);
-				delim = tmp.find_first_of(';');
-				std::string message = tmp.substr(delim + 1);
-
-				if (command == "sendMessage") {
-					ResFile << "recieveMessage;" << sender << ";" << message << std::endl;
-				}
-
-				solvedIndex.push_back(i);
-			}
-		}
-
-		ResFile.close();
-
-		std::string a = path + "/" + res + ".lock";
-		std::remove(a.c_str()); // unlock the file
 	}
 
-	for (int i = solvedIndex.size() - 1; i > -1; --i) { // remove solved requests from requests_
-		requests_.erase(requests_.begin() + i);
+	while (isFileLocked(RESPONSE_FILE_PATH)) {
+		// waiting
 	}
+
+	lockFile(RESPONSE_FILE_PATH);
+
+	std::ofstream resFile(RESPONSE_FILE_PATH, std::ofstream::out | std::ofstream::app);
+
+	for (int i = 0; i < responses_.size(); ++i) {
+		resFile << responses_[i] << std::endl;
+	}
+
+	resFile.close();
+	requests_.clear();
+	responses_.clear();
+	unlockFile(RESPONSE_FILE_PATH);
+}
+
+void Server::performSendMessage(const std::string &req) {
+	int delim = req.find_first_of(';');
+	std::string sender = req.substr(0, delim);
+	std::string tmp = req.substr(delim + 1);
+	delim = tmp.find_first_of(';');
+	std::string command = tmp.substr(0, delim);
+	tmp = tmp.substr(delim + 1);
+	delim = tmp.find_first_of(';');
+	std::string reciever = tmp.substr(0, delim);
+	std::string text = tmp.substr(delim + 1);
+
+	int sendIndex = -1;
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == sender) {
+			sendIndex = i;
+			break;
+		}
+	}
+	if (sendIndex == -1) {
+		throw std::runtime_error("what the fuck did just happen?!");
+	}
+	int recIndex = -1;
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == reciever) {
+			recIndex = i;
+			break;
+		}
+	}
+	if (recIndex == -1) {
+		responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Reciever does not exist");
+		return;
+	}
+
+	Mess theMessage;
+	theMessage.set_sender(sender);
+	theMessage.set_reciever(reciever);
+	theMessage.set_text(text);
+
+	std::string stringified;
+	theMessage.SerializeToString(&stringified);
+
+	users_[recIndex].add_messages(stringToHex(stringified));
+	users_[sendIndex].add_messages(stringToHex(stringified));
+
+	responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Message sent");
+}
+
+void Server::performAuth(const std::string &req) {
+	int delim = req.find_first_of(';');
+	std::string login = req.substr(0, delim);
+	std::string tmp = req.substr(delim + 1);
+	delim = tmp.find_first_of(';');
+	std::string command = tmp.substr(0, delim);
+	std::string pwd = tmp.substr(delim + 1);
+
+	int index = -1;
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == login) {
+			if (users_[i].pwdhash() == pwd) {
+				responses_.emplace_back(users_[i].name() + ";auth;Success");
+			} else {
+				responses_.emplace_back(users_[i].name() + ";auth;Wrong password");
+			}
+			index = i;
+		}
+	}
+	if (index == -1) {
+		// easy in http, hard in file-based communication
+	}
+}
+
+void Server::performFetchMessages(const std::string &req) {
+	int delim = req.find_first_of(';');
+	std::string name = req.substr(0, delim);
+
+	int index = -1;
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == name) {
+			index = i;
+			break;
+		}
+	}
+
+	auto messages = users_[index].messages();
+	for (const auto &it : messages) {
+		std::string response = users_[index].name() + ";fetchMessages;" + it;
+		responses_.push_back(response);
+	}
+}
+
+void Server::loadUsers() {
+	const std::string userDbPath = "tmp_files/db/users";
+	users_.clear();
+	std::ifstream usersFile(userDbPath);
+	std::string line;
+	while (std::getline(usersFile, line)) {
+		std::string parsedFromHex = hexToString(line);
+		userAcc user;
+		user.ParseFromString(parsedFromHex);
+		users_.push_back(user);
+	}
+	usersFile.close();
+}
+
+void Server::writeUsers() {
+	const std::string usersDbPath = "tmp_files/db/users";
+	std::ofstream usersFile(usersDbPath, std::ofstream::out | std::ofstream::trunc);
+	std::string line;
+	for (int i = 0; i < users_.size(); ++i) {
+
+		if (users_[i].name().size() < 1) {
+			continue;
+		}
+
+		users_[i].SerializeToString(&line);
+
+		usersFile << stringToHex(line);
+	}
+	usersFile.close();
+}
+
+const std::pair<std::string, std::string> Server::getRequesterAndCommand(const std::string &request) {
+	int delim = request.find_first_of(';');
+	const std::string requester = request.substr(0, delim);
+	std::string rest = request.substr(delim + 1);
+	delim = rest.find_first_of(';');
+	const std::string command = rest.substr(0, delim);
+	return std::make_pair(requester, command);
 }

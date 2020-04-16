@@ -15,6 +15,19 @@
 #include <dlfcn.h>
 #include <iomanip>
 
+#include "util.hpp"
+#include <sstream>
+#include <cstring>
+#include "message.pb.h"
+#include <dirent.h>
+#include <sys/types.h>
+#include <cstdio>
+
+#include "../utils/userAcc.pb.h"
+#include "../utils/mess.pb.h"
+
+#include "../utils/functions.hpp"
+#include "../utils/constants.hpp"
 
 
 class Account
@@ -35,7 +48,7 @@ public:
 	 * @param displayName		name to be displayed
 	 */
 	Account(unsigned int id, const std::string &login, const std::string &pwdHash, const std::string &displayName) :
-		id_(id), login_(login), pwdHash_(pwdHash), displayName_(displayName) {}
+		id_(id), login_(login), displayName_(displayName), pwdHash_(pwdHash) {}
 
 	/**
 	 * getter
@@ -118,7 +131,10 @@ private:
 
 	// temporary atribute just for recieving requests
 	// TODO: delete later
-	std::vector<std::pair<std::string, std::string>> requests_;
+	std::vector<std::string> requests_;
+	std::vector<std::string> responses_;
+
+	std::vector<userAcc> users_;
 
 public:
 	/**
@@ -228,6 +244,20 @@ public:
 	void checkRequests();
 
 	void processRequests();
+
+	void loadUsers();
+
+	void writeUsers();
+
+	int tryCreateAccount(const std::string &name);
+
+	const std::pair<std::string, std::string> getRequesterAndCommand(const std::string &request);
+
+	void performSendMessage(const std::string &req);
+
+	void performAuth(const std::string &req);
+
+	void performFetchMessages(const std::string &req);
 };
 
 #endif // SERVER_HPP

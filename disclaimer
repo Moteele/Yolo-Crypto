@@ -1,0 +1,3 @@
+ - hodne heuristicka kontrola na neexistujici username pri prihlaseni
+ - zadna kontrola na autentizaci (zkontroluje se jmeno a heslo pri prihlaseni, ale uzivatel muze delat requesty na message, i kdyz neni prihlaseny...sice nema jak, protoze na clientovi na to neni fce, but watever..)
+

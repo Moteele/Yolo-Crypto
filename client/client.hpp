@@ -1,23 +1,36 @@
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <string>
 
+#include "../utils/userAcc.pb.h"
+#include "../utils/mess.pb.h"
+
+#include <thread>
+#include <chrono>
+#include "../utils/functions.hpp"
+#include "../utils/constants.hpp"
 
 class Client
 {
     std::string name_;
-    std::vector<std::pair<std::string, std::string>> messages_;
+    std::vector<Mess> messages_;
+
+    bool isAuthenticated_ = false;
+    bool gotResponse_ = false;
 
 public:
 
-    Client(std::string &name) : name_(name)
-    {
-        std::ofstream req("tmp_files/req/" + name);
-        std::ofstream res("tmp_files/res/" + name);
-        req.close();
-        res.close();
-    }
+    void develAuth();
+
+    void develCreateAcc();
+
+    void develAwaitCreation();
+
+    void readResponse();
+
+    void writeToReq(const std::string &req);
 
     void develSendMessage();
 
