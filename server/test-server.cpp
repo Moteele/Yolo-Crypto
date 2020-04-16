@@ -1,7 +1,7 @@
 #include <string>
-#include "catch.hpp"
+#include "../utils/catch.hpp"
+#include "../utils/util.hpp"
 #include "server.hpp"
-#include "util.hpp"
 
 TEST_CASE("basic server tests")
 {
@@ -14,12 +14,13 @@ TEST_CASE("basic server tests")
 	Server server(db);
 	server.setId(4);
 
-	void *lib = dlopen(LIB_PATH, RTLD_LAZY);
+
+	//void *lib = dlopen(LIB_PATH, RTLD_LAZY);
 
 	SECTION("playground")
 	{
 		std::cout << "=============Playground=============" << std::endl;
-		server.test();
+		//server.test();
 		std::cout << "=============Playground=============" << std::endl;
 	}
 
@@ -91,7 +92,7 @@ TEST_CASE("basic server tests")
 		std::string id;
 		for (unsigned int i = 4; i < 120; ++i) {
 			id = std::to_string(i);
-			Util::hash512(id + "hashpwd", 7 + id.size(), hash, lib);
+			Util::hash512(id + "hashpwd", 7 + id.size(), hash);
 			server.getDatabase().emplace(std::make_pair(i, Account(i, id + "abc@def.org", hash, id + "name")));
 			hash.clear();
 		}
@@ -102,9 +103,9 @@ TEST_CASE("basic server tests")
 			id = std::to_string(i);
 			toHash = id + "hashpwd";
 
-			Util::hash512(toHash, toHash.size(), hash, lib);
+			Util::hash512(toHash, toHash.size(), hash);
 			toHash = hash;
-			Util::hash512(toHash + "42", toHash.size() + 2, hash, lib);
+			Util::hash512(toHash + "42", toHash.size() + 2, hash);
 			REQUIRE(server.signIn(id + "abc@def.org", hash, 42));
 			REQUIRE_FALSE(server.signIn(id + "abc@def.org", hash, 42));
 			hash.clear();
@@ -133,5 +134,5 @@ TEST_CASE("basic server tests")
 	}
 
 
-	dlclose(lib);
+	//dlclose(lib);
 }
