@@ -118,7 +118,7 @@ required MsgType type = 1;
 optional int32 senId = 2;
 optional string senIdKey = 3;
 ...
-repeating string senOTP = 6
+repeated string senOTP = 6
 optional int32 reqId = 7;
 ```
 * type - type of the message
