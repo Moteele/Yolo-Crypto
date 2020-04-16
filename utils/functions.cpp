@@ -3,6 +3,8 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include "functions.hpp"
 #include "constants.hpp"
 
@@ -69,6 +71,47 @@ void initServer() {
 	    }
 	    resFiles.pop_back();
 	}
-	    
+
 }
 
+/**
+ * This function is not just any hexToString function
+ * but is created specificaly for storing proto buffer stuff as string needs.
+ *
+ * Using for anything else is highly unrecommended.
+ * */
+std::string hexToString(const std::string &input) {
+	std::string output;
+
+	if (((input.length()) % 2) != 0) {
+        throw std::runtime_error("String is not valid length ...");
+    }
+
+	size_t cnt = (input.length()) / 2;
+    for (size_t i = 0; cnt > i; ++i) {
+        uint32_t s = 0;
+        std::stringstream ss;
+        ss << std::hex << input.substr(i * 2, 2);
+        ss >> s;
+
+        output.push_back(static_cast<unsigned char>(s));
+    }
+
+	return output;
+}
+
+
+/**
+ * This function is not just any stringToHex function
+ * but is created specificaly for storing proto buffer stuff as string needs.
+ *
+ * Using for anything else is highly unrecommended.
+ * */
+std::string stringToHex(const std::string &input) {
+	std::stringstream output;
+	for (int i = 0; i < input.size(); ++i) {
+		output << std::hex << std::setfill('0') << std::setw(2) << (int)input[i];
+	}
+	output << std::endl;
+	return output.str();
+}

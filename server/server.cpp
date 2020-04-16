@@ -267,8 +267,9 @@ void Server::performSendMessage(const std::string &req) {
 
 	std::string stringified;
 	theMessage.SerializeToString(&stringified);
-	users_[recIndex].add_messages(stringified);
-	users_[sendIndex].add_messages(stringified);
+
+	users_[recIndex].add_messages(stringToHex(stringified));
+	users_[sendIndex].add_messages(stringToHex(stringified));
 
 	responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Message sent");
 }
@@ -322,8 +323,9 @@ void Server::loadUsers() {
 	std::ifstream usersFile(userDbPath);
 	std::string line;
 	while (std::getline(usersFile, line)) {
+		std::string parsedFromHex = hexToString(line);
 		userAcc user;
-		user.ParseFromString(line);
+		user.ParseFromString(parsedFromHex);
 		users_.push_back(user);
 	}
 	usersFile.close();
@@ -340,7 +342,8 @@ void Server::writeUsers() {
 		}
 
 		users_[i].SerializeToString(&line);
-		usersFile << line << std::endl;
+
+		usersFile << stringToHex(line);
 	}
 	usersFile.close();
 }

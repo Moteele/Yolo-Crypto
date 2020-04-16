@@ -14,3 +14,7 @@ bool isFileLocked(const std::string &path);
 std::vector<std::string> getUnlockedFiles(const std::string &dirPath);
 
 void initServer();
+
+std::string hexToString(const std::string &input);
+
+std::string stringToHex(const std::string &input);

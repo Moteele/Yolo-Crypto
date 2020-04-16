@@ -98,16 +98,17 @@ void Client::readResponse() {
                     isAuthenticated_ = true;
                 } else {
                     std::cout << "Authentication failed: " << message << std::endl;
-                    return;
+                    break;
                 }
             }
             if (command == "sendMessage") {
                 std::cout << message << std::endl;
             }
             if (command == "fetchMessages") {
+                std::string parsedFromHex = hexToString(message);
+
                 Mess msg;
-                msg.ParseFromString(message);
-                std::cout << "msg: " << message;
+                msg.ParseFromString(parsedFromHex);
                 messages_.push_back(msg);
             }
         } else {
@@ -166,64 +167,63 @@ void Client::develRunClient()
             std::getline(std::cin, chosen);
 
 
-	    try {
-		stoi(chosen);
-	    } catch(...) {
-		std::cout << "Invalid choice" << std::endl;
-		continue;
-	    }
+            try {
+                stoi(chosen);
+            } catch(...) {
+                std::cout << "Invalid choice" << std::endl;
+                continue;
+            }
 
-	    switch (std::stoi(chosen)) {
-	    case 1:
-		develCreateAcc();
+            switch (std::stoi(chosen)) {
+            case 1:
+                develCreateAcc();
                 develAwaitCreation();
-		break;
-	    case 2:
+                break;
+            case 2:
                 develAuth();
-		    std::cout << "here" << std::endl;
                 while (!gotResponse_) {
-		    std::cout << "waiting.." << std::endl;
+                    std::cout << "waiting.." << std::endl;
                     readResponse();
                     std::this_thread::sleep_for(1s);
-		    std::cout << "waiting.." << std::endl;
+                    std::cout << "waiting.." << std::endl;
                 }
-		break;
-	    default:
-		std::cout << "Invalid choice" << std::endl;
+                break;
+            default:
+                std::cout << "Invalid choice" << std::endl;
 
             }
         } else {
 
-	    std::cout << "Choose an action:" << std::endl;
+            std::cout << "Choose an action:" << std::endl;
             std::cout << "1 - send a message" << std::endl;
             std::cout << "2 - read messages" << std::endl;
             std::getline(std::cin, chosen);
 
-	    try {
-		stoi(chosen);
-	    } catch(...) {
-		std::cout << "Invalid choice" << std::endl;
-		continue;
-	    }
+            try {
+                stoi(chosen);
+            } catch(...) {
+                std::cout << "Invalid choice" << std::endl;
+                continue;
+            }
 
-	    switch (stoi(chosen)) {
-	    case 1:
+	        switch (stoi(chosen)) {
+	        case 1:
                 develSendMessage();
                 while (!gotResponse_) {
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
-		break;
-	    case 2:
+		        break;
+	        case 2:
                 develReadMessages();
                 while (!gotResponse_) {
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
                 printMessages();
-		break;
-	    default:
-		std::cout << "Invalid choice" << std::endl;
+		        break;
+	        default:
+		        std::cout << "Invalid choice" << std::endl;
             }
         }
     }
