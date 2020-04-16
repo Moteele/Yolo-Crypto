@@ -337,9 +337,9 @@ public:
 	 * @param message	message to be signed
 	 * @param mlen		length of message
 	 * @param random	64 bytes of random data
-	 * @param sig		signature
+	 * @param sig		signature, 64 bytes long
 	 */
-	void xeddsa_sign(unsigned char *priv, const unsigned char *message, size_t mlen, unsigned char *random /* 64 bytes long*/, unsigned char *sig)
+	static void xeddsa_sign(unsigned char *priv, const unsigned char *message, size_t mlen, unsigned char *random /* 64 bytes long*/, unsigned char *sig)
 	{
 		unsigned char new_priv[32];
 		unsigned char new_pub[32];
@@ -402,7 +402,7 @@ public:
 	 * @param sig		signature ofmessage
 	 * @return 0 on success
 	 */
-	int xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t mlen, unsigned char *sig)
+	static int xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t mlen, unsigned char *sig)
 	{
 		// TODO: check validity of parameters
 		unsigned char A[32];

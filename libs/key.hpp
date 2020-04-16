@@ -49,6 +49,8 @@ public:
 		return out;
 	}
 
+	EVP_PKEY *getPkey() { return key; }
+
 	void printPrivate()
 	{
 		std::cout << std::hex;
