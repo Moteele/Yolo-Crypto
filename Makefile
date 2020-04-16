@@ -6,7 +6,7 @@ LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; 
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
 CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
-LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl -no-pie
+LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
 SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp
 OBJECTS_UTIL_TEST=$(SOURCES_UTIL_TEST:.cpp=.o)
