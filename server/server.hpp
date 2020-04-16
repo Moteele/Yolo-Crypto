@@ -1,3 +1,4 @@
+#include <google/protobuf/stubs/common.h>
 #define LIB_PATH "./libs/libmbedcrypto.so"
 
 #ifndef SERVER_HPP
@@ -158,7 +159,7 @@ public:
 	 */
 	~Server()
 	{
-		//dlclose(cryptoLib_);
+		google::protobuf::ShutdownProtobufLibrary();
 	}
 
 	/**
