@@ -11,6 +11,8 @@
 #include <chrono>
 #include "../utils/functions.hpp"
 #include "../utils/constants.hpp"
+#include "../utils/key.hpp"
+#include "../utils/util.hpp"
 
 class Client
 {
@@ -20,13 +22,29 @@ class Client
     bool isAuthenticated_ = false;
     bool gotResponse_ = false;
 
+    std::vector<uint8_t> publicIk_;
+    std::vector<uint8_t> privateIk_;
+
+
+    // std::string publicPk_;
+    // std::string privatePk_;
+
+    // std::vector<std::string> publicOneTime_;
+    // std::vector<std::string> privateOneTime_;
+
 public:
+
+    void createKeys(std::ofstream &output);
 
     void develAuth();
 
+    void develAwaitCreation();
+
     void develCreateAcc();
 
-    void develAwaitCreation();
+    void fetchBundleForInitMsg(const std::string &reciever);
+
+    void createSecretFromKeys(const std::string &keys);
 
     void readResponse();
 

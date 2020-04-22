@@ -48,7 +48,8 @@ void Client::develCreateAcc() {
 
     lockFile("tmp_files/req/" + name);
     std::ofstream req("tmp_files/req/" + name);
-    req << pwd << std::endl;
+    req << "password:" << pwd << std::endl;
+    createKeys(req);
     req.close();
     unlockFile("tmp_files/req/" + name);
 
@@ -94,8 +95,12 @@ void Client::readResponse() {
             std::string command = tmp.substr(0, delim);
             std::string message = tmp.substr(delim + 1);
             if (command == "auth") {
-                if (message == "Success") {
+                if (message != "Wrong password") {
                     isAuthenticated_ = true;
+                    std::string userStr = hexToString(message);
+                    userAcc user;
+                    user.ParseFromString(userStr);
+                    //TODO:
                 } else {
                     std::cout << "Authentication failed: " << message << std::endl;
                     break;
@@ -111,6 +116,11 @@ void Client::readResponse() {
                 msg.ParseFromString(parsedFromHex);
                 messages_.push_back(msg);
             }
+            if (command == "fetchKeys") {
+                std::cout << "Got following keys from BE:" << std::endl;
+                std::cout << message << std::endl;
+                createSecretFromKeys(message);
+            }
         } else {
             newRes << line << std::endl;
         }
@@ -123,17 +133,113 @@ void Client::readResponse() {
     unlockFile(RESPONSE_FILE_PATH);
 }
 
+void Client::createSecretFromKeys(const std::string &keys)
+{
+    //TODO: sometimes it is a signature
+    int delim = keys.find_first_of(';');
+    std::string publicIdString = hexToKey(keys.substr(0, delim));
+    std::string tmp = keys.substr(delim + 1);
+    delim = tmp.find_first_of(';');
+    std::string signedPrekeyString = hexToKey(tmp.substr(0, delim));
+    tmp = tmp.substr(delim + 1);
+    delim = tmp.find_first_of(';');
+    std::string prekeySignatureString = hexToKey(tmp.substr(0, delim));
+    std::string oneTimeString = hexToKey(tmp.substr(delim + 1));
+}
+
 void Client::develSendMessage()
 {
+    using namespace std::chrono_literals;
     std::cout << "\nSend message to:" << std::endl;
     std::string reciever;
     std::getline(std::cin, reciever);
+
+    //TODO: only if not done yet
+    fetchBundleForInitMsg(reciever);
+
+    while (!gotResponse_) {
+        readResponse();
+        std::this_thread::sleep_for(1s);
+    }
+
+
+
+
     std::cout << "Message:" << std::endl;
     std::string message;
     std::getline(std::cin, message);
     std::cout << std::endl;
 
     std::string reqText = name_ + ";sendMessage;" + reciever + ";" + message;
+    writeToReq(reqText);
+}
+
+void Client::createKeys(std::ofstream &output)
+{
+    // Identity Key
+    Key identity;
+    std::vector<uint8_t> privateIdentity = identity.getPrivateKey();
+    std::vector<uint8_t> publicIdentity = identity.getPublicKey();
+
+    std::string privateIdentityKeyString = keyToHex(privateIdentity);
+    std::string publicKeyIdentityString = keyToHex(publicIdentity);
+
+    // Signed prekey
+    Key signedPrekey;
+    std::vector<uint8_t> privateSignedPrekey = signedPrekey.getPrivateKey();
+    std::vector<uint8_t> publicSignedPrekey = signedPrekey.getPublicKey();
+
+    std::string privateSignedPrekeyString = keyToHex(privateSignedPrekey);
+    std::string publicSignedPrekeyString = keyToHex(publicSignedPrekey);
+
+    // Prekey signarute
+    unsigned char rnd[64];
+    unsigned char prekeySignature[64];
+
+    std::string prekeySignatureString = stringToHex((char *)prekeySignature);
+
+    Util::xeddsa_sign(&privateIdentity[0], (const unsigned char*)publicSignedPrekeyString.c_str(), publicSignedPrekeyString.size(), rnd, prekeySignature);
+
+    // One time prekeys
+    Key oneTime1;
+    std::vector<uint8_t> privateOneTime1 = oneTime1.getPrivateKey();
+    std::vector<uint8_t> publicOneTime1 = oneTime1.getPublicKey();
+    std::string privateOneTime1String = keyToHex(privateOneTime1);
+    std::string publicOneTime1String = keyToHex(publicOneTime1);
+
+    Key oneTime2;
+    std::vector<uint8_t> privateOneTime2 = oneTime2.getPrivateKey();
+    std::vector<uint8_t> publicOneTime2 = oneTime2.getPublicKey();
+    std::string privateOneTime2String = keyToHex(privateOneTime2);
+    std::string publicOneTime2String = keyToHex(publicOneTime2);
+
+    Key oneTime3;
+    std::vector<uint8_t> privateOneTime3 = oneTime3.getPrivateKey();
+    std::vector<uint8_t> publicOneTime3 = oneTime3.getPublicKey();
+    std::string privateOneTime3String = keyToHex(privateOneTime3);
+    std::string publicOneTime3String = keyToHex(publicOneTime3);
+
+    output << "privateId:" << privateIdentityKeyString << std::endl;
+    output << "publicId:" << publicKeyIdentityString << std::endl;
+    output << "privateSignedPrekey:" << privateSignedPrekeyString << std::endl;
+    output << "publicSignedPrekey:" << publicSignedPrekeyString << std::endl;
+    output << "prekeySignature:" << prekeySignatureString << std::endl;
+    output << "privateOnetime:" << privateOneTime1String << std::endl;
+    output << "publicOneTime:" << publicOneTime1String << std::endl;
+    output << "privateOnetime:" << privateOneTime2String << std::endl;
+    output << "publicOneTime:" << publicOneTime2String << std::endl;
+    output << "privateOnetime:" << privateOneTime3String << std::endl;
+    output << "publicOneTime:" << publicOneTime3String << std::endl;
+
+    std::cout << "MyPublicId:" << publicKeyIdentityString << std::endl;
+    std::cout << "MySignedPrekey:" << publicSignedPrekeyString << std::endl;
+    std::cout << "signature:" << prekeySignatureString << std::endl;
+    std::cout << "MyOneTime:" << publicOneTime1String << std::endl;
+}
+
+void Client::fetchBundleForInitMsg(const std::string &reciever)
+{
+    std::string reqText = name_ + ";fetchKeys;" + reciever;
     writeToReq(reqText);
 }
 
@@ -193,7 +299,6 @@ void Client::develRunClient()
 
             }
         } else {
-
             std::cout << "Choose an action:" << std::endl;
             std::cout << "1 - send a message" << std::endl;
             std::cout << "2 - read messages" << std::endl;

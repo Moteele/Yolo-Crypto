@@ -18,3 +18,7 @@ void initServer();
 std::string hexToString(const std::string &input);
 
 std::string stringToHex(const std::string &input);
+
+std::string keyToHex(std::vector<uint8_t> &key);
+
+std::vector<uint8_t> hexToKey(std::string &input);

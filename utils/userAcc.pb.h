@@ -177,9 +177,16 @@ class userAcc :
 
   enum : int {
     kMessagesFieldNumber = 5,
+    kOneTimePublicFieldNumber = 11,
+    kOneTimePrivateFieldNumber = 12,
     kNameFieldNumber = 2,
     kDisplayNameFieldNumber = 3,
     kPwdhashFieldNumber = 4,
+    kPublicIkFieldNumber = 6,
+    kPrivateIkFieldNumber = 7,
+    kPublicPkFieldNumber = 8,
+    kPrivatePkFieldNumber = 9,
+    kSignedPkFieldNumber = 10,
     kIdFieldNumber = 1,
   };
   // repeated string messages = 5;
@@ -204,6 +211,54 @@ class userAcc :
   private:
   const std::string& _internal_messages(int index) const;
   std::string* _internal_add_messages();
+  public:
+
+  // repeated string one_time_public = 11;
+  int one_time_public_size() const;
+  private:
+  int _internal_one_time_public_size() const;
+  public:
+  void clear_one_time_public();
+  const std::string& one_time_public(int index) const;
+  std::string* mutable_one_time_public(int index);
+  void set_one_time_public(int index, const std::string& value);
+  void set_one_time_public(int index, std::string&& value);
+  void set_one_time_public(int index, const char* value);
+  void set_one_time_public(int index, const char* value, size_t size);
+  std::string* add_one_time_public();
+  void add_one_time_public(const std::string& value);
+  void add_one_time_public(std::string&& value);
+  void add_one_time_public(const char* value);
+  void add_one_time_public(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& one_time_public() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_one_time_public();
+  private:
+  const std::string& _internal_one_time_public(int index) const;
+  std::string* _internal_add_one_time_public();
+  public:
+
+  // repeated string one_time_private = 12;
+  int one_time_private_size() const;
+  private:
+  int _internal_one_time_private_size() const;
+  public:
+  void clear_one_time_private();
+  const std::string& one_time_private(int index) const;
+  std::string* mutable_one_time_private(int index);
+  void set_one_time_private(int index, const std::string& value);
+  void set_one_time_private(int index, std::string&& value);
+  void set_one_time_private(int index, const char* value);
+  void set_one_time_private(int index, const char* value, size_t size);
+  std::string* add_one_time_private();
+  void add_one_time_private(const std::string& value);
+  void add_one_time_private(std::string&& value);
+  void add_one_time_private(const char* value);
+  void add_one_time_private(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& one_time_private() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_one_time_private();
+  private:
+  const std::string& _internal_one_time_private(int index) const;
+  std::string* _internal_add_one_time_private();
   public:
 
   // required string name = 2;
@@ -266,6 +321,106 @@ class userAcc :
   std::string* _internal_mutable_pwdhash();
   public:
 
+  // optional string public_ik = 6;
+  bool has_public_ik() const;
+  private:
+  bool _internal_has_public_ik() const;
+  public:
+  void clear_public_ik();
+  const std::string& public_ik() const;
+  void set_public_ik(const std::string& value);
+  void set_public_ik(std::string&& value);
+  void set_public_ik(const char* value);
+  void set_public_ik(const char* value, size_t size);
+  std::string* mutable_public_ik();
+  std::string* release_public_ik();
+  void set_allocated_public_ik(std::string* public_ik);
+  private:
+  const std::string& _internal_public_ik() const;
+  void _internal_set_public_ik(const std::string& value);
+  std::string* _internal_mutable_public_ik();
+  public:
+
+  // optional string private_ik = 7;
+  bool has_private_ik() const;
+  private:
+  bool _internal_has_private_ik() const;
+  public:
+  void clear_private_ik();
+  const std::string& private_ik() const;
+  void set_private_ik(const std::string& value);
+  void set_private_ik(std::string&& value);
+  void set_private_ik(const char* value);
+  void set_private_ik(const char* value, size_t size);
+  std::string* mutable_private_ik();
+  std::string* release_private_ik();
+  void set_allocated_private_ik(std::string* private_ik);
+  private:
+  const std::string& _internal_private_ik() const;
+  void _internal_set_private_ik(const std::string& value);
+  std::string* _internal_mutable_private_ik();
+  public:
+
+  // optional string public_pk = 8;
+  bool has_public_pk() const;
+  private:
+  bool _internal_has_public_pk() const;
+  public:
+  void clear_public_pk();
+  const std::string& public_pk() const;
+  void set_public_pk(const std::string& value);
+  void set_public_pk(std::string&& value);
+  void set_public_pk(const char* value);
+  void set_public_pk(const char* value, size_t size);
+  std::string* mutable_public_pk();
+  std::string* release_public_pk();
+  void set_allocated_public_pk(std::string* public_pk);
+  private:
+  const std::string& _internal_public_pk() const;
+  void _internal_set_public_pk(const std::string& value);
+  std::string* _internal_mutable_public_pk();
+  public:
+
+  // optional string private_pk = 9;
+  bool has_private_pk() const;
+  private:
+  bool _internal_has_private_pk() const;
+  public:
+  void clear_private_pk();
+  const std::string& private_pk() const;
+  void set_private_pk(const std::string& value);
+  void set_private_pk(std::string&& value);
+  void set_private_pk(const char* value);
+  void set_private_pk(const char* value, size_t size);
+  std::string* mutable_private_pk();
+  std::string* release_private_pk();
+  void set_allocated_private_pk(std::string* private_pk);
+  private:
+  const std::string& _internal_private_pk() const;
+  void _internal_set_private_pk(const std::string& value);
+  std::string* _internal_mutable_private_pk();
+  public:
+
+  // optional string signed_pk = 10;
+  bool has_signed_pk() const;
+  private:
+  bool _internal_has_signed_pk() const;
+  public:
+  void clear_signed_pk();
+  const std::string& signed_pk() const;
+  void set_signed_pk(const std::string& value);
+  void set_signed_pk(std::string&& value);
+  void set_signed_pk(const char* value);
+  void set_signed_pk(const char* value, size_t size);
+  std::string* mutable_signed_pk();
+  std::string* release_signed_pk();
+  void set_allocated_signed_pk(std::string* signed_pk);
+  private:
+  const std::string& _internal_signed_pk() const;
+  void _internal_set_signed_pk(const std::string& value);
+  std::string* _internal_mutable_signed_pk();
+  public:
+
   // required int32 id = 1;
   bool has_id() const;
   private:
@@ -290,9 +445,16 @@ class userAcc :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> messages_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> one_time_public_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> one_time_private_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr displayname_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr pwdhash_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr public_ik_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr private_ik_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr public_pk_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr private_pk_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr signed_pk_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
   friend struct ::TableStruct_userAcc_2eproto;
 };
@@ -309,7 +471,7 @@ class userAcc :
 
 // required int32 id = 1;
 inline bool userAcc::_internal_has_id() const {
-  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
   return value;
 }
 inline bool userAcc::has_id() const {
@@ -317,7 +479,7 @@ inline bool userAcc::has_id() const {
 }
 inline void userAcc::clear_id() {
   id_ = 0;
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000100u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 userAcc::_internal_id() const {
   return id_;
@@ -327,7 +489,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 userAcc::id() const {
   return _internal_id();
 }
 inline void userAcc::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000100u;
   id_ = value;
 }
 inline void userAcc::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -620,6 +782,509 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 userAcc::mutable_messages() {
   // @@protoc_insertion_point(field_mutable_list:userAcc.messages)
   return &messages_;
+}
+
+// optional string public_ik = 6;
+inline bool userAcc::_internal_has_public_ik() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool userAcc::has_public_ik() const {
+  return _internal_has_public_ik();
+}
+inline void userAcc::clear_public_ik() {
+  public_ik_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline const std::string& userAcc::public_ik() const {
+  // @@protoc_insertion_point(field_get:userAcc.public_ik)
+  return _internal_public_ik();
+}
+inline void userAcc::set_public_ik(const std::string& value) {
+  _internal_set_public_ik(value);
+  // @@protoc_insertion_point(field_set:userAcc.public_ik)
+}
+inline std::string* userAcc::mutable_public_ik() {
+  // @@protoc_insertion_point(field_mutable:userAcc.public_ik)
+  return _internal_mutable_public_ik();
+}
+inline const std::string& userAcc::_internal_public_ik() const {
+  return public_ik_.GetNoArena();
+}
+inline void userAcc::_internal_set_public_ik(const std::string& value) {
+  _has_bits_[0] |= 0x00000008u;
+  public_ik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void userAcc::set_public_ik(std::string&& value) {
+  _has_bits_[0] |= 0x00000008u;
+  public_ik_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:userAcc.public_ik)
+}
+inline void userAcc::set_public_ik(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000008u;
+  public_ik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:userAcc.public_ik)
+}
+inline void userAcc::set_public_ik(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000008u;
+  public_ik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:userAcc.public_ik)
+}
+inline std::string* userAcc::_internal_mutable_public_ik() {
+  _has_bits_[0] |= 0x00000008u;
+  return public_ik_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* userAcc::release_public_ik() {
+  // @@protoc_insertion_point(field_release:userAcc.public_ik)
+  if (!_internal_has_public_ik()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000008u;
+  return public_ik_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void userAcc::set_allocated_public_ik(std::string* public_ik) {
+  if (public_ik != nullptr) {
+    _has_bits_[0] |= 0x00000008u;
+  } else {
+    _has_bits_[0] &= ~0x00000008u;
+  }
+  public_ik_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), public_ik);
+  // @@protoc_insertion_point(field_set_allocated:userAcc.public_ik)
+}
+
+// optional string private_ik = 7;
+inline bool userAcc::_internal_has_private_ik() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool userAcc::has_private_ik() const {
+  return _internal_has_private_ik();
+}
+inline void userAcc::clear_private_ik() {
+  private_ik_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline const std::string& userAcc::private_ik() const {
+  // @@protoc_insertion_point(field_get:userAcc.private_ik)
+  return _internal_private_ik();
+}
+inline void userAcc::set_private_ik(const std::string& value) {
+  _internal_set_private_ik(value);
+  // @@protoc_insertion_point(field_set:userAcc.private_ik)
+}
+inline std::string* userAcc::mutable_private_ik() {
+  // @@protoc_insertion_point(field_mutable:userAcc.private_ik)
+  return _internal_mutable_private_ik();
+}
+inline const std::string& userAcc::_internal_private_ik() const {
+  return private_ik_.GetNoArena();
+}
+inline void userAcc::_internal_set_private_ik(const std::string& value) {
+  _has_bits_[0] |= 0x00000010u;
+  private_ik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void userAcc::set_private_ik(std::string&& value) {
+  _has_bits_[0] |= 0x00000010u;
+  private_ik_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:userAcc.private_ik)
+}
+inline void userAcc::set_private_ik(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000010u;
+  private_ik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:userAcc.private_ik)
+}
+inline void userAcc::set_private_ik(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000010u;
+  private_ik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:userAcc.private_ik)
+}
+inline std::string* userAcc::_internal_mutable_private_ik() {
+  _has_bits_[0] |= 0x00000010u;
+  return private_ik_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* userAcc::release_private_ik() {
+  // @@protoc_insertion_point(field_release:userAcc.private_ik)
+  if (!_internal_has_private_ik()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000010u;
+  return private_ik_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void userAcc::set_allocated_private_ik(std::string* private_ik) {
+  if (private_ik != nullptr) {
+    _has_bits_[0] |= 0x00000010u;
+  } else {
+    _has_bits_[0] &= ~0x00000010u;
+  }
+  private_ik_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), private_ik);
+  // @@protoc_insertion_point(field_set_allocated:userAcc.private_ik)
+}
+
+// optional string public_pk = 8;
+inline bool userAcc::_internal_has_public_pk() const {
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  return value;
+}
+inline bool userAcc::has_public_pk() const {
+  return _internal_has_public_pk();
+}
+inline void userAcc::clear_public_pk() {
+  public_pk_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline const std::string& userAcc::public_pk() const {
+  // @@protoc_insertion_point(field_get:userAcc.public_pk)
+  return _internal_public_pk();
+}
+inline void userAcc::set_public_pk(const std::string& value) {
+  _internal_set_public_pk(value);
+  // @@protoc_insertion_point(field_set:userAcc.public_pk)
+}
+inline std::string* userAcc::mutable_public_pk() {
+  // @@protoc_insertion_point(field_mutable:userAcc.public_pk)
+  return _internal_mutable_public_pk();
+}
+inline const std::string& userAcc::_internal_public_pk() const {
+  return public_pk_.GetNoArena();
+}
+inline void userAcc::_internal_set_public_pk(const std::string& value) {
+  _has_bits_[0] |= 0x00000020u;
+  public_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void userAcc::set_public_pk(std::string&& value) {
+  _has_bits_[0] |= 0x00000020u;
+  public_pk_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:userAcc.public_pk)
+}
+inline void userAcc::set_public_pk(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000020u;
+  public_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:userAcc.public_pk)
+}
+inline void userAcc::set_public_pk(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000020u;
+  public_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:userAcc.public_pk)
+}
+inline std::string* userAcc::_internal_mutable_public_pk() {
+  _has_bits_[0] |= 0x00000020u;
+  return public_pk_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* userAcc::release_public_pk() {
+  // @@protoc_insertion_point(field_release:userAcc.public_pk)
+  if (!_internal_has_public_pk()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000020u;
+  return public_pk_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void userAcc::set_allocated_public_pk(std::string* public_pk) {
+  if (public_pk != nullptr) {
+    _has_bits_[0] |= 0x00000020u;
+  } else {
+    _has_bits_[0] &= ~0x00000020u;
+  }
+  public_pk_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), public_pk);
+  // @@protoc_insertion_point(field_set_allocated:userAcc.public_pk)
+}
+
+// optional string private_pk = 9;
+inline bool userAcc::_internal_has_private_pk() const {
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  return value;
+}
+inline bool userAcc::has_private_pk() const {
+  return _internal_has_private_pk();
+}
+inline void userAcc::clear_private_pk() {
+  private_pk_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline const std::string& userAcc::private_pk() const {
+  // @@protoc_insertion_point(field_get:userAcc.private_pk)
+  return _internal_private_pk();
+}
+inline void userAcc::set_private_pk(const std::string& value) {
+  _internal_set_private_pk(value);
+  // @@protoc_insertion_point(field_set:userAcc.private_pk)
+}
+inline std::string* userAcc::mutable_private_pk() {
+  // @@protoc_insertion_point(field_mutable:userAcc.private_pk)
+  return _internal_mutable_private_pk();
+}
+inline const std::string& userAcc::_internal_private_pk() const {
+  return private_pk_.GetNoArena();
+}
+inline void userAcc::_internal_set_private_pk(const std::string& value) {
+  _has_bits_[0] |= 0x00000040u;
+  private_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void userAcc::set_private_pk(std::string&& value) {
+  _has_bits_[0] |= 0x00000040u;
+  private_pk_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:userAcc.private_pk)
+}
+inline void userAcc::set_private_pk(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000040u;
+  private_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:userAcc.private_pk)
+}
+inline void userAcc::set_private_pk(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000040u;
+  private_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:userAcc.private_pk)
+}
+inline std::string* userAcc::_internal_mutable_private_pk() {
+  _has_bits_[0] |= 0x00000040u;
+  return private_pk_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* userAcc::release_private_pk() {
+  // @@protoc_insertion_point(field_release:userAcc.private_pk)
+  if (!_internal_has_private_pk()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000040u;
+  return private_pk_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void userAcc::set_allocated_private_pk(std::string* private_pk) {
+  if (private_pk != nullptr) {
+    _has_bits_[0] |= 0x00000040u;
+  } else {
+    _has_bits_[0] &= ~0x00000040u;
+  }
+  private_pk_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), private_pk);
+  // @@protoc_insertion_point(field_set_allocated:userAcc.private_pk)
+}
+
+// optional string signed_pk = 10;
+inline bool userAcc::_internal_has_signed_pk() const {
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  return value;
+}
+inline bool userAcc::has_signed_pk() const {
+  return _internal_has_signed_pk();
+}
+inline void userAcc::clear_signed_pk() {
+  signed_pk_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline const std::string& userAcc::signed_pk() const {
+  // @@protoc_insertion_point(field_get:userAcc.signed_pk)
+  return _internal_signed_pk();
+}
+inline void userAcc::set_signed_pk(const std::string& value) {
+  _internal_set_signed_pk(value);
+  // @@protoc_insertion_point(field_set:userAcc.signed_pk)
+}
+inline std::string* userAcc::mutable_signed_pk() {
+  // @@protoc_insertion_point(field_mutable:userAcc.signed_pk)
+  return _internal_mutable_signed_pk();
+}
+inline const std::string& userAcc::_internal_signed_pk() const {
+  return signed_pk_.GetNoArena();
+}
+inline void userAcc::_internal_set_signed_pk(const std::string& value) {
+  _has_bits_[0] |= 0x00000080u;
+  signed_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void userAcc::set_signed_pk(std::string&& value) {
+  _has_bits_[0] |= 0x00000080u;
+  signed_pk_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:userAcc.signed_pk)
+}
+inline void userAcc::set_signed_pk(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000080u;
+  signed_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:userAcc.signed_pk)
+}
+inline void userAcc::set_signed_pk(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000080u;
+  signed_pk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:userAcc.signed_pk)
+}
+inline std::string* userAcc::_internal_mutable_signed_pk() {
+  _has_bits_[0] |= 0x00000080u;
+  return signed_pk_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* userAcc::release_signed_pk() {
+  // @@protoc_insertion_point(field_release:userAcc.signed_pk)
+  if (!_internal_has_signed_pk()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000080u;
+  return signed_pk_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void userAcc::set_allocated_signed_pk(std::string* signed_pk) {
+  if (signed_pk != nullptr) {
+    _has_bits_[0] |= 0x00000080u;
+  } else {
+    _has_bits_[0] &= ~0x00000080u;
+  }
+  signed_pk_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), signed_pk);
+  // @@protoc_insertion_point(field_set_allocated:userAcc.signed_pk)
+}
+
+// repeated string one_time_public = 11;
+inline int userAcc::_internal_one_time_public_size() const {
+  return one_time_public_.size();
+}
+inline int userAcc::one_time_public_size() const {
+  return _internal_one_time_public_size();
+}
+inline void userAcc::clear_one_time_public() {
+  one_time_public_.Clear();
+}
+inline std::string* userAcc::add_one_time_public() {
+  // @@protoc_insertion_point(field_add_mutable:userAcc.one_time_public)
+  return _internal_add_one_time_public();
+}
+inline const std::string& userAcc::_internal_one_time_public(int index) const {
+  return one_time_public_.Get(index);
+}
+inline const std::string& userAcc::one_time_public(int index) const {
+  // @@protoc_insertion_point(field_get:userAcc.one_time_public)
+  return _internal_one_time_public(index);
+}
+inline std::string* userAcc::mutable_one_time_public(int index) {
+  // @@protoc_insertion_point(field_mutable:userAcc.one_time_public)
+  return one_time_public_.Mutable(index);
+}
+inline void userAcc::set_one_time_public(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:userAcc.one_time_public)
+  one_time_public_.Mutable(index)->assign(value);
+}
+inline void userAcc::set_one_time_public(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:userAcc.one_time_public)
+  one_time_public_.Mutable(index)->assign(std::move(value));
+}
+inline void userAcc::set_one_time_public(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  one_time_public_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:userAcc.one_time_public)
+}
+inline void userAcc::set_one_time_public(int index, const char* value, size_t size) {
+  one_time_public_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:userAcc.one_time_public)
+}
+inline std::string* userAcc::_internal_add_one_time_public() {
+  return one_time_public_.Add();
+}
+inline void userAcc::add_one_time_public(const std::string& value) {
+  one_time_public_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:userAcc.one_time_public)
+}
+inline void userAcc::add_one_time_public(std::string&& value) {
+  one_time_public_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:userAcc.one_time_public)
+}
+inline void userAcc::add_one_time_public(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  one_time_public_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:userAcc.one_time_public)
+}
+inline void userAcc::add_one_time_public(const char* value, size_t size) {
+  one_time_public_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:userAcc.one_time_public)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+userAcc::one_time_public() const {
+  // @@protoc_insertion_point(field_list:userAcc.one_time_public)
+  return one_time_public_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+userAcc::mutable_one_time_public() {
+  // @@protoc_insertion_point(field_mutable_list:userAcc.one_time_public)
+  return &one_time_public_;
+}
+
+// repeated string one_time_private = 12;
+inline int userAcc::_internal_one_time_private_size() const {
+  return one_time_private_.size();
+}
+inline int userAcc::one_time_private_size() const {
+  return _internal_one_time_private_size();
+}
+inline void userAcc::clear_one_time_private() {
+  one_time_private_.Clear();
+}
+inline std::string* userAcc::add_one_time_private() {
+  // @@protoc_insertion_point(field_add_mutable:userAcc.one_time_private)
+  return _internal_add_one_time_private();
+}
+inline const std::string& userAcc::_internal_one_time_private(int index) const {
+  return one_time_private_.Get(index);
+}
+inline const std::string& userAcc::one_time_private(int index) const {
+  // @@protoc_insertion_point(field_get:userAcc.one_time_private)
+  return _internal_one_time_private(index);
+}
+inline std::string* userAcc::mutable_one_time_private(int index) {
+  // @@protoc_insertion_point(field_mutable:userAcc.one_time_private)
+  return one_time_private_.Mutable(index);
+}
+inline void userAcc::set_one_time_private(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:userAcc.one_time_private)
+  one_time_private_.Mutable(index)->assign(value);
+}
+inline void userAcc::set_one_time_private(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:userAcc.one_time_private)
+  one_time_private_.Mutable(index)->assign(std::move(value));
+}
+inline void userAcc::set_one_time_private(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  one_time_private_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:userAcc.one_time_private)
+}
+inline void userAcc::set_one_time_private(int index, const char* value, size_t size) {
+  one_time_private_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:userAcc.one_time_private)
+}
+inline std::string* userAcc::_internal_add_one_time_private() {
+  return one_time_private_.Add();
+}
+inline void userAcc::add_one_time_private(const std::string& value) {
+  one_time_private_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:userAcc.one_time_private)
+}
+inline void userAcc::add_one_time_private(std::string&& value) {
+  one_time_private_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:userAcc.one_time_private)
+}
+inline void userAcc::add_one_time_private(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  one_time_private_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:userAcc.one_time_private)
+}
+inline void userAcc::add_one_time_private(const char* value, size_t size) {
+  one_time_private_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:userAcc.one_time_private)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+userAcc::one_time_private() const {
+  // @@protoc_insertion_point(field_list:userAcc.one_time_private)
+  return one_time_private_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+userAcc::mutable_one_time_private() {
+  // @@protoc_insertion_point(field_mutable_list:userAcc.one_time_private)
+  return &one_time_private_;
 }
 
 #ifdef __GNUC__

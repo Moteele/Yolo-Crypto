@@ -115,3 +115,29 @@ std::string stringToHex(const std::string &input) {
 	output << std::endl;
 	return output.str();
 }
+
+
+std::string keyToHex(std::vector<uint8_t> &key) {
+	std::stringstream output;
+	for (int i = 0; i < key.size(); ++i) {
+		output << std::hex << std::setfill('0') << std::setw(2) << (int)key[i];
+	}
+	//output << std::endl;
+	return output.str();
+}
+
+std::vector<uint8_t> hexToKey(std::string &input) {
+	std::vector<uint8_t> output;
+	if (((input.length()) % 2) != 0) {
+		throw std::runtime_error("String is not valid length...");
+	}
+	size_t cnt = (input.length()) / 2;
+	for (size_t i = 0; cnt > i; ++i) {
+		uint32_t s = 0;
+		std::stringstream ss;
+		ss << std::hex << input.substr(i * 2, 2);
+		ss >> s;
+		output.push_back(static_cast<uint8_t>(s));
+	}
+	return output;
+}

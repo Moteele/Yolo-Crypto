@@ -160,12 +160,48 @@ int Server::tryCreateAccount(const std::string &name) {
 	}
 	std::string path = "tmp_files/req/" + name;
 	std::ifstream req(path);
-	std::string reqText;
-	std::getline(req, reqText);
+
 	userAcc newUser;
+	std::string line;
 	newUser.set_name(name);
-	newUser.set_pwdhash(reqText);
 	newUser.set_id(users_.size());
+	while (std::getline(req, line)) {
+		int delim = line.find_first_of(':');
+		std::string command = line.substr(0, delim);
+		std::string value = line.substr(delim + 1);
+		if (command == "password") {
+			newUser.set_pwdhash(value);
+			continue;
+		}
+		if (command == "privateId") {
+			newUser.set_private_ik(value);
+			continue;
+		}
+		if (command == "publicId") {
+			newUser.set_public_ik(value);
+			continue;
+		}
+		if (command == "privateSignedPrekey") {
+			newUser.set_private_pk(value);
+			continue;
+		}
+		if (command == "publicSignedPrekey") {
+			newUser.set_public_pk(value);
+			continue;
+		}
+		if (command == "prekeySignature") {
+			newUser.set_signed_pk(value);
+			continue;
+		}
+		if (command == "privateOnetime") {
+			newUser.add_one_time_private(value);
+			continue;
+		}
+		if (command == "publicOnetime") {
+			newUser.add_one_time_public(value);
+			continue;
+		}
+	}
 	users_.push_back(newUser);
 	req.close();
 	std::remove(path.c_str());
@@ -182,6 +218,8 @@ void Server::processRequests()
 			performAuth(requests_[i]);
 		} else if (requesterAndCommand.second == "fetchMessages") {
 			performFetchMessages(requests_[i]);
+		} else if (requesterAndCommand.second == "fetchKeys") {
+			performFetchKeys(requests_[i]);
 		}
 	}
 
@@ -262,7 +300,11 @@ void Server::performAuth(const std::string &req) {
 	for (int i = 0; i < users_.size(); ++i) {
 		if (users_[i].name() == login) {
 			if (users_[i].pwdhash() == pwd) {
-				responses_.emplace_back(users_[i].name() + ";auth;Success");
+				std::string line;
+				users_[i].SerializeToString(&line);
+				std::stringstream usr;
+				usr << stringToHex(line);
+				responses_.emplace_back(users_[i].name() + ";auth;" + usr.str());
 			} else {
 				responses_.emplace_back(users_[i].name() + ";auth;Wrong password");
 			}
@@ -291,6 +333,39 @@ void Server::performFetchMessages(const std::string &req) {
 		std::string response = users_[index].name() + ";fetchMessages;" + it;
 		responses_.push_back(response);
 	}
+}
+
+void Server::performFetchKeys(const std::string &req) {
+	int delim = req.find_first_of(';');
+	std::string name = req.substr(0, delim);
+	std::string tmp = req.substr(delim + 1);
+	delim = tmp.find_first_of(';');
+	std::string keysOwner = tmp.substr(delim + 1);
+	int index = -1;
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == keysOwner) {
+			index = i;
+			break;
+		}
+	}
+	if (index == -1) {
+		std::string response = name + ";fetchKeys;Error";
+		responses_.push_back(response);
+		return;
+	}
+	std::stringstream response;
+	response << name + ";fetchKeys;";
+	response << users_[index].public_ik() << ";";
+	response << users_[index].public_pk() << ";";
+	response << users_[index].signed_pk() << ";";
+
+	//TODO: take only one and delete it from server
+	auto oneTimes = users_[index].one_time_public();
+	for (const auto &it : oneTimes) {
+		response << it;
+		break;
+	}
+	responses_.push_back(response.str());
 }
 
 void Server::loadUsers() {
