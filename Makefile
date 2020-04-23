@@ -5,7 +5,7 @@ SHELL := bash
 LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
-CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
+CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -I/snap/protobuf/current/include -L/snap/protobuf/current/lib -Llibs -pthread $(LIBCXXFLAGS)
 LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
 SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp utils/util.cpp
@@ -48,7 +48,7 @@ client-build: clientApp
 valgrind:server-build
 	valgrind --leak-check=full --show-reachable=yes ./serverApp
 
-debug:
+debug-flags:
 	echo $(CXXFLAGS); echo $(LDFLAGS)
 
 test-util: $(OBJECTS_UTIL_TEST)
