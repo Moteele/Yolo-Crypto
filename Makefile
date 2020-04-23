@@ -8,9 +8,9 @@ LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; p
 CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
 LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
-SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp
+SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp utils/util.cpp
 OBJECTS_UTIL_TEST=$(SOURCES_UTIL_TEST:.cpp=.o)
-SOURCES_SERVER=server/server.cpp server/message.pb.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp
+SOURCES_SERVER=server/server.cpp server/message.pb.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/util.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER)
 SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
