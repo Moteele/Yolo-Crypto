@@ -1,6 +1,6 @@
 #include "client.hpp"
 
-
+#include <bitset>
 
 
 bool Client::develFileExists(const std::string &path) {
@@ -21,6 +21,35 @@ void Client::writeToReq(const std::string &req) {
     reqFile.close();
     gotResponse_ = false;
     unlockFile(REQEST_FILE_PATH);
+}
+
+void Client::setupKey(std::string name, std::vector<uint8_t> &key) {
+    for (int i = 0; i < 32; ++i) {
+        if (name == "pub_identity") {
+            pub_identity[i] = key[i];
+        }
+        if (name == "pri_identity") {
+            pri_identity[i] = key[i];
+        }
+        if (name == "pub_signedPre") {
+            pub_signedPre[i] = key[i];
+        }
+        if (name == "pri_signedPre") {
+            pri_signedPre[i] = key[i];
+        }
+        if (name == "pub_oneTime") {
+            pub_oneTime[i] = key[i];
+        }
+        if (name == "pri_oneTime") {
+            pri_oneTime[i] = key[i];
+        }
+        if (name == "pub_empheral") {
+            pub_empheral[i] = key[i];
+        }
+        if (name == "pri_empheral") {
+            pri_empheral[i] = key[i];
+        }
+    }
 }
 
 void Client::develAuth() {
@@ -117,9 +146,10 @@ void Client::readResponse() {
                 messages_.push_back(msg);
             }
             if (command == "fetchKeys") {
-                std::cout << "Got following keys from BE:" << std::endl;
-                std::cout << message << std::endl;
                 createSecretFromKeys(message);
+            }
+            if (command == "initialMessage") {
+                checkInitial(message);
             }
         } else {
             newRes << line << std::endl;
@@ -135,16 +165,108 @@ void Client::readResponse() {
 
 void Client::createSecretFromKeys(const std::string &keys)
 {
-    //TODO: sometimes it is a signature
     int delim = keys.find_first_of(';');
-    std::string publicIdString = hexToKey(keys.substr(0, delim));
+    std::string arg = keys.substr(0, delim);
+    std::vector<uint8_t> publicId = hexToKey(arg);
     std::string tmp = keys.substr(delim + 1);
     delim = tmp.find_first_of(';');
-    std::string signedPrekeyString = hexToKey(tmp.substr(0, delim));
+    arg = tmp.substr(0, delim);
+    std::vector<uint8_t> signedPrekey = hexToKey(arg);
+    std::string signedPrekeyHex = arg;
     tmp = tmp.substr(delim + 1);
     delim = tmp.find_first_of(';');
-    std::string prekeySignatureString = hexToKey(tmp.substr(0, delim));
-    std::string oneTimeString = hexToKey(tmp.substr(delim + 1));
+    arg = tmp.substr(0, delim);
+    std::string prekeySignatureString = arg;
+
+    std::stringstream decode;
+    for (int i = 0; i < prekeySignatureString.size(); i += 8) {
+        std::bitset<8> bits(prekeySignatureString.substr(i, i+8));
+        decode << static_cast<unsigned char>(bits.to_ulong());
+    }
+    std::string signature = decode.str();
+    unsigned char sig[64];
+    for (int i = 0; i < 64; ++i) {
+        sig[i] = signature[i];
+    }
+
+    arg = tmp.substr(delim + 1);
+    std::vector<uint8_t> oneTime = hexToKey(arg);
+
+    //--------------------------------------
+    int verified = Util::xeddsa_verify(&publicId[0], (const unsigned char*)signedPrekeyHex.c_str(), signedPrekeyHex.size(), sig);
+
+    if (verified != 0) {
+        throw std::runtime_error("verification of the signature has failed");
+    }
+
+    Key empheral;
+    std::vector<uint8_t> empheralPrivate = empheral.getPrivateKey();
+    std::vector<uint8_t> empheralPublic = empheral.getPublicKey();
+    setupKey("pri_empheral", empheralPrivate);
+    setupKey("pub_empheral", empheralPublic);
+
+    // DH1
+    unsigned char signedPrekeyRaw[32];
+    for (int i = 0; i < 32; ++i) {
+        signedPrekeyRaw[i] = signedPrekey[i];
+    }
+    EVP_PKEY *fst = EVP_PKEY_new();
+    fst = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_identity, 32);
+    EVP_PKEY *snd = EVP_PKEY_new();
+    snd = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, signedPrekeyRaw, 32);
+    size_t ssize;
+    unsigned char DH1[32];
+    Util::ecdh(fst, snd, DH1, &ssize);
+
+    // DH2
+    unsigned char hisIdentityRaw[32];
+    for (int i = 0; i < 32; ++i) {
+        hisIdentityRaw[i] = publicId[i];
+    }
+    EVP_PKEY *fst2 = EVP_PKEY_new();
+    fst2 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_empheral, 32);
+    EVP_PKEY *snd2 = EVP_PKEY_new();
+    snd2 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, hisIdentityRaw, 32);
+    size_t ssize2;
+    unsigned char DH2[32];
+    Util::ecdh(fst2, snd2, DH2, &ssize2);
+
+    // DH3
+    EVP_PKEY *fst3 = EVP_PKEY_new();
+    fst3 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_empheral, 32);
+    EVP_PKEY *snd3 = EVP_PKEY_new();
+    snd3 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, signedPrekeyRaw, 32);
+    size_t ssize3;
+    unsigned char DH3[32];
+    Util::ecdh(fst3, snd3, DH3, &ssize3);
+
+    // DH4
+    unsigned char oneTimeRaw[32];
+    for (int i = 0; i < 32; ++i) {
+        oneTimeRaw[i] = oneTime[i];
+    }
+    EVP_PKEY *fst4 = EVP_PKEY_new();
+    fst4 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_empheral, 32);
+    EVP_PKEY *snd4 = EVP_PKEY_new();
+    snd4 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, oneTimeRaw, 32);
+    size_t ssize4;
+    unsigned char DH4[32];
+    Util::ecdh(fst4, snd4, DH4, &ssize4);
+
+    // KDF
+    unsigned char concat[32];
+    for (int i = 0; i < 32; ++i) {
+        concat[i] = DH1[i] | DH2[i]  | DH3[i] | DH4[i];
+    }
+
+    int result = Util::kdf(concat, 32, sharedSecret, &sharedSecretLen);
+
+    //TODO: delete stuff not needed anymore
+
+    // AD
+    for (int i = 0; i < 32; ++i) {
+        AD[i] = pri_identity[i] | hisIdentityRaw[i];
+    }
 }
 
 void Client::develSendMessage()
@@ -162,7 +284,35 @@ void Client::develSendMessage()
         std::this_thread::sleep_for(1s);
     }
 
+    // now stuff for initial message is ready
+    std::cout << "My version of shared secret:" << std::endl;
+    for (int i = 0; i < 32; ++i) {
+        std::cout << sharedSecret[i];
+    }
+    std::cout << std::endl;
 
+    std::stringstream initialMessageSS;
+    initialMessageSS << name_ << ";initialMessage;" << reciever << ";";
+    std::vector<uint8_t> public_ik;
+    for (int i = 0; i < 32; ++i) {
+        public_ik.push_back(pub_identity[i]);
+    }
+    std::string ikHex = keyToHex(public_ik);
+    initialMessageSS << ikHex << ";";
+    std::vector<uint8_t> public_emp;
+    for (int i = 0; i < 32; ++i) {
+        public_emp.push_back(pub_empheral[i]);
+    }
+    std::string emHex = keyToHex(public_emp);
+    initialMessageSS << emHex << ";";
+    std::vector<uint8_t> ad;
+    for (int i = 0; i < 32; ++i) {
+        ad.push_back(AD[i]);
+    }
+    std::string adHex = keyToHex(ad);
+    initialMessageSS << adHex;
+
+    writeToReq(initialMessageSS.str());
 
 
     std::cout << "Message:" << std::endl;
@@ -180,6 +330,8 @@ void Client::createKeys(std::ofstream &output)
     Key identity;
     std::vector<uint8_t> privateIdentity = identity.getPrivateKey();
     std::vector<uint8_t> publicIdentity = identity.getPublicKey();
+    setupKey("pri_identity", privateIdentity);
+    setupKey("pub_identity", publicIdentity);
 
     std::string privateIdentityKeyString = keyToHex(privateIdentity);
     std::string publicKeyIdentityString = keyToHex(publicIdentity);
@@ -188,6 +340,8 @@ void Client::createKeys(std::ofstream &output)
     Key signedPrekey;
     std::vector<uint8_t> privateSignedPrekey = signedPrekey.getPrivateKey();
     std::vector<uint8_t> publicSignedPrekey = signedPrekey.getPublicKey();
+    setupKey("pri_signedPre", privateSignedPrekey);
+    setupKey("pub_signedPre", publicSignedPrekey);
 
     std::string privateSignedPrekeyString = keyToHex(privateSignedPrekey);
     std::string publicSignedPrekeyString = keyToHex(publicSignedPrekey);
@@ -196,14 +350,21 @@ void Client::createKeys(std::ofstream &output)
     unsigned char rnd[64];
     unsigned char prekeySignature[64];
 
-    std::string prekeySignatureString = stringToHex((char *)prekeySignature);
-
+    //TODO: this should sign encoded publicSignedPrekey not raw
     Util::xeddsa_sign(&privateIdentity[0], (const unsigned char*)publicSignedPrekeyString.c_str(), publicSignedPrekeyString.size(), rnd, prekeySignature);
+
+    std::stringstream encoded;
+    for(int i = 0; i < 64; ++i) {
+        encoded << std::bitset<8>(prekeySignature[i]).to_string();
+    }
+    std::string prekeySignatureString = encoded.str();
 
     // One time prekeys
     Key oneTime1;
     std::vector<uint8_t> privateOneTime1 = oneTime1.getPrivateKey();
     std::vector<uint8_t> publicOneTime1 = oneTime1.getPublicKey();
+    setupKey("pri_oneTime", privateOneTime1);
+    setupKey("pub_oneTime", publicOneTime1);
     std::string privateOneTime1String = keyToHex(privateOneTime1);
     std::string publicOneTime1String = keyToHex(publicOneTime1);
 
@@ -225,16 +386,87 @@ void Client::createKeys(std::ofstream &output)
     output << "publicSignedPrekey:" << publicSignedPrekeyString << std::endl;
     output << "prekeySignature:" << prekeySignatureString << std::endl;
     output << "privateOnetime:" << privateOneTime1String << std::endl;
-    output << "publicOneTime:" << publicOneTime1String << std::endl;
+    output << "publicOnetime:" << publicOneTime1String << std::endl;
     output << "privateOnetime:" << privateOneTime2String << std::endl;
-    output << "publicOneTime:" << publicOneTime2String << std::endl;
+    output << "publicOnetime:" << publicOneTime2String << std::endl;
     output << "privateOnetime:" << privateOneTime3String << std::endl;
-    output << "publicOneTime:" << publicOneTime3String << std::endl;
+    output << "publicOnetime:" << publicOneTime3String << std::endl;
+}
 
-    std::cout << "MyPublicId:" << publicKeyIdentityString << std::endl;
-    std::cout << "MySignedPrekey:" << publicSignedPrekeyString << std::endl;
-    std::cout << "signature:" << prekeySignatureString << std::endl;
-    std::cout << "MyOneTime:" << publicOneTime1String << std::endl;
+void Client::checkInitial(const std::string &message) {
+    int delim = message.find_first_of(';');
+    std::string hisPublicHex = message.substr(0, delim);
+    std::string tmp = message.substr(delim + 1);
+    delim = tmp.find_first_of(';');
+    std::string hisEmpHex = tmp.substr(0, delim);
+    std::string adHex = tmp.substr(delim + 1);
+
+    std::vector<uint8_t> hisPublic = hexToKey(hisPublicHex);
+    std::vector<uint8_t> hisEmp = hexToKey(hisEmpHex);
+    std::vector<uint8_t> ad = hexToKey(adHex);
+
+    unsigned char hisPublicRaw[32];
+    for (int i = 0; i < 32; ++i) {
+        hisPublicRaw[i] = hisPublic[i];
+    }
+    unsigned char hisEmpRaw[32];
+    for (int i = 0; i < 32; ++i) {
+        hisEmpRaw[i] = hisEmp[i];
+    }
+    unsigned char adRaw[32];
+    for (int i = 0; i < 32; ++i) {
+        adRaw[i] = ad[i];
+    }
+
+    // DH1
+    EVP_PKEY *fst = EVP_PKEY_new();
+    fst = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, hisPublicRaw, 32);
+    EVP_PKEY *snd = EVP_PKEY_new();
+    snd = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_signedPre, 32);
+    size_t ssize;
+    unsigned char DH1[32];
+    Util::ecdh(fst, snd, DH1, &ssize);
+
+    // DH2
+    EVP_PKEY *fst2 = EVP_PKEY_new();
+    fst2 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, hisEmpRaw, 32);
+    EVP_PKEY *snd2 = EVP_PKEY_new();
+    snd2 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_identity, 32);
+    size_t ssize2;
+    unsigned char DH2[32];
+    Util::ecdh(fst2, snd2, DH2, &ssize2);
+
+    // DH3
+    EVP_PKEY *fst3 = EVP_PKEY_new();
+    fst3 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, hisEmpRaw, 32);
+    EVP_PKEY *snd3 = EVP_PKEY_new();
+    snd3 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_signedPre, 32);
+    size_t ssize3;
+    unsigned char DH3[32];
+    Util::ecdh(fst3, snd3, DH3, &ssize3);
+
+    // DH4
+    EVP_PKEY *fst4 = EVP_PKEY_new();
+    fst4 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, hisEmpRaw, 32);
+    EVP_PKEY *snd4 = EVP_PKEY_new();
+    snd4 = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, pub_oneTime, 32);
+    size_t ssize4;
+    unsigned char DH4[32];
+    Util::ecdh(fst4, snd4, DH4, &ssize4);
+
+    // KDF
+    unsigned char concat[32];
+    for (int i = 0; i < 32; ++i) {
+        concat[i] = DH1[i] | DH2[i]  | DH3[i] | DH4[i];
+    }
+
+    int result = Util::kdf(concat, 32, sharedSecret, &sharedSecretLen);
+
+    std::cout << "My version of shared secret: " << std::endl;
+    for (int i = 0; i < 32; ++i) {
+        std::cout << sharedSecret[i];
+    }
+    std::cout << std::endl;
 }
 
 void Client::fetchBundleForInitMsg(const std::string &reciever)
@@ -302,6 +534,7 @@ void Client::develRunClient()
             std::cout << "Choose an action:" << std::endl;
             std::cout << "1 - send a message" << std::endl;
             std::cout << "2 - read messages" << std::endl;
+            std::cout << "3 - check initial messages" << std::endl;
             std::getline(std::cin, chosen);
 
             try {
@@ -327,6 +560,9 @@ void Client::develRunClient()
                 }
                 printMessages();
 		        break;
+            case 3:
+                readResponse();
+                break;
 	        default:
 		        std::cout << "Invalid choice" << std::endl;
             }

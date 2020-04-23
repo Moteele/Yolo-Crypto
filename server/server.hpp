@@ -263,6 +263,8 @@ public:
 	void performFetchMessages(const std::string &req);
 
 	void performFetchKeys(const std::string &req);
+
+	void performSendInitialMsg(const std::string &req);
 };
 
 #endif // SERVER_HPP

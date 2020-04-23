@@ -174,31 +174,33 @@ int Server::tryCreateAccount(const std::string &name) {
 			continue;
 		}
 		if (command == "privateId") {
-			newUser.set_private_ik(value);
+			newUser.set_privateik(value);
 			continue;
 		}
 		if (command == "publicId") {
-			newUser.set_public_ik(value);
+			newUser.set_publicik(value);
 			continue;
 		}
 		if (command == "privateSignedPrekey") {
-			newUser.set_private_pk(value);
+			newUser.set_privatepk(value);
 			continue;
 		}
 		if (command == "publicSignedPrekey") {
-			newUser.set_public_pk(value);
+			newUser.set_publicpk(value);
 			continue;
 		}
 		if (command == "prekeySignature") {
-			newUser.set_signed_pk(value);
+			newUser.set_signedpk(value);
+			std::cout << "setting signature:" << value << std::endl;
 			continue;
 		}
 		if (command == "privateOnetime") {
-			newUser.add_one_time_private(value);
+			newUser.add_onetimeprivate(value);
 			continue;
 		}
 		if (command == "publicOnetime") {
-			newUser.add_one_time_public(value);
+			std::cout << "publicOneTime " << value << std::endl;
+			newUser.add_onetimepublic(value);
 			continue;
 		}
 	}
@@ -220,6 +222,8 @@ void Server::processRequests()
 			performFetchMessages(requests_[i]);
 		} else if (requesterAndCommand.second == "fetchKeys") {
 			performFetchKeys(requests_[i]);
+		} else if (requesterAndCommand.second == "initialMessage") {
+			performSendInitialMsg(requests_[i]);
 		}
 	}
 
@@ -335,6 +339,19 @@ void Server::performFetchMessages(const std::string &req) {
 	}
 }
 
+void Server::performSendInitialMsg(const std::string &req) {
+	int delim = req.find_first_of(';');
+	std::string name = req.substr(0, delim);
+	std::string tmp = req.substr(delim + 1);
+	delim = tmp.find_first_of(';');
+	tmp = tmp.substr(delim + 1);
+	delim = tmp.find_first_of(';');
+	std::string rec = tmp.substr(0, delim);
+	std::string text = tmp.substr(delim + 1);
+	std::string response = rec + ";initialMessage;" + text;
+	responses_.push_back(response);
+}
+
 void Server::performFetchKeys(const std::string &req) {
 	int delim = req.find_first_of(';');
 	std::string name = req.substr(0, delim);
@@ -355,13 +372,16 @@ void Server::performFetchKeys(const std::string &req) {
 	}
 	std::stringstream response;
 	response << name + ";fetchKeys;";
-	response << users_[index].public_ik() << ";";
-	response << users_[index].public_pk() << ";";
-	response << users_[index].signed_pk() << ";";
+	response << users_[index].publicik() << ";";
+	response << users_[index].publicpk() << ";";
+	response << users_[index].signedpk() << ";";
 
+	std::cout << "signature:" << users_[index].signedpk() << "\n";
 	//TODO: take only one and delete it from server
-	auto oneTimes = users_[index].one_time_public();
+	auto oneTimes = users_[index].onetimepublic();
+	std::cout << "len of oneTimes:" << oneTimes.size() << std::endl;
 	for (const auto &it : oneTimes) {
+		std::cout << "oneTime:" << it;
 		response << it;
 		break;
 	}
@@ -377,6 +397,7 @@ void Server::loadUsers() {
 		std::string parsedFromHex = hexToString(line);
 		userAcc user;
 		user.ParseFromString(parsedFromHex);
+		std::cout << "load user with signature:" << user.signedpk() << std::endl;
 		users_.push_back(user);
 	}
 	usersFile.close();
@@ -391,6 +412,8 @@ void Server::writeUsers() {
 		if (users_[i].name().size() < 1) {
 			continue;
 		}
+
+		std::cout << "writting user with signature:" << users_[i].signedpk() << std::endl;
 
 		users_[i].SerializeToString(&line);
 

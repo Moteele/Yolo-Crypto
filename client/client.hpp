@@ -25,16 +25,26 @@ class Client
     std::vector<uint8_t> publicIk_;
     std::vector<uint8_t> privateIk_;
 
+    unsigned char pub_identity[32];
+    unsigned char pri_identity[32];
 
-    // std::string publicPk_;
-    // std::string privatePk_;
+    unsigned char pub_signedPre[32];
+    unsigned char pri_signedPre[32];
 
-    // std::vector<std::string> publicOneTime_;
-    // std::vector<std::string> privateOneTime_;
+    unsigned char pub_empheral[32];
+    unsigned char pri_empheral[32];
 
+    unsigned char pub_oneTime[32];
+    unsigned char pri_oneTime[32];
+
+    unsigned char AD[32];
+    unsigned char sharedSecret[32];
+    size_t sharedSecretLen;
 public:
 
     void createKeys(std::ofstream &output);
+
+    void setupKey(std::string name, std::vector<uint8_t> &key);
 
     void develAuth();
 
@@ -59,4 +69,6 @@ public:
     bool develFileExists(const std::string &path);
 
     void printMessages();
+
+    void checkInitial(const std::string &message);
 };
