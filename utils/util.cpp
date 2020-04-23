@@ -66,7 +66,7 @@ void Util::genKeyX25519(EVP_PKEY **key)
 	EVP_PKEY_keygen(kctx, key);
 
 	EVP_PKEY_CTX_free(kctx);
-	std::cout << "end of generation" << std::endl;
+	//std::cout << "end of generation" << std::endl;
 }
 
 void Util::genKeyED25519(EVP_PKEY **key)
@@ -77,7 +77,7 @@ void Util::genKeyED25519(EVP_PKEY **key)
 	EVP_PKEY_keygen(kctx, key);
 
 	EVP_PKEY_CTX_free(kctx);
-	std::cout << "end of generation" << std::endl;
+	//std::cout << "end of generation" << std::endl;
 }
 
 int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen)
@@ -86,28 +86,26 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	EVP_KDF *kdf;
 	EVP_KDF_CTX *kctx = NULL;
 	unsigned char derived[64];
+	// maybe use unique_ptr?
+	unsigned char FKM[32 + ssize];
 	OSSL_PARAM params[5], *p = params;
 
 
 	kdf = EVP_KDF_fetch(NULL, "hkdf", NULL);
 	if (kdf == NULL) {
-		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+#ifdef DEBUG
+		std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+#endif // DEBUG
 		EVP_KDF_free(kdf);
 		return 1;
 	}
 
 	kctx = EVP_KDF_CTX_new(kdf);
-
-	if (kctx == NULL) {
-		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
-		EVP_KDF_free(kdf);
-		EVP_KDF_CTX_free(kctx);
-		return 1;
-	}
+	if (kctx == NULL)
+		goto error;
 
 	// for X25519 it is sequence of 32 0xFF bytes
 	// for X448 it is sequence of 57 0xFF bytes
-	unsigned char FKM[32 + ssize];
 	std::memset(FKM, 0xFF, 32);
 	std::memcpy(&FKM[32], secret, ssize);
 
@@ -122,51 +120,51 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	*p++ = OSSL_PARAM_construct_octet_string("info", (void *)("yolo"), static_cast<size_t>(4));
 	*p = OSSL_PARAM_construct_end();
 
-	if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
-		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
-		EVP_KDF_free(kdf);
-		EVP_KDF_CTX_free(kctx);
-		return 1;
-	}
+	if (EVP_KDF_CTX_set_params(kctx, params) <= 0)
+		goto error;
 
-	if (EVP_KDF_derive(kctx, key, 64) <= 0) {
-		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
-		EVP_KDF_free(kdf);
-		EVP_KDF_CTX_free(kctx);
-		return 1;
-	}
+	if (EVP_KDF_derive(kctx, key, 64) <= 0)
+		goto error;
 
 	EVP_KDF_free(kdf);
 	EVP_KDF_CTX_free(kctx);
 	return 0;
+
+error:
+#ifdef DEBUG
+	std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+#endif // DEBUG
+	EVP_KDF_CTX_free(kctx);
+	EVP_KDF_free(kdf);
+	return 1;
 }
 int Util::ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize)
 {
-        EVP_PKEY_CTX *ctx;
+	while (ERR_get_error() != 0) {}
 
+        EVP_PKEY_CTX *ctx;
         ctx = EVP_PKEY_CTX_new(key, NULL);
 
-        if (EVP_PKEY_derive_init(ctx) != 1) {
-                std::cout << "ctx initialization failed" << std::endl;
-                return 1;
-        }
+        if (EVP_PKEY_derive_init(ctx) != 1)
+		goto error;
 
-        if (EVP_PKEY_derive_set_peer(ctx, peer) != 1) {
-                std::cout << "setting peer failed" << std::endl;
-                return 1;
-        }
+        if (EVP_PKEY_derive_set_peer(ctx, peer) != 1)
+		goto error;
 
-        if (EVP_PKEY_derive(ctx, NULL, ssize) != 1) {
-                std::cout << "getting length failed" << std::endl;
-                return 1;
-        }
+        if (EVP_PKEY_derive(ctx, NULL, ssize) != 1)
+		goto error;
 
-        //std::cout << "Length of secret = " << *ssize << std::endl;
-
-        EVP_PKEY_derive(ctx, secret, ssize);
+        if (EVP_PKEY_derive(ctx, secret, ssize) != 1)
+		goto error;
 
         EVP_PKEY_CTX_free(ctx);
 	return 0;
+error:
+#ifdef DEBUG
+	std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+#endif // DEBUG
+	EVP_PKEY_CTX_free(ctx);
+	return 1;
 }
 
 int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext, int pad /* = 1 */)
@@ -197,7 +195,9 @@ int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, u
 	return clen;
 
 error:
+#ifdef DEBUG
 	std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+#endif // DEBUG
 	EVP_CIPHER_CTX_free(ctx);
 	return 0;
 }
@@ -231,7 +231,9 @@ int Util::aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *k
 	return plen;
 
 error:
+#ifdef DEBUG
 	std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+#endif // DEBUG
 	EVP_CIPHER_CTX_free(ctx);
 	return 0;
 }

@@ -278,7 +278,35 @@ TEST_CASE("Util function tests")
 		}
 	}
 
-	SECTION("ecdh")
+	SECTION("xeddsa random")
+	{
+		unsigned char message[128];
+                unsigned char rnd[64];
+                unsigned char sig[64];
+
+		RAND_bytes(message, 128);
+		RAND_bytes(rnd, 64);
+
+		Key k;
+
+                std::vector<uint8_t> sk = k.getPrivateKey();
+                std::vector<uint8_t> pk = k.getPublicKey();
+
+		Util::xeddsa_sign(&sk[0], message, sizeof(message), rnd, sig);
+
+                REQUIRE(Util::xeddsa_verify(&pk[0], message, sizeof(message), sig) == 0);
+
+		// change it a bit
+		if (sig[12] != 0xff) {
+			sig[12] = static_cast<unsigned>(sig[12]) + 1;
+		} else {
+			sig[12] = static_cast<unsigned>(sig[12]) - 1;
+		}
+
+                REQUIRE_FALSE(Util::xeddsa_verify(&pk[0], message, sizeof(message), sig) == 0);
+	}
+
+	SECTION("ecdh basic")
 	{
 		unsigned char raw_alice_priv[32] = {
 				0x77, 0x07, 0x6d, 0x0a, 0x73, 0x18, 0xa5, 0x7d,
@@ -329,10 +357,94 @@ TEST_CASE("Util function tests")
 		EVP_PKEY_free(bob);
 	}
 
+	SECTION("ecdh basic 2")
+	{
+		EVP_PKEY *key = NULL;
+		EVP_PKEY *peer = NULL;
+		size_t len;
+		unsigned char priv[32];
+		unsigned char pub[32];
+		unsigned char out[32];
+		unsigned char out_correct[32];
+		Util::stringToUnsignedChar("a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac4", priv);
+		Util::stringToUnsignedChar("e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c", pub);
+		Util::stringToUnsignedChar("c3da55379de9c6908e94ea4df28d084f32eccf03491c71f754b4075577a28552", out_correct);
+
+		key = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, priv, 32);
+		peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pub, 32);
+
+		Util::ecdh(key, peer, out, &len);
+		REQUIRE(std::memcmp(out, out_correct, 32) == 0);
+
+		Util::stringToUnsignedChar("4b66e9d4d1b4673c5ad22691957d6af5c11b6421e0ea01d42ca4169e7918ba0d", priv);
+		Util::stringToUnsignedChar("e5210f12786811d3f4b7959d0538ae2c31dbe7106fc03c3efc4cd549c715a493", pub);
+		Util::stringToUnsignedChar("95cbde9476e8907d7aade45cb4b873f88b595a68799fa152e6f8f7647aac7957", out_correct);
+
+		EVP_PKEY_free(key);
+		EVP_PKEY_free(peer);
+
+		key = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, priv, 32);
+		peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pub, 32);
+
+		Util::ecdh(key, peer, out, &len);
+		REQUIRE(std::memcmp(out, out_correct, 32) == 0);
+
+		EVP_PKEY_free(key);
+		EVP_PKEY_free(peer);
+	}
+
+	SECTION("ecdh advanced")
+	{
+		EVP_PKEY *key = NULL;
+		EVP_PKEY *peer = NULL;
+		size_t len;
+		unsigned char priv[32];
+		unsigned char pub[32];
+		unsigned char out[32];
+		unsigned char out_correct_1[32];
+		unsigned char out_correct_1000[32];
+		unsigned char out_correct_1000000[32];
+		Util::stringToUnsignedChar("0900000000000000000000000000000000000000000000000000000000000000", priv);
+		Util::stringToUnsignedChar("0900000000000000000000000000000000000000000000000000000000000000", pub);
+		Util::stringToUnsignedChar("422c8e7a6227d7bca1350b3e2bb7279f7897b87bb6854b783c60e80311ae3079", out_correct_1);
+		Util::stringToUnsignedChar("684cf59ba83309552800ef566f2f4d3c1c3887c49360e3875f2eb94d99532c51", out_correct_1000);
+		Util::stringToUnsignedChar("7c3911e0ab2586fd864497297e575e6f3bc601c0883c30df5f4dd2d24f665424", out_correct_1000000);
+
+		// set i <= 1 000 000, if you are brave enough (or patient)
+		for (size_t i = 1; i <= 1000; ++i) {
+			key = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, priv, 32);
+			peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pub, 32);
+
+			Util::ecdh(key, peer, out, &len);
+
+			std::memcpy(pub, priv, 32);
+			std::memcpy(priv, out, 32);
+
+			EVP_PKEY_free(key);
+			EVP_PKEY_free(peer);
+
+			if (i == 1)
+				REQUIRE(std::memcmp(out, out_correct_1, 32) == 0);
+
+			if (i == 1000)
+				REQUIRE(std::memcmp(out, out_correct_1000, 32) == 0);
+
+			if (i == 1000000)
+				REQUIRE(std::memcmp(out, out_correct_1000000, 32) == 0);
+		}
+	}
+
 	google::protobuf::ShutdownProtobufLibrary();
 }
 
 TEST_CASE("kdf")
 {
+	SECTION("kdf basic")
+	{
+		unsigned char secret[32] = "123456789qwertyuiopasdfghjklzxc";
+		unsigned char key[64];
+		size_t len = 64;
 
+		REQUIRE(Util::kdf(secret, 32, key, &len) == 0);
+	}
 }
