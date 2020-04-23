@@ -92,6 +92,7 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	kdf = EVP_KDF_fetch(NULL, "hkdf", NULL);
 	if (kdf == NULL) {
 		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+		EVP_KDF_free(kdf);
 		return 1;
 	}
 
@@ -99,6 +100,8 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 
 	if (kctx == NULL) {
 		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+		EVP_KDF_free(kdf);
+		EVP_KDF_CTX_free(kctx);
 		return 1;
 	}
 
@@ -111,6 +114,7 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	// salt is zero-filled byte sequence with same length as hash output
 	unsigned char salt[64];
 	std::memset(salt, 0, 64);
+
 	// not particularly nice
 	*p++ = OSSL_PARAM_construct_utf8_string("digest", const_cast<char *>("sha512"), static_cast<size_t>(7));
 	*p++ = OSSL_PARAM_construct_octet_string("salt", salt, static_cast<size_t>(64));
@@ -118,9 +122,19 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	*p++ = OSSL_PARAM_construct_octet_string("info", (void *)("yolo"), static_cast<size_t>(4));
 	*p = OSSL_PARAM_construct_end();
 
-	EVP_KDF_CTX_set_params(kctx, params);
+	if (EVP_KDF_CTX_set_params(kctx, params) <= 0) {
+		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+		EVP_KDF_free(kdf);
+		EVP_KDF_CTX_free(kctx);
+		return 1;
+	}
 
-	EVP_KDF_derive(kctx, key, 64);
+	if (EVP_KDF_derive(kctx, key, 64) <= 0) {
+		std::cout << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+		EVP_KDF_free(kdf);
+		EVP_KDF_CTX_free(kctx);
+		return 1;
+	}
 
 	EVP_KDF_free(kdf);
 	EVP_KDF_CTX_free(kctx);
@@ -157,6 +171,8 @@ int Util::ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssi
 
 int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext, int pad /* = 1 */)
 {
+	while (ERR_get_error() != 0) {}
+
 	int len = plen;
 	int clen = 0;
 	EVP_CIPHER_CTX *ctx;
@@ -164,20 +180,32 @@ int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, u
 	ctx = EVP_CIPHER_CTX_new();
 	EVP_CIPHER_CTX_set_padding(ctx, pad);
 
-	EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+	if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1)
+		goto error;
 
-	EVP_EncryptUpdate(ctx, ciphertext, &len, plain, plen);
+	if (EVP_EncryptUpdate(ctx, ciphertext, &len, plain, plen) != 1)
+		goto error;
+
 	clen = len;
 
-	EVP_EncryptFinal_ex(ctx, ciphertext + len, &len);
+	if (EVP_EncryptFinal_ex(ctx, ciphertext + len, &len) != 1)
+		goto error;
+
 	clen += len;
 
 	EVP_CIPHER_CTX_free(ctx);
 	return clen;
+
+error:
+	std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+	EVP_CIPHER_CTX_free(ctx);
+	return 0;
 }
 
 int Util::aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *key, unsigned char *iv, unsigned char *plain, int pad /* = 1 */)
 {
+	while (ERR_get_error() != 0) {}
+
 	int len = 0;
 	int plen = 0;
 	EVP_CIPHER_CTX *ctx;
@@ -186,16 +214,26 @@ int Util::aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *k
 
 	EVP_CIPHER_CTX_set_padding(ctx, pad);
 
-	int r = EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+	if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1)
+		goto error;
 
-	r = EVP_DecryptUpdate(ctx, plain, &len, ciphertext, clen);
+	if (EVP_DecryptUpdate(ctx, plain, &len, ciphertext, clen) != 1)
+		goto error;
+
 	plen = len;
 
-	r = EVP_DecryptFinal_ex(ctx, plain + len, &len);
+	if (EVP_DecryptFinal_ex(ctx, plain + len, &len) != 1)
+		goto error;
+
 	plen += len;
 
 	EVP_CIPHER_CTX_free(ctx);
 	return plen;
+
+error:
+	std::cerr << ERR_error_string(ERR_get_error(), NULL) << std::endl;
+	EVP_CIPHER_CTX_free(ctx);
+	return 0;
 }
 
 void Util::convert_mont(unsigned char *out, const unsigned char *in)

@@ -108,6 +108,8 @@ TEST_CASE("aes256")
 	unsigned char ct[160];
 	unsigned char ct2[160];
 
+
+
 	SECTION("aes encrypt")
 	{
 		for (size_t i = 0; i < 10; ++i) {
@@ -133,6 +135,28 @@ TEST_CASE("aes256")
 		}
 	}
 
+	SECTION("aes invalid encryption")
+	{
+		for (size_t i = 0; i < 10; ++i) {
+			Util::stringToUnsignedChar(keys[i], key);
+			Util::stringToUnsignedChar(ivs[i], iv);
+			Util::stringToUnsignedChar(pts[i], pt);
+			Util::stringToUnsignedChar(cts2[i], ct2);
+
+			REQUIRE(Util::aes256encrypt(pt, 15 + i * 16, key, iv, ct, 0) == 0);
+		}
+
+		for (size_t i = 0; i < 10; ++i) {
+			Util::stringToUnsignedChar(keys[i + 10], key);
+			Util::stringToUnsignedChar(ivs[i + 10], iv);
+			Util::stringToUnsignedChar(pts[i + 10], pt);
+			Util::stringToUnsignedChar(cts2[i + 10], ct2);
+
+			REQUIRE(Util::aes256encrypt(pt, 15 + i * 16, key, iv, ct, 0) == 0);
+
+		}
+	}
+
 	SECTION("aes decrypt")
 	{
 		for (size_t i = 0; i < 10; ++i) {
@@ -155,6 +179,27 @@ TEST_CASE("aes256")
 			Util::aes256decrypt(ct2, 16 + i * 16, key, iv, pt, 0);
 
 			REQUIRE(std::memcmp(pt, pt2, 16 + 16 * i) == 0);
+		}
+	}
+
+	SECTION("aes invalid decryption")
+	{
+		for (size_t i = 0; i < 10; ++i) {
+			Util::stringToUnsignedChar(keys[i], key);
+			Util::stringToUnsignedChar(ivs[i], iv);
+			Util::stringToUnsignedChar(pts[i], pt2);
+			Util::stringToUnsignedChar(cts2[i], ct2);
+
+			REQUIRE(Util::aes256decrypt(ct2, 15 + 16 * i, key, iv, pt, 0) == 0);
+		}
+
+		for (size_t i = 0; i < 10; ++i) {
+			Util::stringToUnsignedChar(keys[i + 10], key);
+			Util::stringToUnsignedChar(ivs[i + 10], iv);
+			Util::stringToUnsignedChar(pts[i + 10], pt2);
+			Util::stringToUnsignedChar(cts2[i + 10], ct2);
+
+			REQUIRE(Util::aes256decrypt(ct2, 15 + i * 16, key, iv, pt, 0) == 0);
 		}
 	}
 
@@ -285,4 +330,9 @@ TEST_CASE("Util function tests")
 	}
 
 	google::protobuf::ShutdownProtobufLibrary();
+}
+
+TEST_CASE("kdf")
+{
+
 }

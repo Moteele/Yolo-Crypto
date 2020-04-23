@@ -89,7 +89,7 @@ public:
 	static int ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize);
 
 	/**
-	 * derives a key from shared secret with sha512
+	 * derives a key from shared secret with sha512, key is 64 bytes long
 	 * @param secret		shared secret
 	 * @param ssize			length of shared secret
 	 * @param key			derived key
