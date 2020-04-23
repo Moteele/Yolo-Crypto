@@ -35,6 +35,14 @@ public:
 	static void printUnsignedChar(unsigned char *array, size_t len);
 
 	/**
+	 * converts hexadecimal string to unsigned char
+	 * eg.: "ab10d140" -> {'ab', '10', 'd1', '40'}
+	 * @param str		string to be converted
+	 * @param out		output array
+	 */
+	static void stringToUnsignedChar(const std::string &str, unsigned char *out);
+
+	/**
 	 * hashes the input with sha512
 	 * @param in    input string
 	 * @param len   length of input
@@ -97,9 +105,10 @@ public:
 	 * @param key		key used for encryption, must be 32 bytes long
 	 * @param iv		initialization vector, must be 16 bytes long
 	 * @param ciphertext	buffer where the ciphertext is written
+	 * @param padding	1 enable padding, 0 disable padding
 	 * @return length of ciphertext
 	 */
-	static int aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext);
+	static int aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext, int pad = 1);
 
 	/**
 	 * decrypts ciphertext from aes-256 in cbc mode
@@ -108,9 +117,10 @@ public:
 	 * @param key		key used for decryption, must be 32 bytes long
 	 * @param iv		initialization vector, must be 16 bytes long
 	 * @param plain		buffer, where the decrypted text is written
+	 * @param padding	1 enable padding, 0 disable padding
 	 * @return length of decrypted plaintext
 	 */
-	static int aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *key, unsigned char *iv, unsigned char *plain);
+	static int aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *key, unsigned char *iv, unsigned char *plain, int pad = 1);
 
 	/**
 	 * converts montgomery u coordinate to edwards y coordinate

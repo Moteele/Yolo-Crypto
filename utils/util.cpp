@@ -1,4 +1,5 @@
 #include "util.hpp"
+#include <string>
 
 void Util::printUnsignedChar(unsigned char *array, size_t len)
 {
@@ -8,6 +9,18 @@ void Util::printUnsignedChar(unsigned char *array, size_t len)
 	}
 
 	std::cout << std::dec << std::endl;
+}
+
+void Util::stringToUnsignedChar(const std::string &str, unsigned char *out)
+{
+	size_t len;
+	std::string tmp;
+
+	for (size_t i = 0; i < str.size(); i += 2) {
+		tmp = str[i];
+		tmp += str[i + 1];
+		out[i / 2] = std::stoul(tmp, &len, 16);
+	}
 }
 
 int Util::hash512(const std::string &in, size_t len, std::string &out)
@@ -142,13 +155,14 @@ int Util::ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssi
 	return 0;
 }
 
-int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext)
+int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext, int pad /* = 1 */)
 {
 	int len = plen;
 	int clen = 0;
 	EVP_CIPHER_CTX *ctx;
 
 	ctx = EVP_CIPHER_CTX_new();
+	EVP_CIPHER_CTX_set_padding(ctx, pad);
 
 	EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
 
@@ -162,20 +176,22 @@ int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, u
 	return clen;
 }
 
-int Util::aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *key, unsigned char *iv, unsigned char *plain)
+int Util::aes256decrypt(unsigned char *ciphertext, size_t clen, unsigned char *key, unsigned char *iv, unsigned char *plain, int pad /* = 1 */)
 {
-	int len;
-	int plen;
+	int len = 0;
+	int plen = 0;
 	EVP_CIPHER_CTX *ctx;
 
 	ctx = EVP_CIPHER_CTX_new();
 
-	EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+	EVP_CIPHER_CTX_set_padding(ctx, pad);
 
-	EVP_DecryptUpdate(ctx, plain, &len, ciphertext, clen);
+	int r = EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
+
+	r = EVP_DecryptUpdate(ctx, plain, &len, ciphertext, clen);
 	plen = len;
 
-	EVP_DecryptFinal_ex(ctx, plain + len, &len);
+	r = EVP_DecryptFinal_ex(ctx, plain + len, &len);
 	plen += len;
 
 	EVP_CIPHER_CTX_free(ctx);
