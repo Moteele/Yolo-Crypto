@@ -33,7 +33,7 @@ test: test-server test-util
 	./test-server; ./test-util
 
 test-valgrind: test-server test-util
-	valgrind --leak-check=full --show-reachable=yes ./test-server; valgrind --leak-check=full --show-reachable=yes ./test-server
+	valgrind --leak-check=full --show-reachable=yes ./test-server; valgrind --leak-check=full --show-reachable=yes ./test-util
 
 	#valgrind --leak-check=full ./test-server
 
