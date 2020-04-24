@@ -15,6 +15,8 @@
 #include "../libs/include/openssl/pem.h"
 #include "../libs/include/openssl/err.h"
 
+#include "key.hpp"
+
 #include "../libs/openssl_internals/curve25519.h"
 
 
@@ -96,7 +98,7 @@ public:
 	 * @param keylen		length of key
 	 * @return 0 on success
 	 */
-	static int kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen);
+	static int kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen, unsigned char *salt);
 
 	/**
 	 * encrypts text using aes-256 in cbc mode
@@ -160,3 +162,28 @@ public:
 };
 
 #endif // UTIL_HPP
+
+struct keyPair {
+    unsigned char key1[32];
+    unsigned char key2[32];
+};
+
+class Ratchet {
+    public:
+	Key *DHs;
+	EVP_PKEY *DHr;
+	unsigned char *RK = { nullptr };
+	unsigned char *CKs[32] = { nullptr };
+	unsigned char *CKr[32] = { nullptr };
+	int Ns = 0, Nr = 0;
+	int PN = 0;
+	std::vector<unsigned char[32]> MKSKIPPED;
+
+	void InitA(unsigned char* SK, unsigned char* BpubKey);
+
+	void InitB(unsigned char* SK, Key *BkeyPair);
+
+	keyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);
+
+	keyPair kdf_ck(unsigned char* CK);
+};

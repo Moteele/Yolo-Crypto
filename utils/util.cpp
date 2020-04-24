@@ -80,7 +80,7 @@ void Util::genKeyED25519(EVP_PKEY **key)
 	//std::cout << "end of generation" << std::endl;
 }
 
-int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen)
+int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen, unsigned char *salt)
 {
 	while (ERR_get_error() != 0) {}
 	EVP_KDF *kdf;
@@ -110,8 +110,8 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	std::memcpy(&FKM[32], secret, ssize);
 
 	// salt is zero-filled byte sequence with same length as hash output
-	unsigned char salt[64];
-	std::memset(salt, 0, 64);
+	//unsigned char salt[64];
+	//std::memset(salt, 0, 64);
 
 	// not particularly nice
 	*p++ = OSSL_PARAM_construct_utf8_string("digest", const_cast<char *>("sha512"), static_cast<size_t>(7));
@@ -180,6 +180,9 @@ int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, u
 
 	if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1)
 		goto error;
+
+	if (pad == 0 && plen % EVP_CIPHER_CTX_block_size(ctx) != 0)
+	    goto error;
 
 	if (EVP_EncryptUpdate(ctx, ciphertext, &len, plain, plen) != 1)
 		goto error;
@@ -438,4 +441,32 @@ int Util::xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t
 	result = CRYPTO_memcmp(R, Rc, 32);
 
 	return result;
+}
+
+
+keyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
+    keyPair keypair;
+    size_t len = 64;
+    unsigned char output[64];
+    Util::kdf(dh_out, 32, output, &len, RK);
+    std:: memcpy(output, keypair.key1, 32);
+    std:: memcpy(output, keypair.key2, 32);
+    return keypair;
+
+}
+void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
+    //Util::genKeyX25519(&DHs);
+    std::memcpy(BpubKey, &DHr, 32);
+
+    unsigned char secret[32];
+    size_t ssize;
+    Util::ecdh(DHs->key, DHr, secret, &ssize );
+    keyPair pairA = kdf_rk(RK, secret);
+    std:: memcpy(RK, pairA.key1, 32);
+    std:: memcpy(CKs, pairA.key2, 32);
+
+}
+
+void Ratchet::InitB (unsigned char* SK, Key *BkeyPair) {
+    DHs = BkeyPair;
 }
