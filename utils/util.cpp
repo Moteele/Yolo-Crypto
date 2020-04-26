@@ -362,6 +362,11 @@ void Util::xeddsa_sign(unsigned char *priv, const unsigned char *message, size_t
 	sig[63] |= sign;
 }
 
+void Util::xeddsa_sign(Key &priv, const unsigned char *message, size_t mlen, unsigned char *random /* 64 bytes long*/, unsigned char *sig)
+{
+	Util::xeddsa_sign(&priv.getPrivateKey()[0], message, mlen, random, sig);
+}
+
 int Util::xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t mlen, unsigned char *sig)
 {
 	// TODO: check validity of parameters
@@ -456,6 +461,11 @@ int Util::xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t
 	result = CRYPTO_memcmp(R, Rc, 32);
 
 	return result;
+}
+
+int Util::xeddsa_verify(Key &pub, const unsigned char *message, size_t mlen, unsigned char *sig)
+{
+	return Util::xeddsa_verify(&pub.getPublicKey()[0], message, mlen, sig);
 }
 
 

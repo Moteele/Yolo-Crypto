@@ -174,6 +174,16 @@ public:
 	static void xeddsa_sign(unsigned char *priv, const unsigned char *message, size_t mlen, unsigned char *random, unsigned char *sig);
 
 	/**
+	 * creates a signature from curve25519 private key and message
+	 * @param priv		private key used for signing
+	 * @param message	message to be signed
+	 * @param mlen		length of message
+	 * @param random	64 bytes of random data
+	 * @param sig		signature, 64 bytes long
+	 */
+	static void xeddsa_sign(Key &priv, const unsigned char *message, size_t mlen, unsigned char *random, unsigned char *sig);
+
+	/**
 	 * verifies a signature given the message and public key
 	 * @param pub		public key for checking
 	 * @param message	message
@@ -182,6 +192,16 @@ public:
 	 * @return 0 on success
 	 */
 	static int xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t mlen, unsigned char *sig);
+
+	/**
+	 * verifies a signature given the message and public key
+	 * @param pub		public key for checking
+	 * @param message	message
+	 * @param mlen		length of message
+	 * @param sig		signature ofmessage
+	 * @return 0 on success
+	 */
+	static int xeddsa_verify(Key &pub, const unsigned char *message, size_t mlen, unsigned char *sig);
 };
 
 
