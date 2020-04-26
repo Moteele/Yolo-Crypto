@@ -8,6 +8,10 @@ LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; p
 CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -I/snap/protobuf/current/include -L/snap/protobuf/current/lib -Llibs -pthread $(LIBCXXFLAGS)
 LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
+# for dependency files for all *.cpp files
+SOURCES_ALL=$(wildcard server/*.cpp) $(wildcard client/*.cpp) $(wildcard utils/*.cpp)
+DEPS=$(SOURCES_ALL:.cpp=.d)
+
 SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp utils/util.cpp utils/key.cpp
 OBJECTS_UTIL_TEST=$(SOURCES_UTIL_TEST:.cpp=.o)
 SOURCES_SERVER=server/server.cpp server/message.pb.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/util.cpp utils/key.cpp
@@ -16,9 +20,6 @@ SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER
 SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
 OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
-
-OPENSSL_EXTRACTED=libs/openssl_internals/curve25519.h
-DEPS=$(OPENSSL_EXTRACTED) server/server.hpp server/message.pb.h client/client.hpp utils/functions.h utils/constants.h utils/userAcc.pb.h utils/mess.pb.h utils/util.hpp utils/key.hpp
 
 SOURCES_CLIENT=client/client.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp
 OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
@@ -49,7 +50,7 @@ valgrind:server-build
 	valgrind --leak-check=full --show-reachable=yes ./serverApp
 
 debug-flags:
-	echo $(CXXFLAGS); echo $(LDFLAGS)
+	echo $(CXXFLAGS); echo $(LDFLAGS); echo $(SOURCES_ALL)
 
 test-util: $(OBJECTS_UTIL_TEST)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
@@ -63,8 +64,10 @@ serverApp: $(OBJECTS_SERVER_MAIN)
 clientApp: $(OBJECTS_CLIENT_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.o: %.cpp $(DEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ $< $(LDFLAGS)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -MMD -MP -c -o $@ $< $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN) $(OBJECTS_UTIL_TEST)
+	rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN) $(OBJECTS_UTIL_TEST) $(DEPS)
+
+-include $(DEPS)
