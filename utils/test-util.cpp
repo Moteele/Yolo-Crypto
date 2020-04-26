@@ -259,6 +259,7 @@ TEST_CASE("Util function tests")
                 std::memset(rnd, 0, 64);
 
                 Key k;
+		k.generate();
 
                 std::vector<uint8_t> sk = k.getPrivateKey();
                 std::vector<uint8_t> pk = k.getPublicKey();
@@ -288,6 +289,7 @@ TEST_CASE("Util function tests")
 		RAND_bytes(rnd, 64);
 
 		Key k;
+		k.generate();
 
                 std::vector<uint8_t> sk = k.getPrivateKey();
                 std::vector<uint8_t> pk = k.getPublicKey();
@@ -337,11 +339,9 @@ TEST_CASE("Util function tests")
 				0xe0, 0x7e, 0x21, 0xc9, 0x47, 0xd1, 0x9e, 0x33,
 				0x76, 0xf0, 0x9b, 0x3c, 0x1e, 0x16, 0x17, 0x42};
 
-		EVP_PKEY *alice = NULL;
-		EVP_PKEY *bob = NULL;
 
-		alice = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, raw_alice_priv, 32);
-		bob = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, raw_bob_priv, 32);
+		Key alice(raw_alice_priv, false);
+		Key bob(raw_bob_priv, false);
 
 		size_t ssize;
 		unsigned char secret1[32];
@@ -353,14 +353,10 @@ TEST_CASE("Util function tests")
 		REQUIRE(std::memcmp(secret1, secret_right, 32) == 0);
 		REQUIRE(std::memcmp(secret2, secret_right, 32) == 0);
 
-		EVP_PKEY_free(alice);
-		EVP_PKEY_free(bob);
 	}
 
 	SECTION("ecdh basic 2")
 	{
-		EVP_PKEY *key = NULL;
-		EVP_PKEY *peer = NULL;
 		size_t len;
 		unsigned char priv[32];
 		unsigned char pub[32];
@@ -370,8 +366,8 @@ TEST_CASE("Util function tests")
 		Util::stringToUnsignedChar("e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c", pub);
 		Util::stringToUnsignedChar("c3da55379de9c6908e94ea4df28d084f32eccf03491c71f754b4075577a28552", out_correct);
 
-		key = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, priv, 32);
-		peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pub, 32);
+		Key key(priv, false);
+		Key peer(pub, true);
 
 		Util::ecdh(key, peer, out, &len);
 		REQUIRE(std::memcmp(out, out_correct, 32) == 0);
@@ -380,23 +376,16 @@ TEST_CASE("Util function tests")
 		Util::stringToUnsignedChar("e5210f12786811d3f4b7959d0538ae2c31dbe7106fc03c3efc4cd549c715a493", pub);
 		Util::stringToUnsignedChar("95cbde9476e8907d7aade45cb4b873f88b595a68799fa152e6f8f7647aac7957", out_correct);
 
-		EVP_PKEY_free(key);
-		EVP_PKEY_free(peer);
-
-		key = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, priv, 32);
-		peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pub, 32);
+		key.setPrivate(priv);
+		peer.setPublic(pub);
 
 		Util::ecdh(key, peer, out, &len);
 		REQUIRE(std::memcmp(out, out_correct, 32) == 0);
 
-		EVP_PKEY_free(key);
-		EVP_PKEY_free(peer);
 	}
 
 	SECTION("ecdh advanced")
 	{
-		EVP_PKEY *key = NULL;
-		EVP_PKEY *peer = NULL;
 		size_t len;
 		unsigned char priv[32];
 		unsigned char pub[32];
@@ -410,18 +399,18 @@ TEST_CASE("Util function tests")
 		Util::stringToUnsignedChar("684cf59ba83309552800ef566f2f4d3c1c3887c49360e3875f2eb94d99532c51", out_correct_1000);
 		Util::stringToUnsignedChar("7c3911e0ab2586fd864497297e575e6f3bc601c0883c30df5f4dd2d24f665424", out_correct_1000000);
 
+		Key key;
+		Key peer;
+
 		// set i <= 1 000 000, if you are brave enough (or patient)
 		for (size_t i = 1; i <= 1000; ++i) {
-			key = EVP_PKEY_new_raw_private_key(EVP_PKEY_X25519, NULL, priv, 32);
-			peer = EVP_PKEY_new_raw_public_key(EVP_PKEY_X25519, NULL, pub, 32);
+			key.setPrivate(priv);
+			peer.setPublic(pub);
 
 			Util::ecdh(key, peer, out, &len);
 
 			std::memcpy(pub, priv, 32);
 			std::memcpy(priv, out, 32);
-
-			EVP_PKEY_free(key);
-			EVP_PKEY_free(peer);
 
 			if (i == 1)
 				REQUIRE(std::memcmp(out, out_correct_1, 32) == 0);

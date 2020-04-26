@@ -80,7 +80,7 @@ void Util::genKeyED25519(EVP_PKEY **key)
 	//std::cout << "end of generation" << std::endl;
 }
 
-int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen, unsigned char *salt)
+int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen, unsigned char *salt, size_t salt_size)
 {
 	while (ERR_get_error() != 0) {}
 	EVP_KDF *kdf;
@@ -115,7 +115,7 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 
 	// not particularly nice
 	*p++ = OSSL_PARAM_construct_utf8_string("digest", const_cast<char *>("sha512"), static_cast<size_t>(7));
-	*p++ = OSSL_PARAM_construct_octet_string("salt", salt, static_cast<size_t>(64));
+	*p++ = OSSL_PARAM_construct_octet_string("salt", salt, salt_size);
 	*p++ = OSSL_PARAM_construct_octet_string("key", FKM, ssize + 32);
 	*p++ = OSSL_PARAM_construct_octet_string("info", (void *)("yolo"), static_cast<size_t>(4));
 	*p = OSSL_PARAM_construct_end();
@@ -138,6 +138,16 @@ error:
 	EVP_KDF_free(kdf);
 	return 1;
 }
+
+int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen)
+{
+	// salt is zero-filled byte sequence with same length as hash output
+	unsigned char salt[64];
+	std::memset(salt, 0, 64);
+
+	return kdf(secret, ssize, key, keylen, salt, 64);
+}
+
 int Util::ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize)
 {
 	while (ERR_get_error() != 0) {}
@@ -165,6 +175,11 @@ error:
 #endif // DEBUG
 	EVP_PKEY_CTX_free(ctx);
 	return 1;
+}
+
+int Util::ecdh(Key &key, Key &peer, unsigned char *secret, size_t *ssize)
+{
+	return Util::ecdh(key.getPkey(), peer.getPkey(), secret, ssize);
 }
 
 int Util::aes256encrypt(unsigned char *plain, size_t plen, unsigned char *key, unsigned char *iv, unsigned char *ciphertext, int pad /* = 1 */)
@@ -444,29 +459,30 @@ int Util::xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t
 }
 
 
-keyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
-    keyPair keypair;
-    size_t len = 64;
-    unsigned char output[64];
-    Util::kdf(dh_out, 32, output, &len, RK);
-    std:: memcpy(output, keypair.key1, 32);
-    std:: memcpy(output, keypair.key2, 32);
-    return keypair;
-
-}
-void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
-    //Util::genKeyX25519(&DHs);
-    std::memcpy(BpubKey, &DHr, 32);
-
-    unsigned char secret[32];
-    size_t ssize;
-    Util::ecdh(DHs->key, DHr, secret, &ssize );
-    keyPair pairA = kdf_rk(RK, secret);
-    std:: memcpy(RK, pairA.key1, 32);
-    std:: memcpy(CKs, pairA.key2, 32);
-
-}
-
-void Ratchet::InitB (unsigned char* SK, Key *BkeyPair) {
-    DHs = BkeyPair;
-}
+//keyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
+//    keyPair keypair;
+//    size_t len = 64;
+//    unsigned char output[64];
+//    Util::kdf(dh_out, 32, output, &len, RK);
+//    std:: memcpy(output, keypair.key1, 32);
+//    std:: memcpy(output, keypair.key2, 32);
+//    return keypair;
+//
+//}
+//
+//void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
+//    //Util::genKeyX25519(&DHs);
+//    std::memcpy(BpubKey, &DHr, 32);
+//
+//    unsigned char secret[32];
+//    size_t ssize;
+//    Util::ecdh(DHs->key, DHr, secret, &ssize );
+//    keyPair pairA = kdf_rk(RK, secret);
+//    std:: memcpy(RK, pairA.key1, 32);
+//    std:: memcpy(CKs, pairA.key2, 32);
+//
+//}
+//
+//void Ratchet::InitB (unsigned char* SK, Key *BkeyPair) {
+//    DHs = BkeyPair;
+//}

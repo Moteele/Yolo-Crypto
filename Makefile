@@ -8,9 +8,9 @@ LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; p
 CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -I/snap/protobuf/current/include -L/snap/protobuf/current/lib -Llibs -pthread $(LIBCXXFLAGS)
 LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
-SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp utils/util.cpp
+SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp utils/util.cpp utils/key.cpp
 OBJECTS_UTIL_TEST=$(SOURCES_UTIL_TEST:.cpp=.o)
-SOURCES_SERVER=server/server.cpp server/message.pb.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/util.cpp
+SOURCES_SERVER=server/server.cpp server/message.pb.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/util.cpp utils/key.cpp
 OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER)
 SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
@@ -18,7 +18,7 @@ OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
 OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
 
 OPENSSL_EXTRACTED=libs/openssl_internals/curve25519.h
-DEPS=$(OPENSSL_EXTRACTED) server/server.hpp server/util.hpp server/message.pb.h client/client.hpp utils/functions.h utils/constants.h utils/userAcc.pb.h utils/mess.pb.h
+DEPS=$(OPENSSL_EXTRACTED) server/server.hpp server/message.pb.h client/client.hpp utils/functions.h utils/constants.h utils/userAcc.pb.h utils/mess.pb.h utils/util.hpp utils/key.hpp
 
 SOURCES_CLIENT=client/client.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp
 OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)

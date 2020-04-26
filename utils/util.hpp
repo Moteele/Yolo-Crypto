@@ -91,6 +91,29 @@ public:
 	static int ecdh(EVP_PKEY *key, EVP_PKEY *peer, unsigned char *secret, size_t *ssize);
 
 	/**
+	 * TODO: add error return codes
+	 * calculates shared secret from two X25519 keys.
+	 * @param key		complete keypair
+	 * @param peer		public key of the other side
+	 * @param secret	shared secret
+	 * @param ssize		size of shared secret
+	 */
+	static int ecdh(Key &key, Key &peer, unsigned char *secret, size_t *ssize);
+
+	/**
+	 * General KDF
+	 * derives a key from shared secret with sha512, key is 64 bytes long
+	 * @param secret		shared secret
+	 * @param ssize			length of shared secret
+	 * @param key			derived key
+	 * @param keylen		length of key
+	 * @param salt			salt to be used
+	 * @param salt_size		length of salt
+	 * @return 0 on success
+	 */
+	static int kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen, unsigned char *salt, size_t salt_size);
+	/**
+	 * x3DH KDF
 	 * derives a key from shared secret with sha512, key is 64 bytes long
 	 * @param secret		shared secret
 	 * @param ssize			length of shared secret
@@ -98,7 +121,7 @@ public:
 	 * @param keylen		length of key
 	 * @return 0 on success
 	 */
-	static int kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen, unsigned char *salt);
+	static int kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *keylen);
 
 	/**
 	 * encrypts text using aes-256 in cbc mode
@@ -161,7 +184,6 @@ public:
 	static int xeddsa_verify(unsigned char *pub, const unsigned char *message, size_t mlen, unsigned char *sig);
 };
 
-#endif // UTIL_HPP
 
 struct keyPair {
     unsigned char key1[32];
@@ -187,3 +209,5 @@ class Ratchet {
 
 	keyPair kdf_ck(unsigned char* CK);
 };
+
+#endif // UTIL_HPP
