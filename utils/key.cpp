@@ -71,4 +71,3 @@ void Key::printPublic()
 {
 	Util::printUnsignedChar(&getPublicKey()[0], 32);
 }
-

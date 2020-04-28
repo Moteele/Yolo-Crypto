@@ -20,7 +20,7 @@ OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
 OPENSSL_EXTRACTED=libs/openssl_internals/curve25519.h
 DEPS=$(OPENSSL_EXTRACTED) server/server.hpp server/message.pb.h client/client.hpp utils/functions.h utils/constants.h utils/userAcc.pb.h utils/mess.pb.h utils/util.hpp utils/key.hpp
 
-SOURCES_CLIENT=client/client.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp
+SOURCES_CLIENT=client/client.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/key.cpp utils/util.cpp
 OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_CLIENT_MAIN=client/main.cpp $(SOURCES_CLIENT)
 OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)

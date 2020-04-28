@@ -265,8 +265,6 @@ public:
 	void performFetchKeys(const std::string &req);
 
 	void performSendInitialMsg(const std::string &req);
-
-	void testSecretCalc();
 };
 
 #endif // SERVER_HPP

@@ -22,25 +22,15 @@ class Client
     bool isAuthenticated_ = false;
     bool gotResponse_ = false;
 
-    std::vector<uint8_t> publicIk_;
-    std::vector<uint8_t> privateIk_;
+    Key identityKey = {};
+    Key signedPrekey = {};
+    std::vector<Key> oneTimeKeys = {};
 
-    unsigned char pub_identity[32];
-    unsigned char pri_identity[32];
+    std::string pica = "pica";
 
-    unsigned char pub_signedPre[32];
-    unsigned char pri_signedPre[32];
-
-    unsigned char pub_empheral[32];
-    unsigned char pri_empheral[32];
-
-    unsigned char pub_oneTime[32];
-    unsigned char pri_oneTime[32];
-
-    unsigned char AD[32];
-    unsigned char sharedSecret[32];
-    size_t sharedSecretLen;
 public:
+
+    Client() = default;
 
     void createKeys(std::ofstream &output);
 

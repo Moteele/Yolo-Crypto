@@ -16,8 +16,6 @@ int main(int argc, char* argv[])
 	// check & process requests every five seconds
 	using namespace std::chrono_literals;
 	while (true) {
-		theServer.testSecretCalc();
-		break;
 		//theServer.loadUsers();
 		theServer.checkRequests();
 		theServer.processRequests();
