@@ -26,8 +26,6 @@ class Client
     Key signedPrekey = {};
     std::vector<Key> oneTimeKeys = {};
 
-    std::string pica = "pica";
-
 public:
 
     Client() = default;

@@ -327,7 +327,7 @@ void Client::develSendMessage()
 
 void Client::createKeys(std::ofstream &output)
 {
-    //auto privIdenPreStr = identityKey.getPrivateKey();
+    auto privIdenPreStr = identityKey.getPrivateKey();
     std::cout << "identityKey" << std::endl;
     // std::string privateIdentityKeyString = keyToHex(privIdenPreStr);
     // auto pubIdenPreStr = identityKey.getPublicKey();
