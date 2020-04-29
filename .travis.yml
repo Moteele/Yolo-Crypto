@@ -2,6 +2,7 @@ dist: bionic
 language: cpp
 compiler: gcc
 script: make && make test
-before_install:
-- sudo snap install --classic protobuf
-- sudo ldconfig
+install:
+    - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.4/protobuf-cpp-3.11.4.tar.gz
+    - tar -xzvf protobuf-cpp-3.11.4.tar.gz
+    - pushd protobuf-3.11.4 && ./configure --prefix=/usr && make && sudo make install && popd

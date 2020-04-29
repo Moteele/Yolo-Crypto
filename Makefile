@@ -5,10 +5,10 @@ SHELL := bash
 LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
-CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -I/snap/protobuf/current/include -L/snap/protobuf/current/lib -Llibs -pthread $(LIBCXXFLAGS)
+CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
 LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
-# for dependency files for all *.cpp files
+# generate dependency files for all *.cpp files
 SOURCES_ALL=$(wildcard server/*.cpp) $(wildcard client/*.cpp) $(wildcard utils/*.cpp)
 DEPS=$(SOURCES_ALL:.cpp=.d)
 
