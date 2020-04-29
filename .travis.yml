@@ -6,6 +6,8 @@ before_install:
 - sudo echo "deb http://archive.ubuntu.com/ubuntu/ groovy-proposed restricted main multiverse universe" >> /etc/apt/sources.list
 - sudo apt update
 - sudo apt search libprotobuf
+- sudo apt search aptitude
 - cat /etc/apt/sources.list
-- sudo apt -y remove libprotobuf-dev
+- dpkg --get-selections | grep hold
+- sudo apt -y autoremove
 - sudo apt -y install libprotobuf-dev
