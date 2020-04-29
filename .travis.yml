@@ -5,4 +5,7 @@ script: make && make test
 before_install:
 - sudo echo "deb http://archive.ubuntu.com/ubuntu/ groovy-proposed restricted main multiverse universe" >> /etc/apt/sources.list
 - sudo apt update
+- sudo apt search libprotobuf
+- cat /etc/apt/sources.list
+- sudo apt -y remove libprotobuf-dev
 - sudo apt -y install libprotobuf-dev
