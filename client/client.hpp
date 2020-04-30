@@ -39,8 +39,6 @@ public:
 
     void createKeys(std::ofstream &output);
 
-    void setupKey(std::string name, std::vector<uint8_t> &key);
-
     void develAuth();
 
     void develAwaitCreation();

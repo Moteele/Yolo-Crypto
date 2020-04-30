@@ -23,35 +23,6 @@ void Client::writeToReq(const std::string &req) {
     unlockFile(REQEST_FILE_PATH);
 }
 
-// void Client::setupKey(std::string name, std::vector<uint8_t> &key) {
-//     for (int i = 0; i < 32; ++i) {
-//         if (name == "pub_identity") {
-//             pub_identity[i] = key[i];
-//         }
-//         if (name == "pri_identity") {
-//             pri_identity[i] = key[i];
-//         }
-//         if (name == "pub_signedPre") {
-//             pub_signedPre[i] = key[i];
-//         }
-//         if (name == "pri_signedPre") {
-//             pri_signedPre[i] = key[i];
-//         }
-//         if (name == "pub_oneTime") {
-//             pub_oneTime[i] = key[i];
-//         }
-//         if (name == "pri_oneTime") {
-//             pri_oneTime[i] = key[i];
-//         }
-//         if (name == "pub_empheral") {
-//             pub_empheral[i] = key[i];
-//         }
-//         if (name == "pri_empheral") {
-//             pri_empheral[i] = key[i];
-//         }
-//     }
-// }
-
 void Client::develAuth() {
     std::cout << "Login:" << std::endl;
     std::string name;
@@ -265,11 +236,6 @@ void Client::createSecretFromKeys(const std::string &keys)
     }
 
 //     //TODO: delete stuff not needed anymore
-
-//     // AD
-//     for (int i = 0; i < 32; ++i) {
-//         AD[i] = pri_identity[i] | hisIdentityRaw[i];
-//     }
 }
 
 void Client::develSendMessage()
@@ -305,15 +271,7 @@ void Client::develSendMessage()
     std::string myPublicEphemHex = keyToHex(myPublicEphemeral);
     initialMessageSS << myPublicEphemHex;
 
-    // std::vector<uint8_t> ad;
-    // for (int i = 0; i < 32; ++i) {
-    //     ad.push_back(AD[i]);
-    // }
-    // std::string adHex = keyToHex(ad);
-    // initialMessageSS << adHex;
-
     writeToReq(initialMessageSS.str());
-
 
     std::cout << "Message:" << std::endl;
     std::string message;
@@ -394,12 +352,6 @@ void Client::readInitial(const std::string &message) {
     std::string hisEphHex = tmp.substr(0, delim);
 
     Key hisPublicEphemeral = createKeyFromHex(hisEphHex, true);
-//     std::string adHex = tmp.substr(delim + 1);
-
-//     unsigned char adRaw[32];
-//     for (int i = 0; i < 32; ++i) {
-//         adRaw[i] = ad[i];
-//     }
 
     // DH1
     size_t ssize;
@@ -517,7 +469,6 @@ void Client::develRunClient()
             std::cout << "Choose an action:" << std::endl;
             std::cout << "1 - send a message" << std::endl;
             std::cout << "2 - read messages" << std::endl;
-            std::cout << "3 - check initial messages" << std::endl;
             std::getline(std::cin, chosen);
 
             try {
@@ -537,15 +488,19 @@ void Client::develRunClient()
 		        break;
 	        case 2:
                 develReadMessages();
+                // Sleep for 5 seconds so the server has time to give you messages with the initial One
+                std::cout << "Reading messages" << std::endl;
+                for (int i = 0; i < 5; ++i) {
+                    std::cout << "." << std::flush;
+                    std::this_thread::sleep_for(1s);
+                }
+                std::cout << std::endl;
                 while (!gotResponse_) {
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
                 printMessages();
 		        break;
-            case 3:
-                readResponse();
-                break;
 	        default:
 		        std::cout << "Invalid choice" << std::endl;
             }
