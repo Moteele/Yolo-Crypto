@@ -212,9 +212,9 @@ struct keyPair {
 
 class Ratchet {
     public:
-	Key *DHs;
-	EVP_PKEY *DHr;
-	unsigned char *RK = { nullptr };
+	Key DHs;
+	Key DHr;
+	unsigned char *RK[32] = { nullptr };
 	unsigned char *CKs[32] = { nullptr };
 	unsigned char *CKr[32] = { nullptr };
 	int Ns = 0, Nr = 0;
@@ -223,7 +223,7 @@ class Ratchet {
 
 	void InitA(unsigned char* SK, unsigned char* BpubKey);
 
-	void InitB(unsigned char* SK, Key *BkeyPair);
+	void InitB(unsigned char* SK, unsigned char* BprivKey);
 
 	keyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);
 
