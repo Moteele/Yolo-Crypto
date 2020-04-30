@@ -469,30 +469,30 @@ int Util::xeddsa_verify(Key &pub, const unsigned char *message, size_t mlen, uns
 }
 
 
-//keyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
-//    keyPair keypair;
-//    size_t len = 64;
-//    unsigned char output[64];
-//    Util::kdf(dh_out, 32, output, &len, RK);
-//    std:: memcpy(output, keypair.key1, 32);
-//    std:: memcpy(output, keypair.key2, 32);
-//    return keypair;
-//
-//}
-//
-//void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
-//    //Util::genKeyX25519(&DHs);
-//    std::memcpy(BpubKey, &DHr, 32);
-//
-//    unsigned char secret[32];
-//    size_t ssize;
-//    Util::ecdh(DHs->key, DHr, secret, &ssize );
-//    keyPair pairA = kdf_rk(RK, secret);
-//    std:: memcpy(RK, pairA.key1, 32);
-//    std:: memcpy(CKs, pairA.key2, 32);
-//
-//}
-//
-//void Ratchet::InitB (unsigned char* SK, Key *BkeyPair) {
-//    DHs = BkeyPair;
-//}
+keyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
+    keyPair keypair;
+    size_t len = 64;
+    unsigned char output[64];
+    Util::kdf(dh_out, 32, output, &len, RK, sizeof RK);
+    std:: memcpy(output, keypair.key1, 32);
+    std:: memcpy(output, keypair.key2, 32);
+    return keypair;
+
+}
+
+void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
+    DHr.setPublic(BpubKey);
+    DHs.generate();
+
+    unsigned char secret[32];
+    size_t ssize;
+    Util::ecdh(DHs, DHr, secret, &ssize );
+    keyPair pairA = kdf_rk(SK, secret);
+    std:: memcpy(RK, pairA.key1, 32);
+    std:: memcpy(CKs, pairA.key2, 32);
+
+}
+
+void Ratchet::InitB (unsigned char* SK, unsigned char* BprivKey) {
+    DHs.setPrivate(BprivKey);
+}
