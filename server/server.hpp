@@ -132,10 +132,10 @@ private:
 
 	// temporary atribute just for recieving requests
 	// TODO: delete later
-	std::vector<std::string> requests_;
-	std::vector<std::string> responses_;
+	std::vector<std::string> requests_ = {};
+	std::vector<std::string> responses_ = {};
 
-	std::vector<userAcc> users_;
+	std::vector<userAcc> users_ = {};
 
 public:
 	/**

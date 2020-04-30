@@ -7,13 +7,13 @@ message userAcc {
 
   repeated string messages = 5;
 
-  optional string publicIk = 6;
-  optional string privateIk = 7;
-  optional string publicPk = 8;
-  optional string privatePk = 9;
+  optional string publicik = 6;
+  optional string privateik = 7;
+  optional string publicpk = 8;
+  optional string privatepk = 9;
 
-  optional string signedPk = 10;
+  optional string signedpk = 10;
 
-  repeated string oneTimePublic = 11;
-  repeated string oneTimePrivate = 12;
+  repeated string onetimepublic = 11;
+  repeated string onetimeprivate = 12;
 }

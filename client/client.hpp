@@ -24,7 +24,14 @@ class Client
 
     Key identityKey = {};
     Key signedPrekey = {};
-    std::vector<Key> oneTimeKeys = {};
+
+    Key oneTimeKey1 = {};
+    Key oneTimeKey2 = {};
+    Key oneTimeKey3 = {};
+
+    Key ephemeral = {};
+
+    std::vector<uint8_t> sharedSecret_ = {};
 
 public:
 
@@ -58,5 +65,7 @@ public:
 
     void printMessages();
 
-    void checkInitial(const std::string &message);
+    void readInitial(const std::string &message);
+
+    Key createKeyFromHex(std::string &hexKey, bool isPublic);
 };

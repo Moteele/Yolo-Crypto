@@ -47,14 +47,28 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_userAcc_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::userAcc, displayname_),
   PROTOBUF_FIELD_OFFSET(::userAcc, pwdhash_),
   PROTOBUF_FIELD_OFFSET(::userAcc, messages_),
-  3,
+  PROTOBUF_FIELD_OFFSET(::userAcc, publicik_),
+  PROTOBUF_FIELD_OFFSET(::userAcc, privateik_),
+  PROTOBUF_FIELD_OFFSET(::userAcc, publicpk_),
+  PROTOBUF_FIELD_OFFSET(::userAcc, privatepk_),
+  PROTOBUF_FIELD_OFFSET(::userAcc, signedpk_),
+  PROTOBUF_FIELD_OFFSET(::userAcc, onetimepublic_),
+  PROTOBUF_FIELD_OFFSET(::userAcc, onetimeprivate_),
+  8,
   0,
   1,
   2,
   ~0u,
+  3,
+  4,
+  5,
+  6,
+  7,
+  ~0u,
+  ~0u,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 10, sizeof(::userAcc)},
+  { 0, 17, sizeof(::userAcc)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -62,9 +76,13 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_userAcc_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\ruserAcc.proto\"[\n\007userAcc\022\n\n\002id\030\001 \002(\005\022\014"
-  "\n\004name\030\002 \002(\t\022\023\n\013displayName\030\003 \001(\t\022\017\n\007pwd"
-  "hash\030\004 \002(\t\022\020\n\010messages\030\005 \003(\t"
+  "\n\ruserAcc.proto\"\346\001\n\007userAcc\022\n\n\002id\030\001 \002(\005\022"
+  "\014\n\004name\030\002 \002(\t\022\023\n\013displayName\030\003 \001(\t\022\017\n\007pw"
+  "dhash\030\004 \002(\t\022\020\n\010messages\030\005 \003(\t\022\020\n\010publici"
+  "k\030\006 \001(\t\022\021\n\tprivateik\030\007 \001(\t\022\020\n\010publicpk\030\010"
+  " \001(\t\022\021\n\tprivatepk\030\t \001(\t\022\020\n\010signedpk\030\n \001("
+  "\t\022\025\n\ronetimepublic\030\013 \003(\t\022\026\n\016onetimepriva"
+  "te\030\014 \003(\t"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_userAcc_2eproto_deps[1] = {
 };
@@ -74,7 +92,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_use
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_userAcc_2eproto_once;
 static bool descriptor_table_userAcc_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_userAcc_2eproto = {
-  &descriptor_table_userAcc_2eproto_initialized, descriptor_table_protodef_userAcc_2eproto, "userAcc.proto", 108,
+  &descriptor_table_userAcc_2eproto_initialized, descriptor_table_protodef_userAcc_2eproto, "userAcc.proto", 248,
   &descriptor_table_userAcc_2eproto_once, descriptor_table_userAcc_2eproto_sccs, descriptor_table_userAcc_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_userAcc_2eproto::offsets,
   file_level_metadata_userAcc_2eproto, 1, file_level_enum_descriptors_userAcc_2eproto, file_level_service_descriptors_userAcc_2eproto,
@@ -91,7 +109,7 @@ class userAcc::_Internal {
  public:
   using HasBits = decltype(std::declval<userAcc>()._has_bits_);
   static void set_has_id(HasBits* has_bits) {
-    (*has_bits)[0] |= 8u;
+    (*has_bits)[0] |= 256u;
   }
   static void set_has_name(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
@@ -101,6 +119,21 @@ class userAcc::_Internal {
   }
   static void set_has_pwdhash(HasBits* has_bits) {
     (*has_bits)[0] |= 4u;
+  }
+  static void set_has_publicik(HasBits* has_bits) {
+    (*has_bits)[0] |= 8u;
+  }
+  static void set_has_privateik(HasBits* has_bits) {
+    (*has_bits)[0] |= 16u;
+  }
+  static void set_has_publicpk(HasBits* has_bits) {
+    (*has_bits)[0] |= 32u;
+  }
+  static void set_has_privatepk(HasBits* has_bits) {
+    (*has_bits)[0] |= 64u;
+  }
+  static void set_has_signedpk(HasBits* has_bits) {
+    (*has_bits)[0] |= 128u;
   }
 };
 
@@ -113,7 +146,9 @@ userAcc::userAcc(const userAcc& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
-      messages_(from.messages_) {
+      messages_(from.messages_),
+      onetimepublic_(from.onetimepublic_),
+      onetimeprivate_(from.onetimeprivate_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_name()) {
@@ -127,6 +162,26 @@ userAcc::userAcc(const userAcc& from)
   if (from._internal_has_pwdhash()) {
     pwdhash_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.pwdhash_);
   }
+  publicik_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_publicik()) {
+    publicik_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.publicik_);
+  }
+  privateik_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_privateik()) {
+    privateik_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.privateik_);
+  }
+  publicpk_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_publicpk()) {
+    publicpk_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.publicpk_);
+  }
+  privatepk_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_privatepk()) {
+    privatepk_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.privatepk_);
+  }
+  signedpk_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_signedpk()) {
+    signedpk_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.signedpk_);
+  }
   id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:userAcc)
 }
@@ -136,6 +191,11 @@ void userAcc::SharedCtor() {
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   displayname_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   pwdhash_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  publicik_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  privateik_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  publicpk_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  privatepk_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  signedpk_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   id_ = 0;
 }
 
@@ -148,6 +208,11 @@ void userAcc::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   displayname_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   pwdhash_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  publicik_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  privateik_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  publicpk_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  privatepk_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  signedpk_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void userAcc::SetCachedSize(int size) const {
@@ -166,8 +231,10 @@ void userAcc::Clear() {
   (void) cached_has_bits;
 
   messages_.Clear();
+  onetimepublic_.Clear();
+  onetimeprivate_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x000000ffu) {
     if (cached_has_bits & 0x00000001u) {
       name_.ClearNonDefaultToEmptyNoArena();
     }
@@ -176,6 +243,21 @@ void userAcc::Clear() {
     }
     if (cached_has_bits & 0x00000004u) {
       pwdhash_.ClearNonDefaultToEmptyNoArena();
+    }
+    if (cached_has_bits & 0x00000008u) {
+      publicik_.ClearNonDefaultToEmptyNoArena();
+    }
+    if (cached_has_bits & 0x00000010u) {
+      privateik_.ClearNonDefaultToEmptyNoArena();
+    }
+    if (cached_has_bits & 0x00000020u) {
+      publicpk_.ClearNonDefaultToEmptyNoArena();
+    }
+    if (cached_has_bits & 0x00000040u) {
+      privatepk_.ClearNonDefaultToEmptyNoArena();
+    }
+    if (cached_has_bits & 0x00000080u) {
+      signedpk_.ClearNonDefaultToEmptyNoArena();
     }
   }
   id_ = 0;
@@ -248,6 +330,93 @@ const char* userAcc::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
         } else goto handle_unusual;
         continue;
+      // optional string publicik = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          auto str = _internal_mutable_publicik();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.publicik");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional string privateik = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          auto str = _internal_mutable_privateik();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.privateik");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional string publicpk = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+          auto str = _internal_mutable_publicpk();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.publicpk");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional string privatepk = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
+          auto str = _internal_mutable_privatepk();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.privatepk");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional string signedpk = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
+          auto str = _internal_mutable_signedpk();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.signedpk");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated string onetimepublic = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_onetimepublic();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.onetimepublic");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<90>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated string onetimeprivate = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_onetimeprivate();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.onetimeprivate");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<98>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -277,7 +446,7 @@ failure:
 
   cached_has_bits = _has_bits_[0];
   // required int32 id = 1;
-  if (cached_has_bits & 0x00000008u) {
+  if (cached_has_bits & 0x00000100u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_id(), target);
   }
@@ -322,6 +491,76 @@ failure:
     target = stream->WriteString(5, s, target);
   }
 
+  // optional string publicik = 6;
+  if (cached_has_bits & 0x00000008u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_publicik().data(), static_cast<int>(this->_internal_publicik().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.publicik");
+    target = stream->WriteStringMaybeAliased(
+        6, this->_internal_publicik(), target);
+  }
+
+  // optional string privateik = 7;
+  if (cached_has_bits & 0x00000010u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_privateik().data(), static_cast<int>(this->_internal_privateik().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.privateik");
+    target = stream->WriteStringMaybeAliased(
+        7, this->_internal_privateik(), target);
+  }
+
+  // optional string publicpk = 8;
+  if (cached_has_bits & 0x00000020u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_publicpk().data(), static_cast<int>(this->_internal_publicpk().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.publicpk");
+    target = stream->WriteStringMaybeAliased(
+        8, this->_internal_publicpk(), target);
+  }
+
+  // optional string privatepk = 9;
+  if (cached_has_bits & 0x00000040u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_privatepk().data(), static_cast<int>(this->_internal_privatepk().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.privatepk");
+    target = stream->WriteStringMaybeAliased(
+        9, this->_internal_privatepk(), target);
+  }
+
+  // optional string signedpk = 10;
+  if (cached_has_bits & 0x00000080u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_signedpk().data(), static_cast<int>(this->_internal_signedpk().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.signedpk");
+    target = stream->WriteStringMaybeAliased(
+        10, this->_internal_signedpk(), target);
+  }
+
+  // repeated string onetimepublic = 11;
+  for (int i = 0, n = this->_internal_onetimepublic_size(); i < n; i++) {
+    const auto& s = this->_internal_onetimepublic(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.onetimepublic");
+    target = stream->WriteString(11, s, target);
+  }
+
+  // repeated string onetimeprivate = 12;
+  for (int i = 0, n = this->_internal_onetimeprivate_size(); i < n; i++) {
+    const auto& s = this->_internal_onetimeprivate(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "userAcc.onetimeprivate");
+    target = stream->WriteString(12, s, target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target, stream);
@@ -361,7 +600,7 @@ size_t userAcc::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:userAcc)
   size_t total_size = 0;
 
-  if (((_has_bits_[0] & 0x0000000d) ^ 0x0000000d) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x00000105) ^ 0x00000105) == 0) {  // All required fields are present.
     // required string name = 2;
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
@@ -392,6 +631,22 @@ size_t userAcc::ByteSizeLong() const {
       messages_.Get(i));
   }
 
+  // repeated string onetimepublic = 11;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(onetimepublic_.size());
+  for (int i = 0, n = onetimepublic_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      onetimepublic_.Get(i));
+  }
+
+  // repeated string onetimeprivate = 12;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(onetimeprivate_.size());
+  for (int i = 0, n = onetimeprivate_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      onetimeprivate_.Get(i));
+  }
+
   // optional string displayName = 3;
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000002u) {
@@ -400,6 +655,43 @@ size_t userAcc::ByteSizeLong() const {
         this->_internal_displayname());
   }
 
+  if (cached_has_bits & 0x000000f8u) {
+    // optional string publicik = 6;
+    if (cached_has_bits & 0x00000008u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_publicik());
+    }
+
+    // optional string privateik = 7;
+    if (cached_has_bits & 0x00000010u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_privateik());
+    }
+
+    // optional string publicpk = 8;
+    if (cached_has_bits & 0x00000020u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_publicpk());
+    }
+
+    // optional string privatepk = 9;
+    if (cached_has_bits & 0x00000040u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_privatepk());
+    }
+
+    // optional string signedpk = 10;
+    if (cached_has_bits & 0x00000080u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_signedpk());
+    }
+
+  }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -432,8 +724,10 @@ void userAcc::MergeFrom(const userAcc& from) {
   (void) cached_has_bits;
 
   messages_.MergeFrom(from.messages_);
+  onetimepublic_.MergeFrom(from.onetimepublic_);
+  onetimeprivate_.MergeFrom(from.onetimeprivate_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x0000000fu) {
+  if (cached_has_bits & 0x000000ffu) {
     if (cached_has_bits & 0x00000001u) {
       _has_bits_[0] |= 0x00000001u;
       name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
@@ -447,9 +741,28 @@ void userAcc::MergeFrom(const userAcc& from) {
       pwdhash_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.pwdhash_);
     }
     if (cached_has_bits & 0x00000008u) {
-      id_ = from.id_;
+      _has_bits_[0] |= 0x00000008u;
+      publicik_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.publicik_);
     }
-    _has_bits_[0] |= cached_has_bits;
+    if (cached_has_bits & 0x00000010u) {
+      _has_bits_[0] |= 0x00000010u;
+      privateik_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.privateik_);
+    }
+    if (cached_has_bits & 0x00000020u) {
+      _has_bits_[0] |= 0x00000020u;
+      publicpk_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.publicpk_);
+    }
+    if (cached_has_bits & 0x00000040u) {
+      _has_bits_[0] |= 0x00000040u;
+      privatepk_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.privatepk_);
+    }
+    if (cached_has_bits & 0x00000080u) {
+      _has_bits_[0] |= 0x00000080u;
+      signedpk_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.signedpk_);
+    }
+  }
+  if (cached_has_bits & 0x00000100u) {
+    _internal_set_id(from._internal_id());
   }
 }
 
@@ -468,7 +781,7 @@ void userAcc::CopyFrom(const userAcc& from) {
 }
 
 bool userAcc::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000000d) != 0x0000000d) return false;
+  if ((_has_bits_[0] & 0x00000105) != 0x00000105) return false;
   return true;
 }
 
@@ -477,11 +790,23 @@ void userAcc::InternalSwap(userAcc* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   messages_.InternalSwap(&other->messages_);
+  onetimepublic_.InternalSwap(&other->onetimepublic_);
+  onetimeprivate_.InternalSwap(&other->onetimeprivate_);
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   displayname_.Swap(&other->displayname_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   pwdhash_.Swap(&other->pwdhash_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  publicik_.Swap(&other->publicik_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  privateik_.Swap(&other->privateik_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  publicpk_.Swap(&other->publicpk_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  privatepk_.Swap(&other->privatepk_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  signedpk_.Swap(&other->signedpk_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(id_, other->id_);
 }

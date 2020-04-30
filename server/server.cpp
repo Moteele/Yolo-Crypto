@@ -191,7 +191,6 @@ int Server::tryCreateAccount(const std::string &name) {
 		}
 		if (command == "prekeySignature") {
 			newUser.set_signedpk(value);
-			std::cout << "setting signature:" << value << std::endl;
 			continue;
 		}
 		if (command == "privateOnetime") {
@@ -199,7 +198,6 @@ int Server::tryCreateAccount(const std::string &name) {
 			continue;
 		}
 		if (command == "publicOnetime") {
-			std::cout << "publicOneTime " << value << std::endl;
 			newUser.add_onetimepublic(value);
 			continue;
 		}
@@ -376,12 +374,9 @@ void Server::performFetchKeys(const std::string &req) {
 	response << users_[index].publicpk() << ";";
 	response << users_[index].signedpk() << ";";
 
-	std::cout << "signature:" << users_[index].signedpk() << "\n";
 	//TODO: take only one and delete it from server
 	auto oneTimes = users_[index].onetimepublic();
-	std::cout << "len of oneTimes:" << oneTimes.size() << std::endl;
 	for (const auto &it : oneTimes) {
-		std::cout << "oneTime:" << it;
 		response << it;
 		break;
 	}
