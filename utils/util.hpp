@@ -205,9 +205,20 @@ public:
 };
 
 
-struct keyPair {
+struct KeyPair {
     unsigned char key1[32];
     unsigned char key2[32];
+};
+
+struct Header {
+    std::vector<unsigned char> pubKey;
+    int pn, n;
+};
+
+struct Ratchet_mess {
+    unsigned char *ad;
+    Header header;
+    unsigned char *message;
 };
 
 class Ratchet {
@@ -225,9 +236,17 @@ class Ratchet {
 
 	void InitB(unsigned char* SK, unsigned char* BprivKey);
 
-	keyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);
+	KeyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);
 
-	keyPair kdf_ck(unsigned char* CK);
+	KeyPair kdf_ck(unsigned char* CK);
+
+	void RatchetEncrypt(unsigned char *message, unsigned char *AD);
+
+	void Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned char *ad, unsigned char *ciphertext);
+
+	void RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned char *AD, unsigned char *plaintext);
+
+	void Decrypt(unsigned char *mk, unsigned char *cipertext, unsigned char* AD, Header header, unsigned char *plaintext);
 };
 
 #endif // UTIL_HPP

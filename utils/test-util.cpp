@@ -437,3 +437,24 @@ TEST_CASE("kdf")
 		REQUIRE(Util::kdf(secret, 32, key, &len) == 0);
 	}
 }
+
+
+TEST_CASE("ratchet")
+{
+    SECTION("ratchet init")
+    {
+	unsigned char bPrivKey[32];
+	std::memset(bPrivKey, 1, 32);
+	unsigned char SK[32];
+	std::memset(SK, 2, 32);
+	Ratchet bob;
+	Ratchet alice;
+
+	bob.InitB(SK, bPrivKey);
+	alice.InitA(SK, &bob.DHs.getPublicKey()[0]);
+
+	std::vector<unsigned char> test(32, 1);
+	REQUIRE(bob.DHs.getPrivateKey() == test);
+	REQUIRE(! std::memcmp(bob.RK, SK, 32));
+    }
+}
