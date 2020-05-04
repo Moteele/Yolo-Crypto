@@ -223,17 +223,18 @@ struct Ratchet_mess {
 
 class Ratchet {
     public:
-	Key DHs;
-	Key DHr;
-	unsigned char *RK[32] = { nullptr };
-	unsigned char *CKs[32] = { nullptr };
-	unsigned char *CKr[32] = { nullptr };
-	int Ns = 0, Nr = 0;
-	int PN = 0;
-	std::vector<unsigned char[32]> MKSKIPPED;
+	Key DHs; // DH Ratchet key pair (self)
+	Key DHr; /// DH Ratchet public key (remote)
+	unsigned char *RK[32] = { nullptr }; // Root key
+	unsigned char *CKs[32] = { nullptr }; // sending chain key
+	unsigned char *CKr[32] = { nullptr }; // receiving chain key
+	int Ns = 0, Nr = 0; // message numbers
+	int PN = 0; // no. of messages in previous sending chain
+	std::vector<unsigned char[32]> MKSKIPPED; // stored skipped-over message keys
 
 	void InitA(unsigned char* SK, unsigned char* BpubKey);
 
+	// BprivKey is Bob;s signed prekey from X3DH
 	void InitB(unsigned char* SK, unsigned char* BprivKey);
 
 	KeyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);

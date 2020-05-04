@@ -482,8 +482,8 @@ KeyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
 
 
 void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
-    DHr.setPublic(BpubKey);
     DHs.generate();
+    DHr.setPublic(BpubKey);
 
     unsigned char secret[32];
     size_t ssize;
@@ -500,7 +500,7 @@ void Ratchet::InitB (unsigned char* SK, unsigned char* BprivKey) {
 }
 
 void Ratchet::RatchetEncrypt(unsigned char *message, unsigned char *AD) {
-    unsigned char *mk;
+    unsigned char mk[32];
     // TODO: should use HMAC in the future instead of HKDF
     unsigned char constant[32];
     std::memset(constant, 0, 32);
