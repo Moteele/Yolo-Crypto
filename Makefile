@@ -39,8 +39,8 @@ test-valgrind: all test-server test-util
 	#valgrind --leak-check=full ./test-server
 
 
-debug: CXXFLAGS += -DDEBUG -g
-debug: server-build client-build
+debug: CXXFLAGS += -DDEBUG -Og -ggdb
+debug: server-build client-build test-util
 
 server-build: serverApp
 #	./main
