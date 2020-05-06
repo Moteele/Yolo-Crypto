@@ -456,5 +456,29 @@ TEST_CASE("ratchet")
 	std::vector<unsigned char> test(32, 1);
 	REQUIRE(bob.DHs.getPrivateKey() == test);
 	REQUIRE(! std::memcmp(bob.RK, SK, 32));
+	REQUIRE(alice.DHr.getPublicKey() == bob.DHs.getPublicKey());
     }
+    SECTION("ratchet encrypt")
+    {
+	unsigned char bPrivKey[32];
+	std::memset(bPrivKey, 1, 32);
+	unsigned char SK[32];
+	std::memset(SK, 2, 32);
+	Ratchet bob;
+	Ratchet alice;
+
+	bob.InitB(SK, bPrivKey);
+	alice.InitA(SK, &bob.DHs.getPublicKey()[0]);
+
+	unsigned char AD[64];
+	std::memset(AD, 3, 64);
+	unsigned char message[32] = "123456789qwertyuiopasdfghjklzxc";
+	alice.RatchetEncrypt(message, AD);
+
+	REQUIRE(1==1);
+    }
+
+
+
+
 }
