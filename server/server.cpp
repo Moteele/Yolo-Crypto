@@ -346,7 +346,7 @@ void Server::performSendInitialMsg(const std::string &req) {
 	delim = tmp.find_first_of(';');
 	std::string rec = tmp.substr(0, delim);
 	std::string text = tmp.substr(delim + 1);
-	std::string response = rec + ";initialMessage;" + text;
+	std::string response = rec + ";initialMessage;" + name + ";" + text;
 	responses_.push_back(response);
 }
 
@@ -369,7 +369,7 @@ void Server::performFetchKeys(const std::string &req) {
 		return;
 	}
 	std::stringstream response;
-	response << name + ";fetchKeys;";
+	response << name + ";fetchKeys;" + keysOwner + ";";
 	response << users_[index].publicik() << ";";
 	response << users_[index].publicpk() << ";";
 	response << users_[index].signedpk() << ";";

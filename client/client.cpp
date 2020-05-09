@@ -147,12 +147,19 @@ Key Client::createKeyFromHex(std::string &hexKey, bool isPublic) {
 void Client::createSecretFromKeys(const std::string &keys)
 {
     int delim = keys.find_first_of(';');
-    std::string arg = keys.substr(0, delim);
+    std::string rec = keys.substr(0, delim);
+    std::string tmp = keys.substr(delim + 1);
+    delim = tmp.find_first_of(';');
+    std::string arg = tmp.substr(0, delim);
 
     Key hisPublicIdentity = createKeyFromHex(arg, true);
 
+    auto hisRawPublic = hisPublicIdentity.getPublicKey();
+    for (int i = 0; i < 32; ++i) {
+        helperKey[i] = hisRawPublic[i];
+    }
 
-    std::string tmp = keys.substr(delim + 1);
+    tmp = tmp.substr(delim + 1);
     delim = tmp.find_first_of(';');
     arg = tmp.substr(0, delim);
 
@@ -231,11 +238,23 @@ void Client::createSecretFromKeys(const std::string &keys)
 
     Util::kdf(concat, 128, sharedSecret, &sharedSecretLen);
 
+
+    std::pair<std::string, std::string> newPair = std::make_pair(rec, "");
     for (int i = 0; i < 32; ++i) {
-        sharedSecret_.push_back(sharedSecret[i]);
+        newPair.second += sharedSecret[i];
     }
+    sharedSecrets_.push_back(newPair);
 
 //     //TODO: delete stuff not needed anymore
+}
+
+int Client::getIndexOfSharedSecret(const std::string &name) {
+    for (int i = 0; i < sharedSecrets_.size(); ++i) {
+        if (sharedSecrets_[i].first == name) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 void Client::develSendMessage()
@@ -245,21 +264,16 @@ void Client::develSendMessage()
     std::string reciever;
     std::getline(std::cin, reciever);
 
-    if (sharedSecret_.size() == 0) {
+    int sharedSecretIndex = getIndexOfSharedSecret(reciever);
+    if (sharedSecretIndex == -1) {
         fetchBundleForInitMsg(reciever);
 
         while (!gotResponse_) {
             readResponse();
             std::this_thread::sleep_for(1s);
+            // here shared secret is created
         }
     }
-
-    // now stuff for initial message is ready
-    std::cout << "My version of shared secret:" << std::endl;
-    for (int i = 0; i < 32; ++i) {
-        std::cout << sharedSecret_[i];
-    }
-    std::cout << std::endl;
 
     std::stringstream initialMessageSS;
     initialMessageSS << name_ << ";initialMessage;" << reciever << ";";
@@ -269,7 +283,35 @@ void Client::develSendMessage()
 
     auto myPublicEphemeral = ephemeral.getPublicKey();
     std::string myPublicEphemHex = keyToHex(myPublicEphemeral);
-    initialMessageSS << myPublicEphemHex;
+    initialMessageSS << myPublicEphemHex << ";";
+
+    // AD
+    sharedSecretIndex = getIndexOfSharedSecret(reciever);
+    unsigned char key[32];
+    for (int i = 0; i < 32; ++i) {
+        key[i] = sharedSecrets_[sharedSecretIndex].second[i];
+    }
+    unsigned char iv[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
+    unsigned char ciphered[64];
+    unsigned char ad[64];
+    auto myIdentity = identityKey.getPublicKey();
+    for (int i = 0; i < 32; ++i) {
+        ad[i] = myIdentity[i];
+    }
+    for (int i = 0; i < 32; ++i) {
+        ad[32 + i] = helperKey[i];
+    }
+    int len = Util::aes256encrypt(ad, 64, key, iv, ciphered, 0);
+    // TODO: make sure about the ciphered text len
+
+    std::stringstream encodedCiphered;
+    for(int i = 0; i < 64; ++i) {
+        encodedCiphered << std::bitset<8>(ciphered[i]).to_string();
+    }
+    std::string cipheredAd = encodedCiphered.str();
+
+    initialMessageSS << cipheredAd;
+
 
     writeToReq(initialMessageSS.str());
 
@@ -343,13 +385,35 @@ void Client::createKeys(std::ofstream &output)
 
 void Client::readInitial(const std::string &message) {
     int delim = message.find_first_of(';');
-    std::string hisPublicHex = message.substr(0, delim);
+    std::string name = message.substr(0, delim);
+    std::string tmp = message.substr(delim + 1);
+    delim = tmp.find_first_of(';');
+
+    std::string hisPublicHex = tmp.substr(0, delim);
 
     Key hisPublicId = createKeyFromHex(hisPublicHex, true);
 
-    std::string tmp = message.substr(delim + 1);
+    tmp = tmp.substr(delim + 1);
     delim = tmp.find_first_of(';');
     std::string hisEphHex = tmp.substr(0, delim);
+    std::string encodedEncryptedAd = tmp.substr(delim + 1);
+
+    std::stringstream decode;
+    for (int i = 0; i < encodedEncryptedAd.size(); i += 8) {
+        std::bitset<8> bits(encodedEncryptedAd.substr(i, i+8));
+        decode << static_cast<unsigned char>(bits.to_ulong());
+    }
+    std::string encryptedAd = decode.str();
+
+    unsigned char ad[64];
+    auto myIdPub = identityKey.getPublicKey();
+    auto hisIdPub = hisPublicId.getPublicKey();
+    for (int i = 0; i < 32; ++i) {
+        ad[i] = hisIdPub[i];
+    }
+    for (int i = 0; i < 32; ++i) {
+        ad[32 + i] = myIdPub[i];
+    }
 
     Key hisPublicEphemeral = createKeyFromHex(hisEphHex, true);
 
@@ -393,15 +457,37 @@ void Client::readInitial(const std::string &message) {
 
     Util::kdf(concat, 128, sharedSecret, &sharedSecretLen);
 
-    for (int i = 0; i < 32; ++i) {
-        sharedSecret_.push_back(sharedSecret[i]);
+    // authenticate with AD
+    unsigned char decryptedAd[64];
+    unsigned char iv[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
+    unsigned char encryptedAdArr[64];
+    for (int i = 0; i < 64; ++i) {
+        encryptedAdArr[i] = encryptedAd[i];
     }
 
-    std::cout << "My version of shared secret: " << std::endl;
-    for (int i = 0; i < 32; ++i) {
-        std::cout << sharedSecret[i];
+    int len = Util::aes256decrypt(encryptedAdArr, 64, sharedSecret, iv, decryptedAd, 0);
+    //TODO: make something with the len
+
+    for (int i = 0; i < 64; ++i) {
+        if (decryptedAd[i] != ad[i]) {
+            std::cout << "Authentication failed!" << std::endl;
+            //return;
+        }
     }
-    std::cout << std::endl;
+    std::cout << "Authentication successful" << std::endl;
+
+    for (int i = 0; i < sharedSecrets_.size(); ++i) {
+        if (sharedSecrets_[i].first == name) {
+            std::cout << "Weird stuff happening, already have shared secret with this person" << std::endl;
+            std::cout << "Possible error, do not use this app anymore" << std::endl;
+            return;
+        }
+    }
+    std::pair<std::string, std::string> newPair = std::make_pair(name, "");
+    for (int i = 0; i < 32; ++i) {
+        newPair.second += sharedSecret[i];
+    }
+    sharedSecrets_.push_back(newPair);
 }
 
 void Client::fetchBundleForInitMsg(const std::string &reciever)
@@ -424,6 +510,17 @@ void Client::printMessages()
     }
 
     messages_.clear();
+}
+
+void Client::printSharedSecrets() {
+    std::cout << "sharedSecrets len " << sharedSecrets_.size() << std::endl;
+    for (int i = 0; i < sharedSecrets_.size(); ++i) {
+        std::cout << "Shared secret with " + sharedSecrets_[i].first << ":" << std::endl;
+        for (int j = 0; j < 32; ++j) {
+            std::cout << sharedSecrets_[i].second[j];
+        }
+        std::cout << std::endl;
+    }
 }
 
 
@@ -501,6 +598,9 @@ void Client::develRunClient()
                 }
                 printMessages();
 		        break;
+            case 3:
+                printSharedSecrets();
+                break;
 	        default:
 		        std::cout << "Invalid choice" << std::endl;
             }

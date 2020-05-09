@@ -31,11 +31,16 @@ class Client
 
     Key ephemeral = {};
 
-    std::vector<uint8_t> sharedSecret_ = {};
+    // !!! the second string is a shared secret and it's a BINARY string !!!
+    std::vector<std::pair<std::string, std::string>> sharedSecrets_ = {};
+
+    unsigned char helperKey[32];
 
 public:
 
     Client() = default;
+
+    int getIndexOfSharedSecret(const std::string &name);
 
     void createKeys(std::ofstream &output);
 
@@ -66,4 +71,6 @@ public:
     void readInitial(const std::string &message);
 
     Key createKeyFromHex(std::string &hexKey, bool isPublic);
+
+    void printSharedSecrets(); // only for devel purposes, should be deleted later
 };
