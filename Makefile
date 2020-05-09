@@ -20,7 +20,8 @@ SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
 OBJECTS_SERVER_MAIN=$(SOURCES_SERVER_MAIN:.cpp=.o)
 
-SOURCES_CLIENT=client/client.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp
+SOURCES_CLIENT=client/client.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/key.cpp utils/util.cpp
+OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_CLIENT_MAIN=client/main.cpp $(SOURCES_CLIENT)
 OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)
 

@@ -11,6 +11,8 @@
 #include <chrono>
 #include "../utils/functions.hpp"
 #include "../utils/constants.hpp"
+#include "../utils/key.hpp"
+#include "../utils/util.hpp"
 
 class Client
 {
@@ -20,13 +22,37 @@ class Client
     bool isAuthenticated_ = false;
     bool gotResponse_ = false;
 
+    Key identityKey = {};
+    Key signedPrekey = {};
+
+    Key oneTimeKey1 = {};
+    Key oneTimeKey2 = {};
+    Key oneTimeKey3 = {};
+
+    Key ephemeral = {};
+
+    // !!! the second string is a shared secret and it's a BINARY string !!!
+    std::vector<std::pair<std::string, std::string>> sharedSecrets_ = {};
+
+    unsigned char helperKey[32];
+
 public:
+
+    Client() = default;
+
+    int getIndexOfSharedSecret(const std::string &name);
+
+    void createKeys(std::ofstream &output);
 
     void develAuth();
 
+    void develAwaitCreation();
+
     void develCreateAcc();
 
-    void develAwaitCreation();
+    void fetchBundleForInitMsg(const std::string &reciever);
+
+    void createSecretFromKeys(const std::string &keys);
 
     void readResponse();
 
@@ -41,4 +67,10 @@ public:
     bool develFileExists(const std::string &path);
 
     void printMessages();
+
+    void readInitial(const std::string &message);
+
+    Key createKeyFromHex(std::string &hexKey, bool isPublic);
+
+    void printSharedSecrets(); // only for devel purposes, should be deleted later
 };

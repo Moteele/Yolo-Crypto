@@ -64,11 +64,10 @@ EVP_PKEY *Key::getPkey() { return key_; }
 
 void Key::printPrivate()
 {
-	Util::printUnsignedChar(&getPrivateKey()[0], 32);
+	//Util::printUnsignedChar(&getPrivateKey()[0], 32);
 }
 
 void Key::printPublic()
 {
-	Util::printUnsignedChar(&getPublicKey()[0], 32);
+	//Util::printUnsignedChar(&getPublicKey()[0], 32);
 }
-

@@ -6,4 +6,14 @@ message userAcc {
   required string pwdhash = 4;
 
   repeated string messages = 5;
+
+  optional string publicik = 6;
+  optional string privateik = 7;
+  optional string publicpk = 8;
+  optional string privatepk = 9;
+
+  optional string signedpk = 10;
+
+  repeated string onetimepublic = 11;
+  repeated string onetimeprivate = 12;
 }

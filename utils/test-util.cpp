@@ -264,7 +264,7 @@ TEST_CASE("Util function tests")
                 std::vector<uint8_t> sk = k.getPrivateKey();
                 std::vector<uint8_t> pk = k.getPublicKey();
 
-		Util::xeddsa_sign(&sk[0], message, sizeof(message), rnd, sig);
+				Util::xeddsa_sign(&sk[0], message, sizeof(message), rnd, sig);
 
                 REQUIRE(Util::xeddsa_verify(&pk[0], message, sizeof(message), sig) == 0);
 

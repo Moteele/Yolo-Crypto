@@ -5,11 +5,15 @@ message userAcc {
   optional string displayName = 3;
   required string pwdhash = 4;
 
-  message Mess {
-    required string sender = 1;
-    required string reciever = 2;
-    required string text = 3;
-  }
+  repeated string messages = 5;
 
-  repeated Mess messages = 5;
+  optional string public_ik = 6;
+  optional string private_ik = 7;
+  optional string public_pk = 8;
+  optional string private_pk = 9;
+
+  optional string signed_pk = 10;
+
+  repeated string one_time_public = 11;
+  repeated string one_time_private = 12;
 }
