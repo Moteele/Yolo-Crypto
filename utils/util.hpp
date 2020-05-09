@@ -205,29 +205,49 @@ public:
 };
 
 
-struct keyPair {
+struct KeyPair {
     unsigned char key1[32];
     unsigned char key2[32];
 };
 
+struct Header {
+    std::vector<unsigned char> pubKey;
+    int pn, n;
+};
+
+struct Ratchet_mess {
+    unsigned char *ad;
+    Header header;
+    unsigned char *message;
+};
+
 class Ratchet {
     public:
-	Key *DHs;
-	EVP_PKEY *DHr;
-	unsigned char *RK = { nullptr };
-	unsigned char *CKs[32] = { nullptr };
-	unsigned char *CKr[32] = { nullptr };
-	int Ns = 0, Nr = 0;
-	int PN = 0;
-	std::vector<unsigned char[32]> MKSKIPPED;
+	Key DHs; // DH Ratchet key pair (self)
+	Key DHr; /// DH Ratchet public key (remote)
+	unsigned char *RK[32] = { nullptr }; // Root key
+	unsigned char *CKs[32] = { nullptr }; // sending chain key
+	unsigned char *CKr[32] = { nullptr }; // receiving chain key
+	int Ns = 0, Nr = 0; // message numbers
+	int PN = 0; // no. of messages in previous sending chain
+	std::vector<unsigned char[32]> MKSKIPPED; // stored skipped-over message keys
 
 	void InitA(unsigned char* SK, unsigned char* BpubKey);
 
-	void InitB(unsigned char* SK, Key *BkeyPair);
+	// BprivKey is Bob;s signed prekey from X3DH
+	void InitB(unsigned char* SK, unsigned char* BprivKey);
 
-	keyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);
+	KeyPair kdf_rk(unsigned char* RK, unsigned char* dh_out);
 
-	keyPair kdf_ck(unsigned char* CK);
+	KeyPair kdf_ck(unsigned char* CK);
+
+	void RatchetEncrypt(unsigned char *message, unsigned char *AD);
+
+	void Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned char *ad, unsigned char *ciphertext);
+
+	void RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned char *AD, unsigned char *plaintext);
+
+	void Decrypt(unsigned char *mk, unsigned char *cipertext, unsigned char* AD, Header header, unsigned char *plaintext);
 };
 
 #endif // UTIL_HPP

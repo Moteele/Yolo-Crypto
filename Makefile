@@ -5,17 +5,16 @@ SHELL := bash
 LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
 LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
-CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -I/snap/protobuf/current/include -L/snap/protobuf/current/lib -Llibs -pthread $(LIBCXXFLAGS)
+CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
 LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
 
-# for dependency files for all *.cpp files
+# generate dependency files for all *.cpp files
 SOURCES_ALL=$(wildcard server/*.cpp) $(wildcard client/*.cpp) $(wildcard utils/*.cpp)
 DEPS=$(SOURCES_ALL:.cpp=.d)
 
 SOURCES_UTIL_TEST=utils/test-util.cpp server/test-main.cpp utils/util.cpp utils/key.cpp
 OBJECTS_UTIL_TEST=$(SOURCES_UTIL_TEST:.cpp=.o)
-SOURCES_SERVER=server/server.cpp server/message.pb.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/mess.pb.cpp utils/util.cpp utils/key.cpp
-OBJECTS_SERVER=$(SOURCES_MAIN:.cpp=.o)
+SOURCES_SERVER=utils/mess.pb.cpp server/message.pb.cpp server/server.cpp utils/functions.cpp utils/userAcc.pb.cpp utils/util.cpp utils/key.cpp
 SOURCES_SERVER_TEST=server/test-server.cpp server/test-main.cpp $(SOURCES_SERVER)
 SOURCES_SERVER_MAIN=server/main.cpp $(SOURCES_SERVER)
 OBJECTS_SERVER_TEST=$(SOURCES_SERVER_TEST:.cpp=.o)
@@ -26,27 +25,29 @@ OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_CLIENT_MAIN=client/main.cpp $(SOURCES_CLIENT)
 OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)
 
+RUN=`./utils/generate_protobuf.sh`
+
 
 #all: test
-all: server-build client-build
+all:  server-build client-build
 
-test: test-server test-util
+test: all test-server test-util
 	./test-server; ./test-util
 
-test-valgrind: test-server test-util
+test-valgrind: all test-server test-util
 	valgrind --leak-check=full --show-reachable=yes ./test-server; valgrind --leak-check=full --show-reachable=yes ./test-util
 
 	#valgrind --leak-check=full ./test-server
 
 
-debug: CXXFLAGS += -DDEBUG -g
-debug: server-build client-build
+debug: CXXFLAGS += -DDEBUG -Og -ggdb
+debug: server-build client-build test-util
 
 server-build: serverApp
 #	./main
 client-build: clientApp
 
-valgrind:server-build
+valgrind: server-build
 	valgrind --leak-check=full --show-reachable=yes ./serverApp
 
 debug-flags:
@@ -64,8 +65,11 @@ serverApp: $(OBJECTS_SERVER_MAIN)
 clientApp: $(OBJECTS_CLIENT_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.o: %.cpp
+%.o: *.pb.cpp %.cpp
 	$(CXX) $(CXXFLAGS) -MMD -MP -c -o $@ $< $(LDFLAGS)
+
+%.pb.cpp: %.proto
+	./utils/generate_protobuf.sh $^
 
 clean:
 	rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN) $(OBJECTS_UTIL_TEST) $(DEPS)

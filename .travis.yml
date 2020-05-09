@@ -3,5 +3,7 @@ language: cpp
 compiler: gcc
 script: make && make test
 before_install:
-- sudo snap install --classic protobuf
-- sudo ldconfig
+- sudo echo "deb http://archive.ubuntu.com/ubuntu/ groovy restricted main multiverse universe" >> /etc/apt/sources.list
+- sudo echo "deb http://archive.ubuntu.com/ubuntu/ groovy-proposed restricted main multiverse universe" >> /etc/apt/sources.list
+- sudo apt update
+- sudo apt -y install libprotobuf-dev
