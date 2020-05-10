@@ -42,7 +42,9 @@ public:
 
     int getIndexOfSharedSecret(const std::string &name);
 
-    void createKeys(std::ofstream &output);
+    //void createKeys(std::ofstream &output);
+
+    void createKeys(Mess &message);
 
     void develAuth();
 
@@ -68,7 +70,7 @@ public:
 
     void printMessages();
 
-    void readInitial(const std::string &message);
+    void readInitial(const std::string &req);
 
     Key createKeyFromHex(std::string &hexKey, bool isPublic);
 

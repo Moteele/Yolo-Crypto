@@ -110,9 +110,11 @@ std::string hexToString(const std::string &input) {
 std::string stringToHex(const std::string &input) {
 	std::stringstream output;
 	for (int i = 0; i < input.size(); ++i) {
-		output << std::hex << std::setfill('0') << std::setw(2) << (int)input[i];
+		unsigned c = static_cast<unsigned char>(input.c_str()[i]);
+		output << std::hex << std::setfill('0') << std::setw(2) << c;// static_cast<unsigned char>(input.c_str()[i]);
 	}
-	output << std::endl;
+
+	//output << std::endl;
 	return output.str();
 }
 

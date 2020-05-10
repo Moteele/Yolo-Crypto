@@ -265,6 +265,8 @@ public:
 	void performFetchKeys(const std::string &req);
 
 	void performSendInitialMsg(const std::string &req);
+
+	void performCreateAccount(const std::string &req);
 };
 
 #endif // SERVER_HPP
