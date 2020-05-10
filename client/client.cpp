@@ -295,12 +295,14 @@ void Client::develSendMessage()
     unsigned char ciphered[64];
     unsigned char ad[64];
     auto myIdentity = identityKey.getPublicKey();
+
     for (int i = 0; i < 32; ++i) {
         ad[i] = myIdentity[i];
     }
     for (int i = 0; i < 32; ++i) {
         ad[32 + i] = helperKey[i];
     }
+
     int len = Util::aes256encrypt(ad, 64, key, iv, ciphered, 0);
     // TODO: make sure about the ciphered text len
 
@@ -408,6 +410,7 @@ void Client::readInitial(const std::string &message) {
     unsigned char ad[64];
     auto myIdPub = identityKey.getPublicKey();
     auto hisIdPub = hisPublicId.getPublicKey();
+
     for (int i = 0; i < 32; ++i) {
         ad[i] = hisIdPub[i];
     }
@@ -471,7 +474,7 @@ void Client::readInitial(const std::string &message) {
     for (int i = 0; i < 64; ++i) {
         if (decryptedAd[i] != ad[i]) {
             std::cout << "Authentication failed!" << std::endl;
-            //return;
+            return;
         }
     }
     std::cout << "Authentication successful" << std::endl;

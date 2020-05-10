@@ -123,7 +123,7 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	if (EVP_KDF_CTX_set_params(kctx, params) <= 0)
 		goto error;
 
-	if (EVP_KDF_derive(kctx, key, 64) <= 0)
+	if (EVP_KDF_derive(kctx, key, *keylen) <= 0)
 		goto error;
 
 	EVP_KDF_free(kdf);
