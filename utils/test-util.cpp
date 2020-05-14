@@ -460,25 +460,28 @@ TEST_CASE("ratchet")
     }
     SECTION("ratchet encrypt")
     {
-	unsigned char bPrivKey[32];
-	std::memset(bPrivKey, 1, 32);
+	Key bkey;
+	bkey.generate();
 	unsigned char SK[32];
 	std::memset(SK, 2, 32);
 	Ratchet bob;
 	Ratchet alice;
 
-	bob.InitB(SK, bPrivKey);
-	alice.InitA(SK, &bob.DHs.getPublicKey()[0]);
+	bob.InitB(SK, bkey.getPrivateKey().data());
+	alice.InitA(SK, bkey.getPublicKey().data());
 
 	unsigned char AD[64];
 	std::memset(AD, 3, 64);
-	unsigned char message[32] = "123456789qwertyuiopasdfghjklzxc";
+	unsigned char testString[] = "123456789qwertyuiopasdfghjklzxc";
 	unsigned char decrypted[64];
-	Ratchet_mess encrypted = alice.RatchetEncrypt(message, AD);
-	std::cout << "pt0: " << decrypted;
-	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.ad, decrypted);
+	Ratchet_mess encrypted = alice.RatchetEncrypt(testString, sizeof(testString) / sizeof(*testString), AD);
+	std::cout << "pt0: " << testString << std::endl;
+	std::cout << "ct0: ";
+	Util::printUnsignedChar(&encrypted.message[0], encrypted.message.size());
+	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted);
 
-	std::cout << "pt1: " << message << std::endl << "pt2: " << decrypted;
+
+	std::cout << "pt1: " << decrypted;
 	REQUIRE(1==1);
     }
 

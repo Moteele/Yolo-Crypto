@@ -241,13 +241,13 @@ class Ratchet {
 
 	KeyPair kdf_ck(unsigned char* CK);
 
-	Ratchet_mess RatchetEncrypt(unsigned char *message, unsigned char *AD);
+	Ratchet_mess RatchetEncrypt(unsigned char *message, unsigned int mess_len, unsigned char *AD);
 
-	void Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned char *ad, unsigned char *ciphertext);
+	void Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned int pt_size, unsigned char *ad, unsigned char *ciphertext);
 
-	void RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned char *AD, unsigned char *plaintext);
+	void RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned int ct_len, unsigned char *AD, unsigned char *plaintext);
 
-	void Decrypt(unsigned char *mk, unsigned char *cipertext, unsigned char* AD, Header header, unsigned char *plaintext);
+	void Decrypt(unsigned char *mk, unsigned char *cipertext, unsigned int ct_len, unsigned char* AD, Header header, unsigned char *plaintext);
 
 	void DHRatchet(Header header);
 };
