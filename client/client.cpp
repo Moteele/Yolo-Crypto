@@ -1,6 +1,9 @@
 #include "client.hpp"
 
 #include <bitset>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 
 bool Client::develFileExists(const std::string &path) {
@@ -9,7 +12,9 @@ bool Client::develFileExists(const std::string &path) {
 }
 
 void Client::writeToReq(const std::string &req) {
-    while (isFileLocked(REQEST_FILE_PATH)) {
+    send(socket_ , req.c_str() , req.size() , 0 );
+    gotResponse_ = false;
+    /*while (isFileLocked(REQEST_FILE_PATH)) {
         //waiting
     }
 
@@ -20,7 +25,7 @@ void Client::writeToReq(const std::string &req) {
     reqFile << req << std::endl;
     reqFile.close();
     gotResponse_ = false;
-    unlockFile(REQEST_FILE_PATH);
+    unlockFile(REQEST_FILE_PATH);*/
 }
 
 void Client::develAuth() {
@@ -46,12 +51,16 @@ void Client::develCreateAcc() {
     std::getline(std::cin, pwd);
     std::cout << std::endl;
 
-    lockFile("tmp_files/req/" + name);
+    /*lockFile("tmp_files/req/" + name);
     std::ofstream req("tmp_files/req/" + name);
-    req << "password:" << pwd << std::endl;
-    createKeys(req);
-    req.close();
-    unlockFile("tmp_files/req/" + name);
+    req << "password:" << pwd << std::endl;*/
+    std::stringstream request;
+    request << name << ";createAccount;" << "password:" << pwd << ";";
+
+    createKeys(request);
+    writeToReq(request.str());
+    /*req.close();
+    unlockFile("tmp_files/req/" + name);*/
 
     name_ = name;
 }
@@ -77,61 +86,54 @@ void Client::develAwaitCreation() {
 }
 
 void Client::readResponse() {
-    while (isFileLocked(RESPONSE_FILE_PATH)) {
-        // waiting
+    char buffer[2048];
+    std::cout << "buffer: " << buffer << std::endl;
+    int valread = read(socket_, buffer, 2048);
+    buffer[valread] = '\0';
+    std::stringstream response;
+    for (int i = 0; i < valread; ++i) {
+        response << buffer[i];
     }
-    lockFile(RESPONSE_FILE_PATH);
-    std::ifstream resFile(RESPONSE_FILE_PATH);
-    std::string line;
-    std::string newName = RESPONSE_FILE_PATH + "_new";
-    std::ofstream newRes(newName);
-    while (std::getline(resFile, line)) {
-        int delim = line.find_first_of(';');
-        std::string resRec = line.substr(0, delim);
-        if (resRec == name_) {
-            gotResponse_ = true;
-            std::string tmp = line.substr(delim + 1);
-            delim = tmp.find_first_of(';');
-            std::string command = tmp.substr(0, delim);
-            std::string message = tmp.substr(delim + 1);
-            if (command == "auth") {
-                if (message != "Wrong password") {
-                    isAuthenticated_ = true;
-                    std::string userStr = hexToString(message);
-                    userAcc user;
-                    user.ParseFromString(userStr);
-                    //TODO:
-                } else {
-                    std::cout << "Authentication failed: " << message << std::endl;
-                    break;
-                }
-            }
-            if (command == "sendMessage") {
-                std::cout << message << std::endl;
-            }
-            if (command == "fetchMessages") {
-                std::string parsedFromHex = hexToString(message);
+    std::string line = response.str();
+    std::cout << "line " << line << std::endl;
+    int delim = line.find_first_of(';');
+    std::string resRec = line.substr(0, delim);
 
-                Mess msg;
-                msg.ParseFromString(parsedFromHex);
-                messages_.push_back(msg);
-            }
-            if (command == "fetchKeys") {
-                createSecretFromKeys(message);
-            }
-            if (command == "initialMessage") {
-                readInitial(message);
-            }
+    gotResponse_ = true;
+    std::string tmp = line.substr(delim + 1);
+    delim = tmp.find_first_of(';');
+    std::string command = tmp.substr(0, delim);
+    std::string message = tmp.substr(delim + 1);
+    if (command == "auth") {
+        if (message == "Success") {
+            isAuthenticated_ = true;
+        } else if (message != "Wrong password") {
+            isAuthenticated_ = true;
+            std::string userStr = hexToString(message);
+            userAcc user;
+            user.ParseFromString(userStr);
+            //TODO:
         } else {
-            newRes << line << std::endl;
+            std::cerr << "Authentication failed: " << message << std::endl;
+            exit(1);
         }
     }
-    resFile.close();
-    newRes.close();
-    std::remove(RESPONSE_FILE_PATH.c_str());
-    std::rename(newName.c_str(), RESPONSE_FILE_PATH.c_str());
-    std::remove(newName.c_str());
-    unlockFile(RESPONSE_FILE_PATH);
+    if (command == "sendMessage") {
+        std::cout << message << std::endl;
+    }
+    if (command == "fetchMessages") {
+        std::string parsedFromHex = hexToString(message);
+
+        Mess msg;
+        msg.ParseFromString(parsedFromHex);
+        messages_.push_back(msg);
+    }
+    if (command == "fetchKeys") {
+        createSecretFromKeys(message);
+    }
+    if (command == "initialMessage") {
+        readInitial(message);
+    }
 }
 
 Key Client::createKeyFromHex(std::string &hexKey, bool isPublic) {
@@ -146,6 +148,7 @@ Key Client::createKeyFromHex(std::string &hexKey, bool isPublic) {
 
 void Client::createSecretFromKeys(const std::string &keys)
 {
+    std::cout << "keys: " << keys << std::endl;
     int delim = keys.find_first_of(';');
     std::string rec = keys.substr(0, delim);
     std::string tmp = keys.substr(delim + 1);
@@ -263,14 +266,12 @@ void Client::develSendMessage()
     std::cout << "\nSend message to:" << std::endl;
     std::string reciever;
     std::getline(std::cin, reciever);
-
     int sharedSecretIndex = getIndexOfSharedSecret(reciever);
     if (sharedSecretIndex == -1) {
         fetchBundleForInitMsg(reciever);
-
         while (!gotResponse_) {
             readResponse();
-            std::this_thread::sleep_for(1s);
+            std::this_thread::sleep_for(10s);
             // here shared secret is created
         }
     }
@@ -325,7 +326,7 @@ void Client::develSendMessage()
 }
 
 
-void Client::createKeys(std::ofstream &output)
+void Client::createKeys(std::stringstream &output)
 {
     identityKey.generate();
     auto privIdenPreStr = identityKey.getPrivateKey();
@@ -369,18 +370,18 @@ void Client::createKeys(std::ofstream &output)
     auto pubOne3PreStr = oneTimeKey3.getPublicKey();
     std::string publicOneTime3String = keyToHex(pubOne3PreStr);
 
-    output << "privateId:" << privateIdentityKeyString << std::endl;
-    output << "publicId:" << publicIdentityKeyString << std::endl;
-    output << "privateSignedPrekey:" << privateSignedPrekeyString << std::endl;
-    output << "publicSignedPrekey:" << publicSignedPrekeyString << std::endl;
-    output << "prekeySignature:" << prekeySignatureString << std::endl;
+    output << "privateId:" << privateIdentityKeyString << ";";
+    output << "publicId:" << publicIdentityKeyString << ";";
+    output << "privateSignedPrekey:" << privateSignedPrekeyString << ";";
+    output << "publicSignedPrekey:" << publicSignedPrekeyString << ";";
+    output << "prekeySignature:" << prekeySignatureString << ";";
 
-    output << "privateOnetime:" << privateOneTime1String << std::endl;
-    output << "publicOnetime:" << publicOneTime1String << std::endl;
-    output << "privateOnetime:" << privateOneTime2String << std::endl;
-    output << "publicOnetime:" << publicOneTime2String << std::endl;
-    output << "privateOnetime:" << privateOneTime3String << std::endl;
-    output << "publicOnetime:" << publicOneTime3String << std::endl;
+    output << "privateOnetime:" << privateOneTime1String << ";";
+    output << "publicOnetime:" << publicOneTime1String << ";";
+    output << "privateOnetime:" << privateOneTime2String << ";";
+    output << "publicOnetime:" << publicOneTime2String << ";";
+    output << "privateOnetime:" << privateOneTime3String << ";";
+    output << "publicOnetime:" << publicOneTime3String << ";";
 }
 
 void Client::readInitial(const std::string &message) {
@@ -523,9 +524,36 @@ void Client::printSharedSecrets() {
     }
 }
 
+void Client::initConnection() {
+    int port = 8080;
+    struct sockaddr_in serv_addr;
+    char buffer[2048] = {0};
+    if ((socket_ = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        std::cerr << "\n Socket creation error \n" << std::endl;
+        exit(1);
+    }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)
+    {
+        std::cerr << "\nInvalid address/ Address not supported \n" << std::endl;
+        exit(1);
+    }
+
+    if (connect(socket_, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
+        std::cerr << "\nConnection Failed \n" << std::endl;
+        exit(1);
+    }
+}
+
 
 void Client::develRunClient()
 {
+    initConnection();
     using namespace std::chrono_literals;
     std::string chosen;
     while (true) {
@@ -547,7 +575,8 @@ void Client::develRunClient()
             switch (std::stoi(chosen)) {
             case 1:
                 develCreateAcc();
-                develAwaitCreation();
+                readResponse();
+                //develAwaitCreation();
                 break;
             case 2:
                 develAuth();

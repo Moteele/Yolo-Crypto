@@ -30,6 +30,19 @@
 #include "../utils/functions.hpp"
 #include "../utils/constants.hpp"
 
+#include <stdio.h>
+#include <string.h>   //strlen
+#include <stdlib.h>
+#include <iostream>
+#include <errno.h>
+#include <unistd.h>   //close
+#include <arpa/inet.h>    //close
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <vector>
+#include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
+
 
 class Account
 {
@@ -246,25 +259,27 @@ public:
 
 	void checkRequests();
 
-	void processRequests();
+	void processRequests(int socketDescriptor);
 
 	void loadUsers();
 
 	void writeUsers();
 
-	int tryCreateAccount(const std::string &name);
+	int tryCreateAccount(int socketDescriptor, const std::string &request);
 
 	const std::pair<std::string, std::string> getRequesterAndCommand(const std::string &request);
 
-	void performSendMessage(const std::string &req);
+	void performSendMessage(int socketDescriptor, const std::string &req);
 
-	void performAuth(const std::string &req);
+	void performAuth(int socketDescriptor, const std::string &req);
 
-	void performFetchMessages(const std::string &req);
+	void performFetchMessages(int socketDescriptor, const std::string &req);
 
-	void performFetchKeys(const std::string &req);
+	void performFetchKeys(int socketDescriptor, const std::string &req);
 
-	void performSendInitialMsg(const std::string &req);
+	void performSendInitialMsg(int socketDescriptor, const std::string &req);
+
+	void readRequest(const std::string &req);
 };
 
 #endif // SERVER_HPP

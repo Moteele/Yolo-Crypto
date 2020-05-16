@@ -108,7 +108,7 @@ void Server::test()
 
 }
 
-void Server::checkRequests()
+/*void Server::checkRequests()
 {
 	std::string path = "tmp_files/req";
 	std::vector<std::string> requestFiles = getUnlockedFiles(path);
@@ -149,26 +149,93 @@ void Server::checkRequests()
 	eraseReqFile.close();
 
 	unlockFile(REQEST_FILE_PATH);
+}*/
+
+void Server::readRequest(const std::string &req) {
+	requests_.emplace_back(req);
+	std::cout << "got request: " << req << std::endl;
 }
 
-int Server::tryCreateAccount(const std::string &name) {
-	for (int i = 0; i < users_.size(); ++i) {
+int Server::tryCreateAccount(int socketDescriptor, const std::string &request) {
+	int delim = 0;
+	char del = ';';
+	std::string tmp = request;
+	delim = request.find_first_of(del);
+	std::string name = request.substr(0, delim);
+
+	userAcc newUser;
+	newUser.set_id(users_.size());
+	newUser.set_name(name);
+	for (int i = 0; i < 14; ++i) {
+		delim = tmp.find_first_of(del);
+		std::string currentLine = tmp.substr(0, delim);
+
+		int split = -1;
+		split = currentLine.find_first_of(':');
+		std::cout << "currentLine: " << currentLine << std::endl;
+		if (split == -1) {
+			std::cout << "continue" << std::endl;
+			tmp = tmp.substr(delim + 1);
+			continue;
+		}
+		std::string command = currentLine.substr(0, split);
+		std::string value = currentLine.substr(split + 1);
+		std::cout << "command: " << command << " value: " << value << std::endl;
+		if (command == "createAccount") {
+			newUser.set_name(value);
+		}
+		if (command == "password") {
+			newUser.set_pwdhash(value);
+		}
+		if (command == "privateId") {
+			newUser.set_privateik(value);
+		}
+		if (command == "publicId") {
+			newUser.set_publicik(value);
+		}
+		if (command == "privateSignedPrekey") {
+			newUser.set_privatepk(value);
+		}
+		if (command == "publicSignedPrekey") {
+			newUser.set_publicpk(value);
+		}
+		if (command == "prekeySignature") {
+			newUser.set_signedpk(value);
+		}
+		if (command == "privateOnetime") {
+			newUser.add_onetimeprivate(value);
+		}
+		if (command == "publicOnetime") {
+			newUser.add_onetimepublic(value);
+		}
+		tmp = tmp.substr(delim + 1);
+	}
+	std::string result = name + ";auth;Success";
+	users_.push_back(newUser);
+	send(socketDescriptor, result.c_str(), result.size(), 0);
+
+	/*for (int i = 0; i < users_.size(); ++i) {
 		if (users_[i].name() == name) {
 			// duplicit name
 			return -1;
 		}
-	}
-	std::string path = "tmp_files/req/" + name;
-	std::ifstream req(path);
+	}*/
+	/*std::string path = "tmp_files/req/" + name;
+	std::ifstream req(path);*/
+	/*std::stringstream req;
+	req << request;
 
 	userAcc newUser;
 	std::string line;
-	newUser.set_name(name);
+	//newUser.set_name(name);
 	newUser.set_id(users_.size());
 	while (std::getline(req, line)) {
 		int delim = line.find_first_of(':');
 		std::string command = line.substr(0, delim);
 		std::string value = line.substr(delim + 1);
+		if (command == "createAccount") {
+			newUser.set_name(value);
+		}
 		if (command == "password") {
 			newUser.set_pwdhash(value);
 			continue;
@@ -203,25 +270,27 @@ int Server::tryCreateAccount(const std::string &name) {
 		}
 	}
 	users_.push_back(newUser);
-	req.close();
-	std::remove(path.c_str());
-	return 0;
+	// req.close();
+	// std::remove(path.c_str());
+	return 0;*/
 }
 
-void Server::processRequests()
+void Server::processRequests(int socketDescriptor)
 {
 	for (int i = 0; i < requests_.size(); ++i) {
 		const std::pair<std::string, std::string> requesterAndCommand = getRequesterAndCommand(requests_[i]);
 		if (requesterAndCommand.second == "sendMessage") {
-			performSendMessage(requests_[i]);
+			performSendMessage(socketDescriptor, requests_[i]);
 		} else if (requesterAndCommand.second == "auth") {
-			performAuth(requests_[i]);
+			performAuth(socketDescriptor, requests_[i]);
 		} else if (requesterAndCommand.second == "fetchMessages") {
-			performFetchMessages(requests_[i]);
+			performFetchMessages(socketDescriptor, requests_[i]);
 		} else if (requesterAndCommand.second == "fetchKeys") {
-			performFetchKeys(requests_[i]);
+			performFetchKeys(socketDescriptor, requests_[i]);
 		} else if (requesterAndCommand.second == "initialMessage") {
-			performSendInitialMsg(requests_[i]);
+			performSendInitialMsg(socketDescriptor, requests_[i]);
+		} else if (requesterAndCommand.second == "createAccount") {
+			tryCreateAccount(socketDescriptor, requests_[i]);
 		}
 	}
 
@@ -243,7 +312,7 @@ void Server::processRequests()
 	unlockFile(RESPONSE_FILE_PATH);
 }
 
-void Server::performSendMessage(const std::string &req) {
+void Server::performSendMessage(int socketDescriptor, const std::string &req) {
 	int delim = req.find_first_of(';');
 	std::string sender = req.substr(0, delim);
 	std::string tmp = req.substr(delim + 1);
@@ -287,10 +356,12 @@ void Server::performSendMessage(const std::string &req) {
 	users_[recIndex].add_messages(stringToHex(stringified));
 	users_[sendIndex].add_messages(stringToHex(stringified));
 
-	responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Message sent");
+	std::string response = users_[sendIndex].name() + ";sendMessage;Message sent";
+	send(socketDescriptor, response.c_str(), response.size(), 0);
+	//responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Message sent");
 }
 
-void Server::performAuth(const std::string &req) {
+void Server::performAuth(int socketDescriptor, const std::string &req) {
 	int delim = req.find_first_of(';');
 	std::string login = req.substr(0, delim);
 	std::string tmp = req.substr(delim + 1);
@@ -306,9 +377,13 @@ void Server::performAuth(const std::string &req) {
 				users_[i].SerializeToString(&line);
 				std::stringstream usr;
 				usr << stringToHex(line);
-				responses_.emplace_back(users_[i].name() + ";auth;" + usr.str());
+				std::string response = users_[i].name() + ";auth;" + usr.str();
+				send(socketDescriptor, response.c_str(), response.size(), 0);
+				//responses_.emplace_back(users_[i].name() + ";auth;" + usr.str());
 			} else {
-				responses_.emplace_back(users_[i].name() + ";auth;Wrong password");
+				std::string response = users_[i].name() + ";auth;Wrong password";
+				send(socketDescriptor, response.c_str(), response.size(), 0);
+				//responses_.emplace_back(users_[i].name() + ";auth;Wrong password");
 			}
 			index = i;
 		}
@@ -318,7 +393,7 @@ void Server::performAuth(const std::string &req) {
 	}
 }
 
-void Server::performFetchMessages(const std::string &req) {
+void Server::performFetchMessages(int socketDescriptor, const std::string &req) {
 	int delim = req.find_first_of(';');
 	std::string name = req.substr(0, delim);
 
@@ -333,11 +408,12 @@ void Server::performFetchMessages(const std::string &req) {
 	auto messages = users_[index].messages();
 	for (const auto &it : messages) {
 		std::string response = users_[index].name() + ";fetchMessages;" + it;
-		responses_.push_back(response);
+		send(socketDescriptor, response.c_str(), response.size(), 0);
+		//responses_.push_back(response);
 	}
 }
 
-void Server::performSendInitialMsg(const std::string &req) {
+void Server::performSendInitialMsg(int socketDescriptor, const std::string &req) {
 	int delim = req.find_first_of(';');
 	std::string name = req.substr(0, delim);
 	std::string tmp = req.substr(delim + 1);
@@ -347,10 +423,11 @@ void Server::performSendInitialMsg(const std::string &req) {
 	std::string rec = tmp.substr(0, delim);
 	std::string text = tmp.substr(delim + 1);
 	std::string response = rec + ";initialMessage;" + name + ";" + text;
-	responses_.push_back(response);
+	send(socketDescriptor, response.c_str(), response.size(), 0);
+	//responses_.push_back(response);
 }
 
-void Server::performFetchKeys(const std::string &req) {
+void Server::performFetchKeys(int socketDescriptor, const std::string &req) {
 	int delim = req.find_first_of(';');
 	std::string name = req.substr(0, delim);
 	std::string tmp = req.substr(delim + 1);
@@ -365,7 +442,8 @@ void Server::performFetchKeys(const std::string &req) {
 	}
 	if (index == -1) {
 		std::string response = name + ";fetchKeys;Error";
-		responses_.push_back(response);
+		send(socketDescriptor, response.c_str(), response.size(), 0);
+		//responses_.push_back(response);
 		return;
 	}
 	std::stringstream response;
@@ -380,7 +458,10 @@ void Server::performFetchKeys(const std::string &req) {
 		response << it;
 		break;
 	}
-	responses_.push_back(response.str());
+	std::string responseStr = response.str();
+	std::cout << "sending keys: " << responseStr << std::endl;
+	send(socketDescriptor, responseStr.c_str(), responseStr.size(), 0);
+	//responses_.push_back(response.str());
 }
 
 void Server::loadUsers() {
