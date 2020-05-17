@@ -1,4 +1,6 @@
 //#pragma once
+#ifndef FUNCTIONS_HPP
+#define FUNCTIONS_HPP
 
 #include <string>
 #include <vector>
@@ -22,3 +24,5 @@ std::string stringToHex(const std::string &input);
 std::string keyToHex(std::vector<uint8_t> &key);
 
 std::vector<uint8_t> hexToKey(std::string &input);
+
+#endif // FUNCTIONS_HPP

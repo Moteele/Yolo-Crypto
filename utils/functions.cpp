@@ -84,18 +84,19 @@ std::string hexToString(const std::string &input) {
 	std::string output;
 
 	if (((input.length()) % 2) != 0) {
-        throw std::runtime_error("String is not valid length ...");
-    }
+		throw std::runtime_error("String is not valid length ...");
+	}
 
 	size_t cnt = (input.length()) / 2;
-    for (size_t i = 0; cnt > i; ++i) {
-        uint32_t s = 0;
-        std::stringstream ss;
-        ss << std::hex << input.substr(i * 2, 2);
-        ss >> s;
 
-        output.push_back(static_cast<unsigned char>(s));
-    }
+	for (size_t i = 0; cnt > i; ++i) {
+		uint32_t s = 0;
+        	std::stringstream ss;
+        	ss << std::hex << input.substr(i * 2, 2);
+        	ss >> s;
+
+        	output.push_back(static_cast<unsigned char>(s));
+	}
 
 	return output;
 }
@@ -109,12 +110,12 @@ std::string hexToString(const std::string &input) {
  * */
 std::string stringToHex(const std::string &input) {
 	std::stringstream output;
+	unsigned c;
 	for (int i = 0; i < input.size(); ++i) {
-		unsigned c = static_cast<unsigned char>(input.c_str()[i]);
+		c = static_cast<unsigned char>(input.c_str()[i]);
 		output << std::hex << std::setfill('0') << std::setw(2) << c;// static_cast<unsigned char>(input.c_str()[i]);
 	}
 
-	//output << std::endl;
 	return output.str();
 }
 
