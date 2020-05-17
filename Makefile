@@ -2,11 +2,11 @@ SHELL := bash
 .SHELLFLAGS := -eu -o pipefail -c
 
 # adds protobuf default installation path for pkg-config
-LIBCXXFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
-LIBLDFLAGS:=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
+LIBCXXFLAGS=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --cflags protobuf`
+LIBLDFLAGS=`export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig; pkg-config --libs protobuf`
 
-CXXFLAGS:=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS)
-LDFLAGS:=$(LIBLDFLAGS) -lcrypto -ldl
+CXXFLAGS=-std=c++14 -Ilibs/include -Ilibs/openssl_internals -Llibs -pthread $(LIBCXXFLAGS) $(OPTIONAL)
+LDFLAGS=$(LIBLDFLAGS) -lcrypto -ldl
 
 # generate dependency files for all *.cpp files
 SOURCES_ALL=$(wildcard server/*.cpp) $(wildcard client/*.cpp) $(wildcard utils/*.cpp)
@@ -25,8 +25,6 @@ OBJECTS_CLIENT=$(SOURCES_MAIN:.cpp=.o)
 SOURCES_CLIENT_MAIN=client/main.cpp $(SOURCES_CLIENT)
 OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)
 
-RUN=`./utils/generate_protobuf.sh`
-
 
 #all: test
 all:  server-build client-build
@@ -40,8 +38,23 @@ test-valgrind: all test-server test-util
 	#valgrind --leak-check=full ./test-server
 
 
-debug: CXXFLAGS += -DDEBUG -Og -ggdb
-debug: server-build client-build test-util
+# builds a target with debugging flags
+# example: make debug-test ... builds target test with debugging flags -DDEBUG -Og -ggdb
+debug-%: clean
+	$(MAKE) $* $(MAKEFILE) OPTIONAL="-DDEBUG -Og -ggdb"
+
+# builds a target with coverage flags
+# WARNING: for generating html files, 'lcov' is required
+coverage-%: clean
+	$(MAKE) $* $(MAKEFILE) CXX="g++" OPTIONAL="--coverage"
+	./utils/generate_lcov.sh
+
+# builds a target with profiling flags
+profile-%: clean
+	$(MAKE) $* $(MAKEFILE) OPTIONAL="-pg"
+
+#debug: CXXFLAGS += -DDEBUG -Og -ggdb
+#debug: server-build client-build test-util
 
 server-build: serverApp
 #	./main
@@ -50,8 +63,10 @@ client-build: clientApp
 valgrind: server-build
 	valgrind --leak-check=full --show-reachable=yes ./serverApp
 
-debug-flags:
-	echo $(CXXFLAGS); echo $(LDFLAGS); echo $(SOURCES_ALL)
+flags:
+	@echo $(CXXFLAGS)
+	@echo $(LDFLAGS)
+	@echo $(SOURCES_ALL)
 
 test-util: $(OBJECTS_UTIL_TEST)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
@@ -71,7 +86,14 @@ clientApp: $(OBJECTS_CLIENT_MAIN)
 %.pb.cpp: %.proto
 	./utils/generate_protobuf.sh $^
 
-clean:
+.PHONY: clean clean-coverage
+
+clean: clean-coverage
 	rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN) $(OBJECTS_UTIL_TEST) $(DEPS)
+
+clean-coverage:
+	rm -rf `find './' -name "*.gcov"`
+	rm -rf `find './' -name "*.gcda"`
+	rm -rf `find './' -name "*.gcno"`
 
 -include $(DEPS)
