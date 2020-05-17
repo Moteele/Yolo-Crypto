@@ -1,5 +1,8 @@
 #!/bin/bash
+# Generates html structure with code coverage, if lcov is installed.
+# To see it, open index.html in the output folder
 
+# is lcov installed?
 lcov -V;
 if [[ $? != 0 ]]; then
 	echo "Please install 'lcov' for html output";
