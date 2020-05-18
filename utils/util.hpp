@@ -211,7 +211,7 @@ struct KeyPair {
 };
 
 struct Header {
-    std::vector<unsigned char> pubKey;
+    unsigned char pubKey[32];
     int pn, n;
 };
 

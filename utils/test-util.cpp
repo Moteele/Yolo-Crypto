@@ -475,14 +475,12 @@ TEST_CASE("ratchet")
 	unsigned char testString[] = "123456789qwertyuiopasdfghjklzxc";
 	unsigned char decrypted[64];
 	Ratchet_mess encrypted = alice.RatchetEncrypt(testString, sizeof(testString) / sizeof(*testString), AD);
-	std::cout << "pt0: " << testString << std::endl;
-	std::cout << "ct0: ";
-	Util::printUnsignedChar(&encrypted.message[0], encrypted.message.size());
+	//std::cout << "pt0: " << testString << std::endl;
 	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted);
 
 
-	std::cout << "pt1: " << decrypted;
-	REQUIRE(1==1);
+	//std::cout << "pt1: " << decrypted;
+	REQUIRE(memcmp(decrypted, &encrypted.message[0], 64));
     }
 
 
