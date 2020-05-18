@@ -154,10 +154,7 @@ void Client::createSecretFromKeys(const std::string &keys)
 
     Key hisPublicIdentity = createKeyFromHex(arg, true);
 
-    auto hisRawPublic = hisPublicIdentity.getPublicKey();
-    for (int i = 0; i < 32; ++i) {
-        helperKey[i] = hisRawPublic[i];
-    }
+    memcpy(helperKey, hisPublicIdentity.getPublicKey().data(), 32);
 
     tmp = tmp.substr(delim + 1);
     delim = tmp.find_first_of(';');
@@ -291,16 +288,13 @@ void Client::develSendMessage()
     for (int i = 0; i < 32; ++i) {
         key[i] = sharedSecrets_[sharedSecretIndex].second[i];
     }
-    unsigned char iv[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
+    unsigned char iv[16];
+    memset(iv, 0, 16);
     unsigned char ciphered[64];
     unsigned char ad[64];
     auto myIdentity = identityKey.getPublicKey();
-    for (int i = 0; i < 32; ++i) {
-        ad[i] = myIdentity[i];
-    }
-    for (int i = 0; i < 32; ++i) {
-        ad[32 + i] = helperKey[i];
-    }
+    memcpy(ad, myIdentity.data(), 32);
+    memcpy(ad + 32, helperKey, 32);
     int len = Util::aes256encrypt(ad, 64, key, iv, ciphered, 0);
     // TODO: make sure about the ciphered text len
 
@@ -459,7 +453,8 @@ void Client::readInitial(const std::string &message) {
 
     // authenticate with AD
     unsigned char decryptedAd[64];
-    unsigned char iv[16] = { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
+    unsigned char iv[16];
+    memset(iv, 0, 16);
     unsigned char encryptedAdArr[64];
     for (int i = 0; i < 64; ++i) {
         encryptedAdArr[i] = encryptedAd[i];
@@ -468,12 +463,9 @@ void Client::readInitial(const std::string &message) {
     int len = Util::aes256decrypt(encryptedAdArr, 64, sharedSecret, iv, decryptedAd, 0);
     //TODO: make something with the len
 
-    for (int i = 0; i < 64; ++i) {
-        if (decryptedAd[i] != ad[i]) {
-            std::cout << "Authentication failed!" << std::endl;
-            //return;
-        }
-    }
+    if (memcmp(decryptedAd, ad, 64))
+	std::cout << "Authentication failed!" << std::endl;
+	//return;
     std::cout << "Authentication successful" << std::endl;
 
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
@@ -575,34 +567,34 @@ void Client::develRunClient()
                 continue;
             }
 
-	        switch (stoi(chosen)) {
-	        case 1:
-                develSendMessage();
-                while (!gotResponse_) {
-                    readResponse();
-                    std::this_thread::sleep_for(1s);
-                }
-		        break;
-	        case 2:
-                develReadMessages();
-                // Sleep for 5 seconds so the server has time to give you messages with the initial One
-                std::cout << "Reading messages" << std::endl;
-                for (int i = 0; i < 5; ++i) {
-                    std::cout << "." << std::flush;
-                    std::this_thread::sleep_for(1s);
-                }
-                std::cout << std::endl;
-                while (!gotResponse_) {
-                    readResponse();
-                    std::this_thread::sleep_for(1s);
-                }
-                printMessages();
-		        break;
-            case 3:
-                printSharedSecrets();
-                break;
-	        default:
-		        std::cout << "Invalid choice" << std::endl;
+	    switch (stoi(chosen)) {
+		case 1:
+		    develSendMessage();
+		    while (!gotResponse_) {
+			readResponse();
+			std::this_thread::sleep_for(1s);
+		    }
+		    break;
+		case 2:
+		    develReadMessages();
+		    // Sleep for 5 seconds so the server has time to give you messages with the initial One
+		    std::cout << "Reading messages" << std::endl;
+		    for (int i = 0; i < 5; ++i) {
+			std::cout << "." << std::flush;
+			std::this_thread::sleep_for(1s);
+		    }
+		    std::cout << std::endl;
+		    while (!gotResponse_) {
+			readResponse();
+			std::this_thread::sleep_for(1s);
+		    }
+		    printMessages();
+		    break;
+		case 3:
+		    printSharedSecrets();
+		    break;
+		default:
+		    std::cout << "Invalid choice" << std::endl;
             }
         }
     }
