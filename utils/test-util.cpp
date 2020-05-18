@@ -473,15 +473,24 @@ TEST_CASE("ratchet")
 	unsigned char AD[64];
 	std::memset(AD, 3, 64);
 	unsigned char testString1[] = "123456789qwertyuiopasdfghjklzxc";
-	unsigned char testString2[] = "123456789qwertyuiopasdfghjklzxc";
+	unsigned char testString2[] = "x";
+	unsigned char testString3[] = "brown fox jumps over the lazy dog\nbrown fox jumps over the lazy dog\nbrown fox jumps over the lazy dog\nbrown fox jumps over the lazy dog";
 	unsigned char decrypted[64];
+	unsigned char decrypted2[64];
+	unsigned char decrypted3[1024];
+
 	Ratchet_mess encrypted = alice.RatchetEncrypt(testString1, sizeof(testString1) / sizeof(*testString1), AD);
-	//std::cout << "pt0: " << testString << std::endl;
 	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted);
 
+	encrypted = bob.RatchetEncrypt(testString2, sizeof(testString2) / sizeof(*testString2), AD);
+	alice.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted2);
 
-	//std::cout << "pt1: " << decrypted;
+	encrypted = alice.RatchetEncrypt(testString3, sizeof(testString3) / sizeof(*testString3), AD);
+	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted3);
+
 	REQUIRE(!memcmp(decrypted, testString1, sizeof(testString1) / sizeof(*testString1)));
+	REQUIRE(!memcmp(decrypted2, testString2, sizeof(testString2) / sizeof(*testString2)));
+	REQUIRE(!memcmp(decrypted3, testString3, sizeof(testString3) / sizeof(*testString3)));
     }
 
 
