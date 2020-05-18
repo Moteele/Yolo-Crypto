@@ -19,6 +19,8 @@ class Client
     std::string name_;
     std::vector<Mess> messages_;
 
+    int socket_ = 0;
+
     bool isAuthenticated_ = false;
     bool gotResponse_ = false;
 
@@ -42,7 +44,7 @@ public:
 
     int getIndexOfSharedSecret(const std::string &name);
 
-    void createKeys(std::ofstream &output);
+    void createKeys(std::stringstream &output);
 
     void develAuth();
 
@@ -73,4 +75,6 @@ public:
     Key createKeyFromHex(std::string &hexKey, bool isPublic);
 
     void printSharedSecrets(); // only for devel purposes, should be deleted later
+
+    void initConnection();
 };
