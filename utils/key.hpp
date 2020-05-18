@@ -14,7 +14,11 @@ class Key
 {
 private:
 	EVP_PKEY *key_ = NULL;
+	std::vector<uint8_t> privKey;
+	std::vector<uint8_t> pubKey;
+
 public:
+
 	/**
 	 * default constructor
 	 */
@@ -59,14 +63,16 @@ public:
 	 * returns the private key as a sequence of 32 bytes
 	 * @return vector with private key
 	 */
-	std::vector<uint8_t> getPrivateKey();
+	std::vector<uint8_t> getPrivateKey_();
 
 	/**
 	 * returns the public key as a sequence of 32 bytes
 	 * @return vector with public key
 	 */
-	std::vector<uint8_t> getPublicKey();
+	std::vector<uint8_t> getPublicKey_();
 
+	std::vector<uint8_t> getPrivateKey();
+	std::vector<uint8_t> getPublicKey();
 	/**
 	 * returns the EVP_PKEY structure that contains the keypair
 	 * @return keypair
