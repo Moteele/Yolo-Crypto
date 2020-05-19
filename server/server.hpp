@@ -280,6 +280,8 @@ public:
 	void performSendInitialMsg(int socketDescriptor, const std::string &req);
 
 	void readRequest(const std::string &req);
+
+	void performCreateAccount(int socketDescriptor, const std::string &req);
 };
 
 #endif // SERVER_HPP

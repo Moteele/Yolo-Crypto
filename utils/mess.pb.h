@@ -31,6 +31,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -61,6 +62,33 @@ PROTOBUF_NAMESPACE_OPEN
 template<> ::Mess* Arena::CreateMaybeMessage<::Mess>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
+enum Mess_MsgType : int {
+  Mess_MsgType_FETCH_KEYS = 0,
+  Mess_MsgType_INIT_MESSAGE = 1,
+  Mess_MsgType_MESSAGE = 2,
+  Mess_MsgType_AUTH = 3,
+  Mess_MsgType_FETCH_MESSAGES = 4,
+  Mess_MsgType_CREATE_ACCOUNT = 5
+};
+bool Mess_MsgType_IsValid(int value);
+constexpr Mess_MsgType Mess_MsgType_MsgType_MIN = Mess_MsgType_FETCH_KEYS;
+constexpr Mess_MsgType Mess_MsgType_MsgType_MAX = Mess_MsgType_CREATE_ACCOUNT;
+constexpr int Mess_MsgType_MsgType_ARRAYSIZE = Mess_MsgType_MsgType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Mess_MsgType_descriptor();
+template<typename T>
+inline const std::string& Mess_MsgType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, Mess_MsgType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function Mess_MsgType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    Mess_MsgType_descriptor(), enum_t_value);
+}
+inline bool Mess_MsgType_Parse(
+    const std::string& name, Mess_MsgType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Mess_MsgType>(
+    Mess_MsgType_descriptor(), name, value);
+}
 // ===================================================================
 
 class Mess :
@@ -173,14 +201,319 @@ class Mess :
 
   // nested types ----------------------------------------------------
 
+  typedef Mess_MsgType MsgType;
+  static constexpr MsgType FETCH_KEYS =
+    Mess_MsgType_FETCH_KEYS;
+  static constexpr MsgType INIT_MESSAGE =
+    Mess_MsgType_INIT_MESSAGE;
+  static constexpr MsgType MESSAGE =
+    Mess_MsgType_MESSAGE;
+  static constexpr MsgType AUTH =
+    Mess_MsgType_AUTH;
+  static constexpr MsgType FETCH_MESSAGES =
+    Mess_MsgType_FETCH_MESSAGES;
+  static constexpr MsgType CREATE_ACCOUNT =
+    Mess_MsgType_CREATE_ACCOUNT;
+  static inline bool MsgType_IsValid(int value) {
+    return Mess_MsgType_IsValid(value);
+  }
+  static constexpr MsgType MsgType_MIN =
+    Mess_MsgType_MsgType_MIN;
+  static constexpr MsgType MsgType_MAX =
+    Mess_MsgType_MsgType_MAX;
+  static constexpr int MsgType_ARRAYSIZE =
+    Mess_MsgType_MsgType_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  MsgType_descriptor() {
+    return Mess_MsgType_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& MsgType_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, MsgType>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function MsgType_Name.");
+    return Mess_MsgType_Name(enum_t_value);
+  }
+  static inline bool MsgType_Parse(const std::string& name,
+      MsgType* value) {
+    return Mess_MsgType_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   enum : int {
-    kSenderFieldNumber = 1,
-    kRecieverFieldNumber = 2,
-    kTextFieldNumber = 3,
+    kSenOTPFieldNumber = 6,
+    kSenIdKeyFieldNumber = 3,
+    kSenPreKeyFieldNumber = 4,
+    kSenPreKeySigFieldNumber = 5,
+    kReqIdKeyFieldNumber = 8,
+    kReqPreKeyFieldNumber = 9,
+    kReqPreKeySigFieldNumber = 10,
+    kReqOTPFieldNumber = 11,
+    kSenEpKeyFieldNumber = 12,
+    kCTFieldNumber = 14,
+    kSenRKeyFieldNumber = 17,
+    kTextContentFieldNumber = 19,
+    kSenderFieldNumber = 20,
+    kRecieverFieldNumber = 21,
+    kTimestampFieldNumber = 22,
+    kUsernameFieldNumber = 23,
+    kPasswordFieldNumber = 24,
+    kCipherAdFieldNumber = 26,
+    kTypeFieldNumber = 1,
+    kSenIdFieldNumber = 2,
+    kReqIdFieldNumber = 7,
+    kOTPidFieldNumber = 13,
+    kMessNumFieldNumber = 15,
+    kPrevNumFieldNumber = 16,
+    kRecIdFieldNumber = 18,
+    kErrorFieldNumber = 25,
   };
-  // required string sender = 1;
+  // repeated bytes senOTP = 6;
+  int senotp_size() const;
+  private:
+  int _internal_senotp_size() const;
+  public:
+  void clear_senotp();
+  const std::string& senotp(int index) const;
+  std::string* mutable_senotp(int index);
+  void set_senotp(int index, const std::string& value);
+  void set_senotp(int index, std::string&& value);
+  void set_senotp(int index, const char* value);
+  void set_senotp(int index, const void* value, size_t size);
+  std::string* add_senotp();
+  void add_senotp(const std::string& value);
+  void add_senotp(std::string&& value);
+  void add_senotp(const char* value);
+  void add_senotp(const void* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& senotp() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_senotp();
+  private:
+  const std::string& _internal_senotp(int index) const;
+  std::string* _internal_add_senotp();
+  public:
+
+  // optional bytes senIdKey = 3;
+  bool has_senidkey() const;
+  private:
+  bool _internal_has_senidkey() const;
+  public:
+  void clear_senidkey();
+  const std::string& senidkey() const;
+  void set_senidkey(const std::string& value);
+  void set_senidkey(std::string&& value);
+  void set_senidkey(const char* value);
+  void set_senidkey(const void* value, size_t size);
+  std::string* mutable_senidkey();
+  std::string* release_senidkey();
+  void set_allocated_senidkey(std::string* senidkey);
+  private:
+  const std::string& _internal_senidkey() const;
+  void _internal_set_senidkey(const std::string& value);
+  std::string* _internal_mutable_senidkey();
+  public:
+
+  // optional bytes senPreKey = 4;
+  bool has_senprekey() const;
+  private:
+  bool _internal_has_senprekey() const;
+  public:
+  void clear_senprekey();
+  const std::string& senprekey() const;
+  void set_senprekey(const std::string& value);
+  void set_senprekey(std::string&& value);
+  void set_senprekey(const char* value);
+  void set_senprekey(const void* value, size_t size);
+  std::string* mutable_senprekey();
+  std::string* release_senprekey();
+  void set_allocated_senprekey(std::string* senprekey);
+  private:
+  const std::string& _internal_senprekey() const;
+  void _internal_set_senprekey(const std::string& value);
+  std::string* _internal_mutable_senprekey();
+  public:
+
+  // optional bytes senPreKeySig = 5;
+  bool has_senprekeysig() const;
+  private:
+  bool _internal_has_senprekeysig() const;
+  public:
+  void clear_senprekeysig();
+  const std::string& senprekeysig() const;
+  void set_senprekeysig(const std::string& value);
+  void set_senprekeysig(std::string&& value);
+  void set_senprekeysig(const char* value);
+  void set_senprekeysig(const void* value, size_t size);
+  std::string* mutable_senprekeysig();
+  std::string* release_senprekeysig();
+  void set_allocated_senprekeysig(std::string* senprekeysig);
+  private:
+  const std::string& _internal_senprekeysig() const;
+  void _internal_set_senprekeysig(const std::string& value);
+  std::string* _internal_mutable_senprekeysig();
+  public:
+
+  // optional bytes reqIdKey = 8;
+  bool has_reqidkey() const;
+  private:
+  bool _internal_has_reqidkey() const;
+  public:
+  void clear_reqidkey();
+  const std::string& reqidkey() const;
+  void set_reqidkey(const std::string& value);
+  void set_reqidkey(std::string&& value);
+  void set_reqidkey(const char* value);
+  void set_reqidkey(const void* value, size_t size);
+  std::string* mutable_reqidkey();
+  std::string* release_reqidkey();
+  void set_allocated_reqidkey(std::string* reqidkey);
+  private:
+  const std::string& _internal_reqidkey() const;
+  void _internal_set_reqidkey(const std::string& value);
+  std::string* _internal_mutable_reqidkey();
+  public:
+
+  // optional bytes reqPreKey = 9;
+  bool has_reqprekey() const;
+  private:
+  bool _internal_has_reqprekey() const;
+  public:
+  void clear_reqprekey();
+  const std::string& reqprekey() const;
+  void set_reqprekey(const std::string& value);
+  void set_reqprekey(std::string&& value);
+  void set_reqprekey(const char* value);
+  void set_reqprekey(const void* value, size_t size);
+  std::string* mutable_reqprekey();
+  std::string* release_reqprekey();
+  void set_allocated_reqprekey(std::string* reqprekey);
+  private:
+  const std::string& _internal_reqprekey() const;
+  void _internal_set_reqprekey(const std::string& value);
+  std::string* _internal_mutable_reqprekey();
+  public:
+
+  // optional bytes reqPreKeySig = 10;
+  bool has_reqprekeysig() const;
+  private:
+  bool _internal_has_reqprekeysig() const;
+  public:
+  void clear_reqprekeysig();
+  const std::string& reqprekeysig() const;
+  void set_reqprekeysig(const std::string& value);
+  void set_reqprekeysig(std::string&& value);
+  void set_reqprekeysig(const char* value);
+  void set_reqprekeysig(const void* value, size_t size);
+  std::string* mutable_reqprekeysig();
+  std::string* release_reqprekeysig();
+  void set_allocated_reqprekeysig(std::string* reqprekeysig);
+  private:
+  const std::string& _internal_reqprekeysig() const;
+  void _internal_set_reqprekeysig(const std::string& value);
+  std::string* _internal_mutable_reqprekeysig();
+  public:
+
+  // optional bytes reqOTP = 11;
+  bool has_reqotp() const;
+  private:
+  bool _internal_has_reqotp() const;
+  public:
+  void clear_reqotp();
+  const std::string& reqotp() const;
+  void set_reqotp(const std::string& value);
+  void set_reqotp(std::string&& value);
+  void set_reqotp(const char* value);
+  void set_reqotp(const void* value, size_t size);
+  std::string* mutable_reqotp();
+  std::string* release_reqotp();
+  void set_allocated_reqotp(std::string* reqotp);
+  private:
+  const std::string& _internal_reqotp() const;
+  void _internal_set_reqotp(const std::string& value);
+  std::string* _internal_mutable_reqotp();
+  public:
+
+  // optional bytes senEpKey = 12;
+  bool has_senepkey() const;
+  private:
+  bool _internal_has_senepkey() const;
+  public:
+  void clear_senepkey();
+  const std::string& senepkey() const;
+  void set_senepkey(const std::string& value);
+  void set_senepkey(std::string&& value);
+  void set_senepkey(const char* value);
+  void set_senepkey(const void* value, size_t size);
+  std::string* mutable_senepkey();
+  std::string* release_senepkey();
+  void set_allocated_senepkey(std::string* senepkey);
+  private:
+  const std::string& _internal_senepkey() const;
+  void _internal_set_senepkey(const std::string& value);
+  std::string* _internal_mutable_senepkey();
+  public:
+
+  // optional bytes CT = 14;
+  bool has_ct() const;
+  private:
+  bool _internal_has_ct() const;
+  public:
+  void clear_ct();
+  const std::string& ct() const;
+  void set_ct(const std::string& value);
+  void set_ct(std::string&& value);
+  void set_ct(const char* value);
+  void set_ct(const void* value, size_t size);
+  std::string* mutable_ct();
+  std::string* release_ct();
+  void set_allocated_ct(std::string* ct);
+  private:
+  const std::string& _internal_ct() const;
+  void _internal_set_ct(const std::string& value);
+  std::string* _internal_mutable_ct();
+  public:
+
+  // optional bytes senRKey = 17;
+  bool has_senrkey() const;
+  private:
+  bool _internal_has_senrkey() const;
+  public:
+  void clear_senrkey();
+  const std::string& senrkey() const;
+  void set_senrkey(const std::string& value);
+  void set_senrkey(std::string&& value);
+  void set_senrkey(const char* value);
+  void set_senrkey(const void* value, size_t size);
+  std::string* mutable_senrkey();
+  std::string* release_senrkey();
+  void set_allocated_senrkey(std::string* senrkey);
+  private:
+  const std::string& _internal_senrkey() const;
+  void _internal_set_senrkey(const std::string& value);
+  std::string* _internal_mutable_senrkey();
+  public:
+
+  // optional bytes textContent = 19;
+  bool has_textcontent() const;
+  private:
+  bool _internal_has_textcontent() const;
+  public:
+  void clear_textcontent();
+  const std::string& textcontent() const;
+  void set_textcontent(const std::string& value);
+  void set_textcontent(std::string&& value);
+  void set_textcontent(const char* value);
+  void set_textcontent(const void* value, size_t size);
+  std::string* mutable_textcontent();
+  std::string* release_textcontent();
+  void set_allocated_textcontent(std::string* textcontent);
+  private:
+  const std::string& _internal_textcontent() const;
+  void _internal_set_textcontent(const std::string& value);
+  std::string* _internal_mutable_textcontent();
+  public:
+
+  // optional bytes sender = 20;
   bool has_sender() const;
   private:
   bool _internal_has_sender() const;
@@ -190,7 +523,7 @@ class Mess :
   void set_sender(const std::string& value);
   void set_sender(std::string&& value);
   void set_sender(const char* value);
-  void set_sender(const char* value, size_t size);
+  void set_sender(const void* value, size_t size);
   std::string* mutable_sender();
   std::string* release_sender();
   void set_allocated_sender(std::string* sender);
@@ -200,7 +533,7 @@ class Mess :
   std::string* _internal_mutable_sender();
   public:
 
-  // required string reciever = 2;
+  // optional bytes reciever = 21;
   bool has_reciever() const;
   private:
   bool _internal_has_reciever() const;
@@ -210,7 +543,7 @@ class Mess :
   void set_reciever(const std::string& value);
   void set_reciever(std::string&& value);
   void set_reciever(const char* value);
-  void set_reciever(const char* value, size_t size);
+  void set_reciever(const void* value, size_t size);
   std::string* mutable_reciever();
   std::string* release_reciever();
   void set_allocated_reciever(std::string* reciever);
@@ -220,39 +553,223 @@ class Mess :
   std::string* _internal_mutable_reciever();
   public:
 
-  // required string text = 3;
-  bool has_text() const;
+  // optional string timestamp = 22;
+  bool has_timestamp() const;
   private:
-  bool _internal_has_text() const;
+  bool _internal_has_timestamp() const;
   public:
-  void clear_text();
-  const std::string& text() const;
-  void set_text(const std::string& value);
-  void set_text(std::string&& value);
-  void set_text(const char* value);
-  void set_text(const char* value, size_t size);
-  std::string* mutable_text();
-  std::string* release_text();
-  void set_allocated_text(std::string* text);
+  void clear_timestamp();
+  const std::string& timestamp() const;
+  void set_timestamp(const std::string& value);
+  void set_timestamp(std::string&& value);
+  void set_timestamp(const char* value);
+  void set_timestamp(const char* value, size_t size);
+  std::string* mutable_timestamp();
+  std::string* release_timestamp();
+  void set_allocated_timestamp(std::string* timestamp);
   private:
-  const std::string& _internal_text() const;
-  void _internal_set_text(const std::string& value);
-  std::string* _internal_mutable_text();
+  const std::string& _internal_timestamp() const;
+  void _internal_set_timestamp(const std::string& value);
+  std::string* _internal_mutable_timestamp();
+  public:
+
+  // optional bytes username = 23;
+  bool has_username() const;
+  private:
+  bool _internal_has_username() const;
+  public:
+  void clear_username();
+  const std::string& username() const;
+  void set_username(const std::string& value);
+  void set_username(std::string&& value);
+  void set_username(const char* value);
+  void set_username(const void* value, size_t size);
+  std::string* mutable_username();
+  std::string* release_username();
+  void set_allocated_username(std::string* username);
+  private:
+  const std::string& _internal_username() const;
+  void _internal_set_username(const std::string& value);
+  std::string* _internal_mutable_username();
+  public:
+
+  // optional bytes password = 24;
+  bool has_password() const;
+  private:
+  bool _internal_has_password() const;
+  public:
+  void clear_password();
+  const std::string& password() const;
+  void set_password(const std::string& value);
+  void set_password(std::string&& value);
+  void set_password(const char* value);
+  void set_password(const void* value, size_t size);
+  std::string* mutable_password();
+  std::string* release_password();
+  void set_allocated_password(std::string* password);
+  private:
+  const std::string& _internal_password() const;
+  void _internal_set_password(const std::string& value);
+  std::string* _internal_mutable_password();
+  public:
+
+  // optional bytes cipherAd = 26;
+  bool has_cipherad() const;
+  private:
+  bool _internal_has_cipherad() const;
+  public:
+  void clear_cipherad();
+  const std::string& cipherad() const;
+  void set_cipherad(const std::string& value);
+  void set_cipherad(std::string&& value);
+  void set_cipherad(const char* value);
+  void set_cipherad(const void* value, size_t size);
+  std::string* mutable_cipherad();
+  std::string* release_cipherad();
+  void set_allocated_cipherad(std::string* cipherad);
+  private:
+  const std::string& _internal_cipherad() const;
+  void _internal_set_cipherad(const std::string& value);
+  std::string* _internal_mutable_cipherad();
+  public:
+
+  // required .Mess.MsgType type = 1;
+  bool has_type() const;
+  private:
+  bool _internal_has_type() const;
+  public:
+  void clear_type();
+  ::Mess_MsgType type() const;
+  void set_type(::Mess_MsgType value);
+  private:
+  ::Mess_MsgType _internal_type() const;
+  void _internal_set_type(::Mess_MsgType value);
+  public:
+
+  // optional int32 senId = 2;
+  bool has_senid() const;
+  private:
+  bool _internal_has_senid() const;
+  public:
+  void clear_senid();
+  ::PROTOBUF_NAMESPACE_ID::int32 senid() const;
+  void set_senid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_senid() const;
+  void _internal_set_senid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 reqId = 7;
+  bool has_reqid() const;
+  private:
+  bool _internal_has_reqid() const;
+  public:
+  void clear_reqid();
+  ::PROTOBUF_NAMESPACE_ID::int32 reqid() const;
+  void set_reqid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_reqid() const;
+  void _internal_set_reqid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 OTPid = 13;
+  bool has_otpid() const;
+  private:
+  bool _internal_has_otpid() const;
+  public:
+  void clear_otpid();
+  ::PROTOBUF_NAMESPACE_ID::int32 otpid() const;
+  void set_otpid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_otpid() const;
+  void _internal_set_otpid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 messNum = 15;
+  bool has_messnum() const;
+  private:
+  bool _internal_has_messnum() const;
+  public:
+  void clear_messnum();
+  ::PROTOBUF_NAMESPACE_ID::int32 messnum() const;
+  void set_messnum(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_messnum() const;
+  void _internal_set_messnum(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 prevNum = 16;
+  bool has_prevnum() const;
+  private:
+  bool _internal_has_prevnum() const;
+  public:
+  void clear_prevnum();
+  ::PROTOBUF_NAMESPACE_ID::int32 prevnum() const;
+  void set_prevnum(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_prevnum() const;
+  void _internal_set_prevnum(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 recId = 18;
+  bool has_recid() const;
+  private:
+  bool _internal_has_recid() const;
+  public:
+  void clear_recid();
+  ::PROTOBUF_NAMESPACE_ID::int32 recid() const;
+  void set_recid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_recid() const;
+  void _internal_set_recid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional bool error = 25;
+  bool has_error() const;
+  private:
+  bool _internal_has_error() const;
+  public:
+  void clear_error();
+  bool error() const;
+  void set_error(bool value);
+  private:
+  bool _internal_error() const;
+  void _internal_set_error(bool value);
   public:
 
   // @@protoc_insertion_point(class_scope:Mess)
  private:
   class _Internal;
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
-
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> senotp_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr senidkey_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr senprekey_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr senprekeysig_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr reqidkey_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr reqprekey_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr reqprekeysig_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr reqotp_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr senepkey_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr ct_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr senrkey_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr textcontent_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr sender_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr reciever_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr text_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr timestamp_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr username_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr password_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cipherad_;
+  int type_;
+  ::PROTOBUF_NAMESPACE_ID::int32 senid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 reqid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 otpid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 messnum_;
+  ::PROTOBUF_NAMESPACE_ID::int32 prevnum_;
+  ::PROTOBUF_NAMESPACE_ID::int32 recid_;
+  bool error_;
   friend struct ::TableStruct_mess_2eproto;
 };
 // ===================================================================
@@ -266,9 +783,1061 @@ class Mess :
 #endif  // __GNUC__
 // Mess
 
-// required string sender = 1;
-inline bool Mess::_internal_has_sender() const {
+// required .Mess.MsgType type = 1;
+inline bool Mess::_internal_has_type() const {
+  bool value = (_has_bits_[0] & 0x00020000u) != 0;
+  return value;
+}
+inline bool Mess::has_type() const {
+  return _internal_has_type();
+}
+inline void Mess::clear_type() {
+  type_ = 0;
+  _has_bits_[0] &= ~0x00020000u;
+}
+inline ::Mess_MsgType Mess::_internal_type() const {
+  return static_cast< ::Mess_MsgType >(type_);
+}
+inline ::Mess_MsgType Mess::type() const {
+  // @@protoc_insertion_point(field_get:Mess.type)
+  return _internal_type();
+}
+inline void Mess::_internal_set_type(::Mess_MsgType value) {
+  assert(::Mess_MsgType_IsValid(value));
+  _has_bits_[0] |= 0x00020000u;
+  type_ = value;
+}
+inline void Mess::set_type(::Mess_MsgType value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:Mess.type)
+}
+
+// optional int32 senId = 2;
+inline bool Mess::_internal_has_senid() const {
+  bool value = (_has_bits_[0] & 0x00040000u) != 0;
+  return value;
+}
+inline bool Mess::has_senid() const {
+  return _internal_has_senid();
+}
+inline void Mess::clear_senid() {
+  senid_ = 0;
+  _has_bits_[0] &= ~0x00040000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::_internal_senid() const {
+  return senid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::senid() const {
+  // @@protoc_insertion_point(field_get:Mess.senId)
+  return _internal_senid();
+}
+inline void Mess::_internal_set_senid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00040000u;
+  senid_ = value;
+}
+inline void Mess::set_senid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_senid(value);
+  // @@protoc_insertion_point(field_set:Mess.senId)
+}
+
+// optional bytes senIdKey = 3;
+inline bool Mess::_internal_has_senidkey() const {
   bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool Mess::has_senidkey() const {
+  return _internal_has_senidkey();
+}
+inline void Mess::clear_senidkey() {
+  senidkey_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& Mess::senidkey() const {
+  // @@protoc_insertion_point(field_get:Mess.senIdKey)
+  return _internal_senidkey();
+}
+inline void Mess::set_senidkey(const std::string& value) {
+  _internal_set_senidkey(value);
+  // @@protoc_insertion_point(field_set:Mess.senIdKey)
+}
+inline std::string* Mess::mutable_senidkey() {
+  // @@protoc_insertion_point(field_mutable:Mess.senIdKey)
+  return _internal_mutable_senidkey();
+}
+inline const std::string& Mess::_internal_senidkey() const {
+  return senidkey_.GetNoArena();
+}
+inline void Mess::_internal_set_senidkey(const std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  senidkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_senidkey(std::string&& value) {
+  _has_bits_[0] |= 0x00000001u;
+  senidkey_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.senIdKey)
+}
+inline void Mess::set_senidkey(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000001u;
+  senidkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.senIdKey)
+}
+inline void Mess::set_senidkey(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000001u;
+  senidkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.senIdKey)
+}
+inline std::string* Mess::_internal_mutable_senidkey() {
+  _has_bits_[0] |= 0x00000001u;
+  return senidkey_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_senidkey() {
+  // @@protoc_insertion_point(field_release:Mess.senIdKey)
+  if (!_internal_has_senidkey()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return senidkey_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_senidkey(std::string* senidkey) {
+  if (senidkey != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  senidkey_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), senidkey);
+  // @@protoc_insertion_point(field_set_allocated:Mess.senIdKey)
+}
+
+// optional bytes senPreKey = 4;
+inline bool Mess::_internal_has_senprekey() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool Mess::has_senprekey() const {
+  return _internal_has_senprekey();
+}
+inline void Mess::clear_senprekey() {
+  senprekey_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const std::string& Mess::senprekey() const {
+  // @@protoc_insertion_point(field_get:Mess.senPreKey)
+  return _internal_senprekey();
+}
+inline void Mess::set_senprekey(const std::string& value) {
+  _internal_set_senprekey(value);
+  // @@protoc_insertion_point(field_set:Mess.senPreKey)
+}
+inline std::string* Mess::mutable_senprekey() {
+  // @@protoc_insertion_point(field_mutable:Mess.senPreKey)
+  return _internal_mutable_senprekey();
+}
+inline const std::string& Mess::_internal_senprekey() const {
+  return senprekey_.GetNoArena();
+}
+inline void Mess::_internal_set_senprekey(const std::string& value) {
+  _has_bits_[0] |= 0x00000002u;
+  senprekey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_senprekey(std::string&& value) {
+  _has_bits_[0] |= 0x00000002u;
+  senprekey_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.senPreKey)
+}
+inline void Mess::set_senprekey(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000002u;
+  senprekey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.senPreKey)
+}
+inline void Mess::set_senprekey(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000002u;
+  senprekey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.senPreKey)
+}
+inline std::string* Mess::_internal_mutable_senprekey() {
+  _has_bits_[0] |= 0x00000002u;
+  return senprekey_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_senprekey() {
+  // @@protoc_insertion_point(field_release:Mess.senPreKey)
+  if (!_internal_has_senprekey()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return senprekey_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_senprekey(std::string* senprekey) {
+  if (senprekey != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  senprekey_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), senprekey);
+  // @@protoc_insertion_point(field_set_allocated:Mess.senPreKey)
+}
+
+// optional bytes senPreKeySig = 5;
+inline bool Mess::_internal_has_senprekeysig() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool Mess::has_senprekeysig() const {
+  return _internal_has_senprekeysig();
+}
+inline void Mess::clear_senprekeysig() {
+  senprekeysig_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline const std::string& Mess::senprekeysig() const {
+  // @@protoc_insertion_point(field_get:Mess.senPreKeySig)
+  return _internal_senprekeysig();
+}
+inline void Mess::set_senprekeysig(const std::string& value) {
+  _internal_set_senprekeysig(value);
+  // @@protoc_insertion_point(field_set:Mess.senPreKeySig)
+}
+inline std::string* Mess::mutable_senprekeysig() {
+  // @@protoc_insertion_point(field_mutable:Mess.senPreKeySig)
+  return _internal_mutable_senprekeysig();
+}
+inline const std::string& Mess::_internal_senprekeysig() const {
+  return senprekeysig_.GetNoArena();
+}
+inline void Mess::_internal_set_senprekeysig(const std::string& value) {
+  _has_bits_[0] |= 0x00000004u;
+  senprekeysig_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_senprekeysig(std::string&& value) {
+  _has_bits_[0] |= 0x00000004u;
+  senprekeysig_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.senPreKeySig)
+}
+inline void Mess::set_senprekeysig(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000004u;
+  senprekeysig_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.senPreKeySig)
+}
+inline void Mess::set_senprekeysig(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000004u;
+  senprekeysig_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.senPreKeySig)
+}
+inline std::string* Mess::_internal_mutable_senprekeysig() {
+  _has_bits_[0] |= 0x00000004u;
+  return senprekeysig_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_senprekeysig() {
+  // @@protoc_insertion_point(field_release:Mess.senPreKeySig)
+  if (!_internal_has_senprekeysig()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000004u;
+  return senprekeysig_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_senprekeysig(std::string* senprekeysig) {
+  if (senprekeysig != nullptr) {
+    _has_bits_[0] |= 0x00000004u;
+  } else {
+    _has_bits_[0] &= ~0x00000004u;
+  }
+  senprekeysig_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), senprekeysig);
+  // @@protoc_insertion_point(field_set_allocated:Mess.senPreKeySig)
+}
+
+// repeated bytes senOTP = 6;
+inline int Mess::_internal_senotp_size() const {
+  return senotp_.size();
+}
+inline int Mess::senotp_size() const {
+  return _internal_senotp_size();
+}
+inline void Mess::clear_senotp() {
+  senotp_.Clear();
+}
+inline std::string* Mess::add_senotp() {
+  // @@protoc_insertion_point(field_add_mutable:Mess.senOTP)
+  return _internal_add_senotp();
+}
+inline const std::string& Mess::_internal_senotp(int index) const {
+  return senotp_.Get(index);
+}
+inline const std::string& Mess::senotp(int index) const {
+  // @@protoc_insertion_point(field_get:Mess.senOTP)
+  return _internal_senotp(index);
+}
+inline std::string* Mess::mutable_senotp(int index) {
+  // @@protoc_insertion_point(field_mutable:Mess.senOTP)
+  return senotp_.Mutable(index);
+}
+inline void Mess::set_senotp(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:Mess.senOTP)
+  senotp_.Mutable(index)->assign(value);
+}
+inline void Mess::set_senotp(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:Mess.senOTP)
+  senotp_.Mutable(index)->assign(std::move(value));
+}
+inline void Mess::set_senotp(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  senotp_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:Mess.senOTP)
+}
+inline void Mess::set_senotp(int index, const void* value, size_t size) {
+  senotp_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Mess.senOTP)
+}
+inline std::string* Mess::_internal_add_senotp() {
+  return senotp_.Add();
+}
+inline void Mess::add_senotp(const std::string& value) {
+  senotp_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:Mess.senOTP)
+}
+inline void Mess::add_senotp(std::string&& value) {
+  senotp_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:Mess.senOTP)
+}
+inline void Mess::add_senotp(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  senotp_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:Mess.senOTP)
+}
+inline void Mess::add_senotp(const void* value, size_t size) {
+  senotp_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:Mess.senOTP)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+Mess::senotp() const {
+  // @@protoc_insertion_point(field_list:Mess.senOTP)
+  return senotp_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+Mess::mutable_senotp() {
+  // @@protoc_insertion_point(field_mutable_list:Mess.senOTP)
+  return &senotp_;
+}
+
+// optional int32 reqId = 7;
+inline bool Mess::_internal_has_reqid() const {
+  bool value = (_has_bits_[0] & 0x00080000u) != 0;
+  return value;
+}
+inline bool Mess::has_reqid() const {
+  return _internal_has_reqid();
+}
+inline void Mess::clear_reqid() {
+  reqid_ = 0;
+  _has_bits_[0] &= ~0x00080000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::_internal_reqid() const {
+  return reqid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::reqid() const {
+  // @@protoc_insertion_point(field_get:Mess.reqId)
+  return _internal_reqid();
+}
+inline void Mess::_internal_set_reqid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00080000u;
+  reqid_ = value;
+}
+inline void Mess::set_reqid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_reqid(value);
+  // @@protoc_insertion_point(field_set:Mess.reqId)
+}
+
+// optional bytes reqIdKey = 8;
+inline bool Mess::_internal_has_reqidkey() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool Mess::has_reqidkey() const {
+  return _internal_has_reqidkey();
+}
+inline void Mess::clear_reqidkey() {
+  reqidkey_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline const std::string& Mess::reqidkey() const {
+  // @@protoc_insertion_point(field_get:Mess.reqIdKey)
+  return _internal_reqidkey();
+}
+inline void Mess::set_reqidkey(const std::string& value) {
+  _internal_set_reqidkey(value);
+  // @@protoc_insertion_point(field_set:Mess.reqIdKey)
+}
+inline std::string* Mess::mutable_reqidkey() {
+  // @@protoc_insertion_point(field_mutable:Mess.reqIdKey)
+  return _internal_mutable_reqidkey();
+}
+inline const std::string& Mess::_internal_reqidkey() const {
+  return reqidkey_.GetNoArena();
+}
+inline void Mess::_internal_set_reqidkey(const std::string& value) {
+  _has_bits_[0] |= 0x00000008u;
+  reqidkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_reqidkey(std::string&& value) {
+  _has_bits_[0] |= 0x00000008u;
+  reqidkey_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.reqIdKey)
+}
+inline void Mess::set_reqidkey(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000008u;
+  reqidkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.reqIdKey)
+}
+inline void Mess::set_reqidkey(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000008u;
+  reqidkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.reqIdKey)
+}
+inline std::string* Mess::_internal_mutable_reqidkey() {
+  _has_bits_[0] |= 0x00000008u;
+  return reqidkey_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_reqidkey() {
+  // @@protoc_insertion_point(field_release:Mess.reqIdKey)
+  if (!_internal_has_reqidkey()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000008u;
+  return reqidkey_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_reqidkey(std::string* reqidkey) {
+  if (reqidkey != nullptr) {
+    _has_bits_[0] |= 0x00000008u;
+  } else {
+    _has_bits_[0] &= ~0x00000008u;
+  }
+  reqidkey_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), reqidkey);
+  // @@protoc_insertion_point(field_set_allocated:Mess.reqIdKey)
+}
+
+// optional bytes reqPreKey = 9;
+inline bool Mess::_internal_has_reqprekey() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool Mess::has_reqprekey() const {
+  return _internal_has_reqprekey();
+}
+inline void Mess::clear_reqprekey() {
+  reqprekey_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline const std::string& Mess::reqprekey() const {
+  // @@protoc_insertion_point(field_get:Mess.reqPreKey)
+  return _internal_reqprekey();
+}
+inline void Mess::set_reqprekey(const std::string& value) {
+  _internal_set_reqprekey(value);
+  // @@protoc_insertion_point(field_set:Mess.reqPreKey)
+}
+inline std::string* Mess::mutable_reqprekey() {
+  // @@protoc_insertion_point(field_mutable:Mess.reqPreKey)
+  return _internal_mutable_reqprekey();
+}
+inline const std::string& Mess::_internal_reqprekey() const {
+  return reqprekey_.GetNoArena();
+}
+inline void Mess::_internal_set_reqprekey(const std::string& value) {
+  _has_bits_[0] |= 0x00000010u;
+  reqprekey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_reqprekey(std::string&& value) {
+  _has_bits_[0] |= 0x00000010u;
+  reqprekey_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.reqPreKey)
+}
+inline void Mess::set_reqprekey(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000010u;
+  reqprekey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.reqPreKey)
+}
+inline void Mess::set_reqprekey(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000010u;
+  reqprekey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.reqPreKey)
+}
+inline std::string* Mess::_internal_mutable_reqprekey() {
+  _has_bits_[0] |= 0x00000010u;
+  return reqprekey_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_reqprekey() {
+  // @@protoc_insertion_point(field_release:Mess.reqPreKey)
+  if (!_internal_has_reqprekey()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000010u;
+  return reqprekey_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_reqprekey(std::string* reqprekey) {
+  if (reqprekey != nullptr) {
+    _has_bits_[0] |= 0x00000010u;
+  } else {
+    _has_bits_[0] &= ~0x00000010u;
+  }
+  reqprekey_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), reqprekey);
+  // @@protoc_insertion_point(field_set_allocated:Mess.reqPreKey)
+}
+
+// optional bytes reqPreKeySig = 10;
+inline bool Mess::_internal_has_reqprekeysig() const {
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  return value;
+}
+inline bool Mess::has_reqprekeysig() const {
+  return _internal_has_reqprekeysig();
+}
+inline void Mess::clear_reqprekeysig() {
+  reqprekeysig_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline const std::string& Mess::reqprekeysig() const {
+  // @@protoc_insertion_point(field_get:Mess.reqPreKeySig)
+  return _internal_reqprekeysig();
+}
+inline void Mess::set_reqprekeysig(const std::string& value) {
+  _internal_set_reqprekeysig(value);
+  // @@protoc_insertion_point(field_set:Mess.reqPreKeySig)
+}
+inline std::string* Mess::mutable_reqprekeysig() {
+  // @@protoc_insertion_point(field_mutable:Mess.reqPreKeySig)
+  return _internal_mutable_reqprekeysig();
+}
+inline const std::string& Mess::_internal_reqprekeysig() const {
+  return reqprekeysig_.GetNoArena();
+}
+inline void Mess::_internal_set_reqprekeysig(const std::string& value) {
+  _has_bits_[0] |= 0x00000020u;
+  reqprekeysig_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_reqprekeysig(std::string&& value) {
+  _has_bits_[0] |= 0x00000020u;
+  reqprekeysig_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.reqPreKeySig)
+}
+inline void Mess::set_reqprekeysig(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000020u;
+  reqprekeysig_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.reqPreKeySig)
+}
+inline void Mess::set_reqprekeysig(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000020u;
+  reqprekeysig_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.reqPreKeySig)
+}
+inline std::string* Mess::_internal_mutable_reqprekeysig() {
+  _has_bits_[0] |= 0x00000020u;
+  return reqprekeysig_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_reqprekeysig() {
+  // @@protoc_insertion_point(field_release:Mess.reqPreKeySig)
+  if (!_internal_has_reqprekeysig()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000020u;
+  return reqprekeysig_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_reqprekeysig(std::string* reqprekeysig) {
+  if (reqprekeysig != nullptr) {
+    _has_bits_[0] |= 0x00000020u;
+  } else {
+    _has_bits_[0] &= ~0x00000020u;
+  }
+  reqprekeysig_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), reqprekeysig);
+  // @@protoc_insertion_point(field_set_allocated:Mess.reqPreKeySig)
+}
+
+// optional bytes reqOTP = 11;
+inline bool Mess::_internal_has_reqotp() const {
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  return value;
+}
+inline bool Mess::has_reqotp() const {
+  return _internal_has_reqotp();
+}
+inline void Mess::clear_reqotp() {
+  reqotp_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline const std::string& Mess::reqotp() const {
+  // @@protoc_insertion_point(field_get:Mess.reqOTP)
+  return _internal_reqotp();
+}
+inline void Mess::set_reqotp(const std::string& value) {
+  _internal_set_reqotp(value);
+  // @@protoc_insertion_point(field_set:Mess.reqOTP)
+}
+inline std::string* Mess::mutable_reqotp() {
+  // @@protoc_insertion_point(field_mutable:Mess.reqOTP)
+  return _internal_mutable_reqotp();
+}
+inline const std::string& Mess::_internal_reqotp() const {
+  return reqotp_.GetNoArena();
+}
+inline void Mess::_internal_set_reqotp(const std::string& value) {
+  _has_bits_[0] |= 0x00000040u;
+  reqotp_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_reqotp(std::string&& value) {
+  _has_bits_[0] |= 0x00000040u;
+  reqotp_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.reqOTP)
+}
+inline void Mess::set_reqotp(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000040u;
+  reqotp_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.reqOTP)
+}
+inline void Mess::set_reqotp(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000040u;
+  reqotp_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.reqOTP)
+}
+inline std::string* Mess::_internal_mutable_reqotp() {
+  _has_bits_[0] |= 0x00000040u;
+  return reqotp_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_reqotp() {
+  // @@protoc_insertion_point(field_release:Mess.reqOTP)
+  if (!_internal_has_reqotp()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000040u;
+  return reqotp_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_reqotp(std::string* reqotp) {
+  if (reqotp != nullptr) {
+    _has_bits_[0] |= 0x00000040u;
+  } else {
+    _has_bits_[0] &= ~0x00000040u;
+  }
+  reqotp_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), reqotp);
+  // @@protoc_insertion_point(field_set_allocated:Mess.reqOTP)
+}
+
+// optional bytes senEpKey = 12;
+inline bool Mess::_internal_has_senepkey() const {
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  return value;
+}
+inline bool Mess::has_senepkey() const {
+  return _internal_has_senepkey();
+}
+inline void Mess::clear_senepkey() {
+  senepkey_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline const std::string& Mess::senepkey() const {
+  // @@protoc_insertion_point(field_get:Mess.senEpKey)
+  return _internal_senepkey();
+}
+inline void Mess::set_senepkey(const std::string& value) {
+  _internal_set_senepkey(value);
+  // @@protoc_insertion_point(field_set:Mess.senEpKey)
+}
+inline std::string* Mess::mutable_senepkey() {
+  // @@protoc_insertion_point(field_mutable:Mess.senEpKey)
+  return _internal_mutable_senepkey();
+}
+inline const std::string& Mess::_internal_senepkey() const {
+  return senepkey_.GetNoArena();
+}
+inline void Mess::_internal_set_senepkey(const std::string& value) {
+  _has_bits_[0] |= 0x00000080u;
+  senepkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_senepkey(std::string&& value) {
+  _has_bits_[0] |= 0x00000080u;
+  senepkey_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.senEpKey)
+}
+inline void Mess::set_senepkey(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000080u;
+  senepkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.senEpKey)
+}
+inline void Mess::set_senepkey(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000080u;
+  senepkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.senEpKey)
+}
+inline std::string* Mess::_internal_mutable_senepkey() {
+  _has_bits_[0] |= 0x00000080u;
+  return senepkey_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_senepkey() {
+  // @@protoc_insertion_point(field_release:Mess.senEpKey)
+  if (!_internal_has_senepkey()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000080u;
+  return senepkey_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_senepkey(std::string* senepkey) {
+  if (senepkey != nullptr) {
+    _has_bits_[0] |= 0x00000080u;
+  } else {
+    _has_bits_[0] &= ~0x00000080u;
+  }
+  senepkey_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), senepkey);
+  // @@protoc_insertion_point(field_set_allocated:Mess.senEpKey)
+}
+
+// optional int32 OTPid = 13;
+inline bool Mess::_internal_has_otpid() const {
+  bool value = (_has_bits_[0] & 0x00100000u) != 0;
+  return value;
+}
+inline bool Mess::has_otpid() const {
+  return _internal_has_otpid();
+}
+inline void Mess::clear_otpid() {
+  otpid_ = 0;
+  _has_bits_[0] &= ~0x00100000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::_internal_otpid() const {
+  return otpid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::otpid() const {
+  // @@protoc_insertion_point(field_get:Mess.OTPid)
+  return _internal_otpid();
+}
+inline void Mess::_internal_set_otpid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00100000u;
+  otpid_ = value;
+}
+inline void Mess::set_otpid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_otpid(value);
+  // @@protoc_insertion_point(field_set:Mess.OTPid)
+}
+
+// optional bytes CT = 14;
+inline bool Mess::_internal_has_ct() const {
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
+  return value;
+}
+inline bool Mess::has_ct() const {
+  return _internal_has_ct();
+}
+inline void Mess::clear_ct() {
+  ct_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline const std::string& Mess::ct() const {
+  // @@protoc_insertion_point(field_get:Mess.CT)
+  return _internal_ct();
+}
+inline void Mess::set_ct(const std::string& value) {
+  _internal_set_ct(value);
+  // @@protoc_insertion_point(field_set:Mess.CT)
+}
+inline std::string* Mess::mutable_ct() {
+  // @@protoc_insertion_point(field_mutable:Mess.CT)
+  return _internal_mutable_ct();
+}
+inline const std::string& Mess::_internal_ct() const {
+  return ct_.GetNoArena();
+}
+inline void Mess::_internal_set_ct(const std::string& value) {
+  _has_bits_[0] |= 0x00000100u;
+  ct_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_ct(std::string&& value) {
+  _has_bits_[0] |= 0x00000100u;
+  ct_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.CT)
+}
+inline void Mess::set_ct(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000100u;
+  ct_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.CT)
+}
+inline void Mess::set_ct(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000100u;
+  ct_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.CT)
+}
+inline std::string* Mess::_internal_mutable_ct() {
+  _has_bits_[0] |= 0x00000100u;
+  return ct_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_ct() {
+  // @@protoc_insertion_point(field_release:Mess.CT)
+  if (!_internal_has_ct()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000100u;
+  return ct_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_ct(std::string* ct) {
+  if (ct != nullptr) {
+    _has_bits_[0] |= 0x00000100u;
+  } else {
+    _has_bits_[0] &= ~0x00000100u;
+  }
+  ct_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ct);
+  // @@protoc_insertion_point(field_set_allocated:Mess.CT)
+}
+
+// optional int32 messNum = 15;
+inline bool Mess::_internal_has_messnum() const {
+  bool value = (_has_bits_[0] & 0x00200000u) != 0;
+  return value;
+}
+inline bool Mess::has_messnum() const {
+  return _internal_has_messnum();
+}
+inline void Mess::clear_messnum() {
+  messnum_ = 0;
+  _has_bits_[0] &= ~0x00200000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::_internal_messnum() const {
+  return messnum_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::messnum() const {
+  // @@protoc_insertion_point(field_get:Mess.messNum)
+  return _internal_messnum();
+}
+inline void Mess::_internal_set_messnum(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00200000u;
+  messnum_ = value;
+}
+inline void Mess::set_messnum(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_messnum(value);
+  // @@protoc_insertion_point(field_set:Mess.messNum)
+}
+
+// optional int32 prevNum = 16;
+inline bool Mess::_internal_has_prevnum() const {
+  bool value = (_has_bits_[0] & 0x00400000u) != 0;
+  return value;
+}
+inline bool Mess::has_prevnum() const {
+  return _internal_has_prevnum();
+}
+inline void Mess::clear_prevnum() {
+  prevnum_ = 0;
+  _has_bits_[0] &= ~0x00400000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::_internal_prevnum() const {
+  return prevnum_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::prevnum() const {
+  // @@protoc_insertion_point(field_get:Mess.prevNum)
+  return _internal_prevnum();
+}
+inline void Mess::_internal_set_prevnum(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00400000u;
+  prevnum_ = value;
+}
+inline void Mess::set_prevnum(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_prevnum(value);
+  // @@protoc_insertion_point(field_set:Mess.prevNum)
+}
+
+// optional bytes senRKey = 17;
+inline bool Mess::_internal_has_senrkey() const {
+  bool value = (_has_bits_[0] & 0x00000200u) != 0;
+  return value;
+}
+inline bool Mess::has_senrkey() const {
+  return _internal_has_senrkey();
+}
+inline void Mess::clear_senrkey() {
+  senrkey_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline const std::string& Mess::senrkey() const {
+  // @@protoc_insertion_point(field_get:Mess.senRKey)
+  return _internal_senrkey();
+}
+inline void Mess::set_senrkey(const std::string& value) {
+  _internal_set_senrkey(value);
+  // @@protoc_insertion_point(field_set:Mess.senRKey)
+}
+inline std::string* Mess::mutable_senrkey() {
+  // @@protoc_insertion_point(field_mutable:Mess.senRKey)
+  return _internal_mutable_senrkey();
+}
+inline const std::string& Mess::_internal_senrkey() const {
+  return senrkey_.GetNoArena();
+}
+inline void Mess::_internal_set_senrkey(const std::string& value) {
+  _has_bits_[0] |= 0x00000200u;
+  senrkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_senrkey(std::string&& value) {
+  _has_bits_[0] |= 0x00000200u;
+  senrkey_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.senRKey)
+}
+inline void Mess::set_senrkey(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000200u;
+  senrkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.senRKey)
+}
+inline void Mess::set_senrkey(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000200u;
+  senrkey_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.senRKey)
+}
+inline std::string* Mess::_internal_mutable_senrkey() {
+  _has_bits_[0] |= 0x00000200u;
+  return senrkey_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_senrkey() {
+  // @@protoc_insertion_point(field_release:Mess.senRKey)
+  if (!_internal_has_senrkey()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000200u;
+  return senrkey_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_senrkey(std::string* senrkey) {
+  if (senrkey != nullptr) {
+    _has_bits_[0] |= 0x00000200u;
+  } else {
+    _has_bits_[0] &= ~0x00000200u;
+  }
+  senrkey_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), senrkey);
+  // @@protoc_insertion_point(field_set_allocated:Mess.senRKey)
+}
+
+// optional int32 recId = 18;
+inline bool Mess::_internal_has_recid() const {
+  bool value = (_has_bits_[0] & 0x00800000u) != 0;
+  return value;
+}
+inline bool Mess::has_recid() const {
+  return _internal_has_recid();
+}
+inline void Mess::clear_recid() {
+  recid_ = 0;
+  _has_bits_[0] &= ~0x00800000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::_internal_recid() const {
+  return recid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Mess::recid() const {
+  // @@protoc_insertion_point(field_get:Mess.recId)
+  return _internal_recid();
+}
+inline void Mess::_internal_set_recid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00800000u;
+  recid_ = value;
+}
+inline void Mess::set_recid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_recid(value);
+  // @@protoc_insertion_point(field_set:Mess.recId)
+}
+
+// optional bytes textContent = 19;
+inline bool Mess::_internal_has_textcontent() const {
+  bool value = (_has_bits_[0] & 0x00000400u) != 0;
+  return value;
+}
+inline bool Mess::has_textcontent() const {
+  return _internal_has_textcontent();
+}
+inline void Mess::clear_textcontent() {
+  textcontent_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000400u;
+}
+inline const std::string& Mess::textcontent() const {
+  // @@protoc_insertion_point(field_get:Mess.textContent)
+  return _internal_textcontent();
+}
+inline void Mess::set_textcontent(const std::string& value) {
+  _internal_set_textcontent(value);
+  // @@protoc_insertion_point(field_set:Mess.textContent)
+}
+inline std::string* Mess::mutable_textcontent() {
+  // @@protoc_insertion_point(field_mutable:Mess.textContent)
+  return _internal_mutable_textcontent();
+}
+inline const std::string& Mess::_internal_textcontent() const {
+  return textcontent_.GetNoArena();
+}
+inline void Mess::_internal_set_textcontent(const std::string& value) {
+  _has_bits_[0] |= 0x00000400u;
+  textcontent_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_textcontent(std::string&& value) {
+  _has_bits_[0] |= 0x00000400u;
+  textcontent_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.textContent)
+}
+inline void Mess::set_textcontent(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000400u;
+  textcontent_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.textContent)
+}
+inline void Mess::set_textcontent(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000400u;
+  textcontent_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.textContent)
+}
+inline std::string* Mess::_internal_mutable_textcontent() {
+  _has_bits_[0] |= 0x00000400u;
+  return textcontent_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_textcontent() {
+  // @@protoc_insertion_point(field_release:Mess.textContent)
+  if (!_internal_has_textcontent()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000400u;
+  return textcontent_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_textcontent(std::string* textcontent) {
+  if (textcontent != nullptr) {
+    _has_bits_[0] |= 0x00000400u;
+  } else {
+    _has_bits_[0] &= ~0x00000400u;
+  }
+  textcontent_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), textcontent);
+  // @@protoc_insertion_point(field_set_allocated:Mess.textContent)
+}
+
+// optional bytes sender = 20;
+inline bool Mess::_internal_has_sender() const {
+  bool value = (_has_bits_[0] & 0x00000800u) != 0;
   return value;
 }
 inline bool Mess::has_sender() const {
@@ -276,7 +1845,7 @@ inline bool Mess::has_sender() const {
 }
 inline void Mess::clear_sender() {
   sender_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline const std::string& Mess::sender() const {
   // @@protoc_insertion_point(field_get:Mess.sender)
@@ -294,29 +1863,29 @@ inline const std::string& Mess::_internal_sender() const {
   return sender_.GetNoArena();
 }
 inline void Mess::_internal_set_sender(const std::string& value) {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000800u;
   sender_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
 }
 inline void Mess::set_sender(std::string&& value) {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000800u;
   sender_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:Mess.sender)
 }
 inline void Mess::set_sender(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000800u;
   sender_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:Mess.sender)
 }
-inline void Mess::set_sender(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000001u;
+inline void Mess::set_sender(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00000800u;
   sender_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:Mess.sender)
 }
 inline std::string* Mess::_internal_mutable_sender() {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000800u;
   return sender_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* Mess::release_sender() {
@@ -324,22 +1893,22 @@ inline std::string* Mess::release_sender() {
   if (!_internal_has_sender()) {
     return nullptr;
   }
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000800u;
   return sender_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline void Mess::set_allocated_sender(std::string* sender) {
   if (sender != nullptr) {
-    _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000800u;
   } else {
-    _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000800u;
   }
   sender_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), sender);
   // @@protoc_insertion_point(field_set_allocated:Mess.sender)
 }
 
-// required string reciever = 2;
+// optional bytes reciever = 21;
 inline bool Mess::_internal_has_reciever() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  bool value = (_has_bits_[0] & 0x00001000u) != 0;
   return value;
 }
 inline bool Mess::has_reciever() const {
@@ -347,7 +1916,7 @@ inline bool Mess::has_reciever() const {
 }
 inline void Mess::clear_reciever() {
   reciever_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline const std::string& Mess::reciever() const {
   // @@protoc_insertion_point(field_get:Mess.reciever)
@@ -365,29 +1934,29 @@ inline const std::string& Mess::_internal_reciever() const {
   return reciever_.GetNoArena();
 }
 inline void Mess::_internal_set_reciever(const std::string& value) {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00001000u;
   reciever_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
 }
 inline void Mess::set_reciever(std::string&& value) {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00001000u;
   reciever_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:Mess.reciever)
 }
 inline void Mess::set_reciever(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00001000u;
   reciever_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:Mess.reciever)
 }
-inline void Mess::set_reciever(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000002u;
+inline void Mess::set_reciever(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00001000u;
   reciever_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:Mess.reciever)
 }
 inline std::string* Mess::_internal_mutable_reciever() {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00001000u;
   return reciever_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* Mess::release_reciever() {
@@ -395,88 +1964,329 @@ inline std::string* Mess::release_reciever() {
   if (!_internal_has_reciever()) {
     return nullptr;
   }
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00001000u;
   return reciever_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline void Mess::set_allocated_reciever(std::string* reciever) {
   if (reciever != nullptr) {
-    _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00001000u;
   } else {
-    _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00001000u;
   }
   reciever_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), reciever);
   // @@protoc_insertion_point(field_set_allocated:Mess.reciever)
 }
 
-// required string text = 3;
-inline bool Mess::_internal_has_text() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+// optional string timestamp = 22;
+inline bool Mess::_internal_has_timestamp() const {
+  bool value = (_has_bits_[0] & 0x00002000u) != 0;
   return value;
 }
-inline bool Mess::has_text() const {
-  return _internal_has_text();
+inline bool Mess::has_timestamp() const {
+  return _internal_has_timestamp();
 }
-inline void Mess::clear_text() {
-  text_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000004u;
+inline void Mess::clear_timestamp() {
+  timestamp_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00002000u;
 }
-inline const std::string& Mess::text() const {
-  // @@protoc_insertion_point(field_get:Mess.text)
-  return _internal_text();
+inline const std::string& Mess::timestamp() const {
+  // @@protoc_insertion_point(field_get:Mess.timestamp)
+  return _internal_timestamp();
 }
-inline void Mess::set_text(const std::string& value) {
-  _internal_set_text(value);
-  // @@protoc_insertion_point(field_set:Mess.text)
+inline void Mess::set_timestamp(const std::string& value) {
+  _internal_set_timestamp(value);
+  // @@protoc_insertion_point(field_set:Mess.timestamp)
 }
-inline std::string* Mess::mutable_text() {
-  // @@protoc_insertion_point(field_mutable:Mess.text)
-  return _internal_mutable_text();
+inline std::string* Mess::mutable_timestamp() {
+  // @@protoc_insertion_point(field_mutable:Mess.timestamp)
+  return _internal_mutable_timestamp();
 }
-inline const std::string& Mess::_internal_text() const {
-  return text_.GetNoArena();
+inline const std::string& Mess::_internal_timestamp() const {
+  return timestamp_.GetNoArena();
 }
-inline void Mess::_internal_set_text(const std::string& value) {
-  _has_bits_[0] |= 0x00000004u;
-  text_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+inline void Mess::_internal_set_timestamp(const std::string& value) {
+  _has_bits_[0] |= 0x00002000u;
+  timestamp_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
 }
-inline void Mess::set_text(std::string&& value) {
-  _has_bits_[0] |= 0x00000004u;
-  text_.SetNoArena(
+inline void Mess::set_timestamp(std::string&& value) {
+  _has_bits_[0] |= 0x00002000u;
+  timestamp_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:Mess.text)
+  // @@protoc_insertion_point(field_set_rvalue:Mess.timestamp)
 }
-inline void Mess::set_text(const char* value) {
+inline void Mess::set_timestamp(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000004u;
-  text_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:Mess.text)
+  _has_bits_[0] |= 0x00002000u;
+  timestamp_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.timestamp)
 }
-inline void Mess::set_text(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000004u;
-  text_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+inline void Mess::set_timestamp(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00002000u;
+  timestamp_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:Mess.text)
+  // @@protoc_insertion_point(field_set_pointer:Mess.timestamp)
 }
-inline std::string* Mess::_internal_mutable_text() {
-  _has_bits_[0] |= 0x00000004u;
-  return text_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline std::string* Mess::_internal_mutable_timestamp() {
+  _has_bits_[0] |= 0x00002000u;
+  return timestamp_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
-inline std::string* Mess::release_text() {
-  // @@protoc_insertion_point(field_release:Mess.text)
-  if (!_internal_has_text()) {
+inline std::string* Mess::release_timestamp() {
+  // @@protoc_insertion_point(field_release:Mess.timestamp)
+  if (!_internal_has_timestamp()) {
     return nullptr;
   }
-  _has_bits_[0] &= ~0x00000004u;
-  return text_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00002000u;
+  return timestamp_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
-inline void Mess::set_allocated_text(std::string* text) {
-  if (text != nullptr) {
-    _has_bits_[0] |= 0x00000004u;
+inline void Mess::set_allocated_timestamp(std::string* timestamp) {
+  if (timestamp != nullptr) {
+    _has_bits_[0] |= 0x00002000u;
   } else {
-    _has_bits_[0] &= ~0x00000004u;
+    _has_bits_[0] &= ~0x00002000u;
   }
-  text_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), text);
-  // @@protoc_insertion_point(field_set_allocated:Mess.text)
+  timestamp_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), timestamp);
+  // @@protoc_insertion_point(field_set_allocated:Mess.timestamp)
+}
+
+// optional bytes username = 23;
+inline bool Mess::_internal_has_username() const {
+  bool value = (_has_bits_[0] & 0x00004000u) != 0;
+  return value;
+}
+inline bool Mess::has_username() const {
+  return _internal_has_username();
+}
+inline void Mess::clear_username() {
+  username_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00004000u;
+}
+inline const std::string& Mess::username() const {
+  // @@protoc_insertion_point(field_get:Mess.username)
+  return _internal_username();
+}
+inline void Mess::set_username(const std::string& value) {
+  _internal_set_username(value);
+  // @@protoc_insertion_point(field_set:Mess.username)
+}
+inline std::string* Mess::mutable_username() {
+  // @@protoc_insertion_point(field_mutable:Mess.username)
+  return _internal_mutable_username();
+}
+inline const std::string& Mess::_internal_username() const {
+  return username_.GetNoArena();
+}
+inline void Mess::_internal_set_username(const std::string& value) {
+  _has_bits_[0] |= 0x00004000u;
+  username_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_username(std::string&& value) {
+  _has_bits_[0] |= 0x00004000u;
+  username_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.username)
+}
+inline void Mess::set_username(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00004000u;
+  username_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.username)
+}
+inline void Mess::set_username(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00004000u;
+  username_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.username)
+}
+inline std::string* Mess::_internal_mutable_username() {
+  _has_bits_[0] |= 0x00004000u;
+  return username_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_username() {
+  // @@protoc_insertion_point(field_release:Mess.username)
+  if (!_internal_has_username()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00004000u;
+  return username_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_username(std::string* username) {
+  if (username != nullptr) {
+    _has_bits_[0] |= 0x00004000u;
+  } else {
+    _has_bits_[0] &= ~0x00004000u;
+  }
+  username_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:Mess.username)
+}
+
+// optional bytes password = 24;
+inline bool Mess::_internal_has_password() const {
+  bool value = (_has_bits_[0] & 0x00008000u) != 0;
+  return value;
+}
+inline bool Mess::has_password() const {
+  return _internal_has_password();
+}
+inline void Mess::clear_password() {
+  password_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00008000u;
+}
+inline const std::string& Mess::password() const {
+  // @@protoc_insertion_point(field_get:Mess.password)
+  return _internal_password();
+}
+inline void Mess::set_password(const std::string& value) {
+  _internal_set_password(value);
+  // @@protoc_insertion_point(field_set:Mess.password)
+}
+inline std::string* Mess::mutable_password() {
+  // @@protoc_insertion_point(field_mutable:Mess.password)
+  return _internal_mutable_password();
+}
+inline const std::string& Mess::_internal_password() const {
+  return password_.GetNoArena();
+}
+inline void Mess::_internal_set_password(const std::string& value) {
+  _has_bits_[0] |= 0x00008000u;
+  password_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_password(std::string&& value) {
+  _has_bits_[0] |= 0x00008000u;
+  password_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.password)
+}
+inline void Mess::set_password(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00008000u;
+  password_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.password)
+}
+inline void Mess::set_password(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00008000u;
+  password_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.password)
+}
+inline std::string* Mess::_internal_mutable_password() {
+  _has_bits_[0] |= 0x00008000u;
+  return password_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_password() {
+  // @@protoc_insertion_point(field_release:Mess.password)
+  if (!_internal_has_password()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00008000u;
+  return password_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_password(std::string* password) {
+  if (password != nullptr) {
+    _has_bits_[0] |= 0x00008000u;
+  } else {
+    _has_bits_[0] &= ~0x00008000u;
+  }
+  password_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), password);
+  // @@protoc_insertion_point(field_set_allocated:Mess.password)
+}
+
+// optional bool error = 25;
+inline bool Mess::_internal_has_error() const {
+  bool value = (_has_bits_[0] & 0x01000000u) != 0;
+  return value;
+}
+inline bool Mess::has_error() const {
+  return _internal_has_error();
+}
+inline void Mess::clear_error() {
+  error_ = false;
+  _has_bits_[0] &= ~0x01000000u;
+}
+inline bool Mess::_internal_error() const {
+  return error_;
+}
+inline bool Mess::error() const {
+  // @@protoc_insertion_point(field_get:Mess.error)
+  return _internal_error();
+}
+inline void Mess::_internal_set_error(bool value) {
+  _has_bits_[0] |= 0x01000000u;
+  error_ = value;
+}
+inline void Mess::set_error(bool value) {
+  _internal_set_error(value);
+  // @@protoc_insertion_point(field_set:Mess.error)
+}
+
+// optional bytes cipherAd = 26;
+inline bool Mess::_internal_has_cipherad() const {
+  bool value = (_has_bits_[0] & 0x00010000u) != 0;
+  return value;
+}
+inline bool Mess::has_cipherad() const {
+  return _internal_has_cipherad();
+}
+inline void Mess::clear_cipherad() {
+  cipherad_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00010000u;
+}
+inline const std::string& Mess::cipherad() const {
+  // @@protoc_insertion_point(field_get:Mess.cipherAd)
+  return _internal_cipherad();
+}
+inline void Mess::set_cipherad(const std::string& value) {
+  _internal_set_cipherad(value);
+  // @@protoc_insertion_point(field_set:Mess.cipherAd)
+}
+inline std::string* Mess::mutable_cipherad() {
+  // @@protoc_insertion_point(field_mutable:Mess.cipherAd)
+  return _internal_mutable_cipherad();
+}
+inline const std::string& Mess::_internal_cipherad() const {
+  return cipherad_.GetNoArena();
+}
+inline void Mess::_internal_set_cipherad(const std::string& value) {
+  _has_bits_[0] |= 0x00010000u;
+  cipherad_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void Mess::set_cipherad(std::string&& value) {
+  _has_bits_[0] |= 0x00010000u;
+  cipherad_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Mess.cipherAd)
+}
+inline void Mess::set_cipherad(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00010000u;
+  cipherad_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Mess.cipherAd)
+}
+inline void Mess::set_cipherad(const void* value, size_t size) {
+  _has_bits_[0] |= 0x00010000u;
+  cipherad_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Mess.cipherAd)
+}
+inline std::string* Mess::_internal_mutable_cipherad() {
+  _has_bits_[0] |= 0x00010000u;
+  return cipherad_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Mess::release_cipherad() {
+  // @@protoc_insertion_point(field_release:Mess.cipherAd)
+  if (!_internal_has_cipherad()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00010000u;
+  return cipherad_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mess::set_allocated_cipherad(std::string* cipherad) {
+  if (cipherad != nullptr) {
+    _has_bits_[0] |= 0x00010000u;
+  } else {
+    _has_bits_[0] &= ~0x00010000u;
+  }
+  cipherad_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), cipherad);
+  // @@protoc_insertion_point(field_set_allocated:Mess.cipherAd)
 }
 
 #ifdef __GNUC__
@@ -485,6 +2295,16 @@ inline void Mess::set_allocated_text(std::string* text) {
 
 // @@protoc_insertion_point(namespace_scope)
 
+
+PROTOBUF_NAMESPACE_OPEN
+
+template <> struct is_proto_enum< ::Mess_MsgType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Mess_MsgType>() {
+  return ::Mess_MsgType_descriptor();
+}
+
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

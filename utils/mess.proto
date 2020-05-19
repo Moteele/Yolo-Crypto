@@ -1,8 +1,40 @@
 syntax = "proto2";
 
 message Mess {
-  required string sender = 1;
-  required string reciever = 2;
-  required string text = 3;
+  enum MsgType {
+    FETCH_KEYS = 0;
+    INIT_MESSAGE = 1;
+    MESSAGE = 2;
+    AUTH = 3;
+    FETCH_MESSAGES = 4;
+    CREATE_ACCOUNT = 5;
+  };
+
+  required MsgType type = 1;
+  optional int32 senId = 2;
+  optional bytes senIdKey = 3;
+  optional bytes senPreKey = 4;
+  optional bytes senPreKeySig = 5;
+  repeated bytes senOTP = 6;
+  optional int32 reqId = 7;
+  optional bytes reqIdKey = 8;
+  optional bytes reqPreKey = 9;
+  optional bytes reqPreKeySig = 10;
+  optional bytes reqOTP = 11;
+  optional bytes senEpKey = 12;
+  optional int32 OTPid = 13;
+  optional bytes CT = 14;
+  optional int32 messNum = 15;
+  optional int32 prevNum = 16;
+  optional bytes senRKey = 17;
+  optional int32 recId = 18;
+  optional bytes textContent = 19;
+  optional bytes sender = 20;
+  optional bytes reciever = 21;
+  optional string timestamp = 22;
+  optional bytes username = 23;
+  optional bytes password = 24;
+  optional bool error = 25;
+  optional bytes cipherAd = 26;
 }
 
