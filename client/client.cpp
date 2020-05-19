@@ -83,7 +83,8 @@ void Client::develCreateAcc() {
 
 void Client::readResponse() {
     char buffer[2048];
-    std::cout << "buffer: " << buffer << std::endl;
+    std::memset(buffer, 0, 2048);
+    std::cout << "buffer: " << stringToHex(buffer) << std::endl;
     int valread = read(socket_, buffer, 2048);
     buffer[valread] = '\0';
     std::stringstream response;
@@ -120,6 +121,9 @@ void Client::readResponse() {
 	}
 
 	message.ParseFromString(hexToString(line));
+#ifdef DEBUG
+	message.PrintDebugString();
+#endif // DEBUG
 
         if (message.reciever() == name_) {
             gotResponse_ = true;
@@ -167,8 +171,8 @@ void Client::readResponse() {
 	// if not for me, ignore it
         } else {
             //std::cerr << "Authentication failed: " << message << std::endl;
-            std::cerr << "Authentication failed: " << std::endl;
-            exit(1);
+            //std::cerr << "Authentication failed: " << std::endl;
+            //exit(1);
         }
     }
 //<<<<<<< HEAD
@@ -494,6 +498,13 @@ void Client::readInitial(const std::string &req) {
 
     int len = Util::aes256decrypt(encryptedAdArr, 64, sharedSecret, iv, decryptedAd, 0);
     //TODO: make something with the len
+
+#ifdef DEBUG
+    std::cout << "DecryptedAd" << std::endl;
+    Util::printUnsignedChar(decryptedAd, 64);
+    std::cout << "FetchedAd" << std::endl;
+    Util::printUnsignedChar(ad, 64);
+#endif // DEBUG
 
     if (memcmp(decryptedAd, ad, 64)) {
 	std::cout << "Authentication failed!" << std::endl;
