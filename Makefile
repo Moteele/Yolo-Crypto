@@ -37,6 +37,10 @@ OBJECTS_CLIENT_MAIN=$(SOURCES_CLIENT_MAIN:.cpp=.o)
 SOURCES_FUNCTIONS_TEST=utils/test-functions.cpp server/test-main.cpp utils/functions.cpp
 OBJECTS_FUNCTIONS_TEST=$(SOURCES_FUNCTIONS_TEST:.cpp=.o)
 
+# PROTO FILES
+PROTO_FILES=$(wildcard utils/*.proto)
+PROTO_FILES_CPP=$(PROTO_FILES:.proto=.pb.cpp)
+
 ############
 # RECIPIES #
 ############
@@ -104,11 +108,11 @@ serverApp: $(OBJECTS_SERVER_MAIN)
 clientApp: $(OBJECTS_CLIENT_MAIN)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.o: *.pb.cpp %.cpp
+%.o: %.cpp $(PROTO_FILES_CPP)
 	$(CXX) $(CXXFLAGS) -MMD -MP -c -o $@ $< $(LDFLAGS)
 
 %.pb.cpp: %.proto
-	./utils/generate_protobuf.sh $^
+	./utils/generate_protobuf.sh $<
 
 # CLEANUP
 .PHONY: clean clean-coverage
