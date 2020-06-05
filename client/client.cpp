@@ -14,20 +14,6 @@ bool Client::develFileExists(const std::string &path) {
 void Client::writeToReq(const std::string &req) {
     send(socket_ , req.c_str() , req.size() , 0 );
     gotResponse_ = false;
-    /*while (isFileLocked(REQEST_FILE_PATH)) {
-        //waiting
-    }
-
-    // lock requests
-    lockFile(REQEST_FILE_PATH);
-
-    //std::cout << req << std::endl;
-
-    std::ofstream reqFile(REQEST_FILE_PATH, std::ofstream::out | std::ofstream::app);
-    reqFile << req << std::endl;
-    reqFile.close();
-    gotResponse_ = false;
-    unlockFile(REQEST_FILE_PATH);*/
 }
 
 void Client::develAuth() {
@@ -84,7 +70,6 @@ void Client::develCreateAcc() {
 void Client::readResponse() {
     char buffer[2048];
     std::memset(buffer, 0, 2048);
-    std::cout << "buffer: " << stringToHex(buffer) << std::endl;
     int valread = read(socket_, buffer, 2048);
     buffer[valread] = '\0';
     std::stringstream response;
@@ -93,116 +78,68 @@ void Client::readResponse() {
     }
 
     std::string line;
-    //std::string line = response.str();
-    //std::cout << "line " << line << std::endl;
-    //int delim = line.find_first_of(';');
-    //std::string resRec = line.substr(0, delim);
-
-    //gotResponse_ = true;
-    //std::string tmp = line.substr(delim + 1);
-    //delim = tmp.find_first_of(';');
-    //std::string command = tmp.substr(0, delim);
-    //std::string message = tmp.substr(delim + 1);
-    //if (command == "auth") {
-    //    if (message == "Success") {
-    //        isAuthenticated_ = true;
-    //    } else if (message != "Wrong password") {
-    //        isAuthenticated_ = true;
-    //        std::string userStr = hexToString(message);
-    //        userAcc user;
-    //        user.ParseFromString(userStr);
-    //        //TODO:
 
     Mess message;
     // go through all responses
     while (std::getline(response, line)) {
-	if (line == "") {
-		continue;
-	}
+        if (line == "") {
+            continue;
+        }
 
-	message.ParseFromString(hexToString(line));
-#ifdef DEBUG
-	message.PrintDebugString();
-#endif // DEBUG
+        message.ParseFromString(hexToString(line));
+    #ifdef DEBUG
+        message.PrintDebugString();
+    #endif // DEBUG
 
         if (message.reciever() == name_) {
             gotResponse_ = true;
-	    switch (message.type()) {
-	    case Mess::AUTH:
-		if (message.error()) {
-		    std::cout << "Authentication failed" << std::endl;
-		} else {
-		    std::cout << "Authentiacion successful" << std::endl;
-		    isAuthenticated_ = true;
-	        }
-		break;
-	    case Mess::MESSAGE:
-		if (message.error()) {
-			std::cout << "Message was not sent" << std::endl;
-		} else {
-			std::cout << "Message sent successfully" << std::endl;
-		}
-		break;
-	    case Mess::FETCH_MESSAGES:
-		messages_.emplace_back(message);
-		break;
-	    case Mess::FETCH_KEYS:
-		if (!message.error()) {
-			createSecretFromKeys(line);
-		} else {
-			std::cout << "User not found" << std::endl;
-		}
-		break;
-	    case Mess::INIT_MESSAGE:
-		readInitial(line);
-		break;
-	    case Mess::CREATE_ACCOUNT:
-		if (message.error()) {
-		    std::cout << "Account creation failed" << std::endl;
-		} else {
-		    std::cout << "Account creation successful" << std::endl;
-		    isAuthenticated_ = true;
-	        }
-		break;
-	    default:
-		break;
-
-	    }
-	// if not for me, ignore it
+            switch (message.type()) {
+            case Mess::AUTH:
+                if (message.error()) {
+                    std::cout << "Authentication failed" << std::endl;
+                } else {
+                    std::cout << "Authentiacion successful" << std::endl;
+                    isAuthenticated_ = true;
+                    }
+                break;
+            case Mess::MESSAGE:
+                if (message.error()) {
+                    std::cout << "Message was not sent" << std::endl;
+                } else {
+                    std::cout << "Message sent successfully" << std::endl;
+                }
+                break;
+            case Mess::FETCH_MESSAGES:
+                messages_.emplace_back(message);
+                break;
+            case Mess::FETCH_KEYS:
+                if (!message.error()) {
+                    createSecretFromKeys(line);
+                } else {
+                    std::cout << "User not found" << std::endl;
+                }
+                break;
+            case Mess::INIT_MESSAGE:
+                readInitial(line);
+                break;
+            case Mess::CREATE_ACCOUNT:
+                if (message.error()) {
+                    std::cout << "Account creation failed" << std::endl;
+                } else {
+                    std::cout << "Account creation successful" << std::endl;
+                    isAuthenticated_ = true;
+                    }
+                break;
+            default:
+                break;
+            }
+        // if not for me, ignore it
         } else {
             //std::cerr << "Authentication failed: " << message << std::endl;
             //std::cerr << "Authentication failed: " << std::endl;
             //exit(1);
         }
     }
-//<<<<<<< HEAD
-//    if (command == "sendMessage") {
-//        std::cout << message << std::endl;
-//    }
-//    if (command == "fetchMessages") {
-//        std::string parsedFromHex = hexToString(message);
-//
-//        Mess msg;
-//        msg.ParseFromString(parsedFromHex);
-//        messages_.push_back(msg);
-//    }
-//    if (command == "fetchKeys") {
-//        createSecretFromKeys(message);
-//    }
-//    if (command == "initialMessage") {
-//        readInitial(message);
-//    }
-//=======
-//
-//    resFile.close();
-//    newRes.close();
-//    std::remove(RESPONSE_FILE_PATH.c_str());
-//    std::rename(newName.c_str(), RESPONSE_FILE_PATH.c_str());
-//    std::remove(newName.c_str());
-//    unlockFile(RESPONSE_FILE_PATH);
-//
-//    //std::cout << "OK" << std::endl;
-//>>>>>>> pb-refactor-honza
 }
 
 Key Client::createKeyFromHex(std::string &hexKey, bool isPublic) {
@@ -295,7 +232,13 @@ void Client::createSecretFromKeys(const std::string &keys)
     }
     sharedSecrets_.push_back(newPair);
 
-//     //TODO: delete stuff not needed anymore
+    // clear the DHs from memory
+    for (int i = 0; i < 32; ++i) {
+        DH1[i] = '\0';
+        DH2[i] = '\0';
+        DH3[i] = '\0';
+        DH4[i] = '\0';
+    }
 }
 
 int Client::getIndexOfSharedSecret(const std::string &name) {
@@ -318,7 +261,8 @@ void Client::develSendMessage()
         fetchBundleForInitMsg(reciever);
         while (!gotResponse_) {
             readResponse();
-            std::this_thread::sleep_for(10s);
+            std::cout << "Creating shared secret..." << std::endl;
+            std::this_thread::sleep_for(1s);
             // here shared secret is created
         }
     }
@@ -525,6 +469,14 @@ void Client::readInitial(const std::string &req) {
         newPair.second += sharedSecret[i];
     }
     sharedSecrets_.push_back(newPair);
+
+    // clear DHs from memory
+    for (int i = 0; i < 32; ++i) {
+        DH1[i] = '\0';
+        DH2[i] = '\0';
+        DH3[i] = '\0';
+        DH4[i] = '\0';
+    }
 }
 
 void Client::fetchBundleForInitMsg(const std::string &reciever)
@@ -665,12 +617,9 @@ void Client::develRunClient()
 		        break;
 	        case 2:
                 develReadMessages();
-                // Sleep for 5 seconds so the server has time to give you messages with the initial One
+                // Sleep for 1 second so the server has time to give you messages with the initial One
                 std::cout << "Reading messages" << std::endl;
-                for (int i = 0; i < 5; ++i) {
-                    std::cout << "." << std::flush;
-                    std::this_thread::sleep_for(1s);
-                }
+                std::this_thread::sleep_for(1s);
                 std::cout << std::endl;
                 for (int i = 0; i < 10 && !gotResponse_; ++i) {
                     readResponse();

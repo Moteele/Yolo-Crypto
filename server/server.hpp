@@ -152,8 +152,6 @@ private:
 
 	std::vector<int> sockets_ = {};
 
-	int pica = 0;
-
 public:
 	/**
 	 * Constructor
@@ -275,10 +273,6 @@ public:
 
 	void performSendMessage(int socketDescriptor, const std::string &req);
 
-	int findSocketIndexFromSocket(int socketDescriptor);
-
-	int findSocketIndexFromName(const std::string &name);
-
 	void performAuth(int socketDescriptor, const std::string &req);
 
 	void performFetchMessages(int socketDescriptor, const std::string &req);
@@ -290,6 +284,7 @@ public:
 	void readRequest(const std::string &req);
 
 	void runServer();
+
 	void performCreateAccount(int socketDescriptor, const std::string &req);
 };
 
