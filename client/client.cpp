@@ -1,8 +1,8 @@
 #include "client.hpp"
 
+#include <arpa/inet.h>
 #include <bitset>
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <unistd.h>
 
 

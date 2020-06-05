@@ -1,18 +1,17 @@
+#include "../utils/constants.hpp"
+#include "../utils/functions.hpp"
+#include "../utils/key.hpp"
+#include "../utils/mess.pb.h"
+#include "../utils/userAcc.pb.h"
+#include "../utils/util.hpp"
+
+#include <fstream>
+#include <chrono>
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <vector>
-#include <string>
-
-#include "../utils/userAcc.pb.h"
-#include "../utils/mess.pb.h"
-
 #include <thread>
-#include <chrono>
-#include "../utils/functions.hpp"
-#include "../utils/constants.hpp"
-#include "../utils/key.hpp"
-#include "../utils/util.hpp"
+#include <vector>
+
 
 class Client
 {

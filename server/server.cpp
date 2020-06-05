@@ -113,15 +113,6 @@ void Server::readRequest(const std::string &req) {
 	//std::cout << "got request: " << req << std::endl;
 }
 
-int Server::tryCreateAccount(int socketDescriptor, const std::string &request) {
-	int delim = 0;
-	char del = ';';
-	std::string tmp = request;
-	delim = request.find_first_of(del);
-	std::string name = request.substr(0, delim);
-	return 0;
-}
-
 void Server::processRequests(int socketDescriptor)
 {
 	Mess message;
@@ -367,10 +358,10 @@ void Server::loadUsers() {
 		std::string parsedFromHex = hexToString(line);
 		userAcc user;
 		user.ParseFromString(parsedFromHex);
-		std::cout << "load user with name:" << user.name() << std::endl;
+		//std::cout << "load user with name:" << user.name() << std::endl;
 		users_.push_back(user);
 	}
-	std::cout << "current number of users: " << users_.size() << std::endl;
+	//std::cout << "current number of users: " << users_.size() << std::endl;
 	usersFile.close();
 }
 
@@ -384,7 +375,7 @@ void Server::writeUsers() {
 			continue;
 		}
 
-		std::cout << "writting user with name:" << users_[i].name() << std::endl;
+		//std::cout << "writting user with name:" << users_[i].name() << std::endl;
 
 		users_[i].SerializeToString(&line);
 
@@ -405,7 +396,7 @@ void Server::runServer() {
     int maxSocketDescriptor;
     struct sockaddr_in address;
 
-    char buffer[2049];  //data buffer of 1K
+    char buffer[2049];  //data buffer of 2K
 
     int serverPort = 8080;
 
@@ -523,7 +514,7 @@ void Server::runServer() {
                     //Somebody disconnected , get his details and print
                     getpeername(socketDescriptor , (struct sockaddr*)&address , \
                         (socklen_t*)&addrlen);
-                    std::cout << "Host disconnected " << inet_ntoa(address.sin_addr) << ":" << ntohs(address.sin_port);
+                    std::cout << "Host disconnected " << inet_ntoa(address.sin_addr) << ":" << ntohs(address.sin_port); << std::endl;
 
                     //Close the socket and mark as 0 in list for reuse
                     close( socketDescriptor );
