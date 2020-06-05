@@ -51,27 +51,12 @@ std::vector<std::string> getUnlockedFiles(const std::string &dirPath) {
 
 // initializes the user database as new
 void initServer() {
-        std::ofstream reqFile(REQEST_FILE_PATH, std::ofstream::out | std::ofstream::trunc);
+	std::ofstream reqFile(REQEST_FILE_PATH, std::ofstream::out | std::ofstream::trunc);
 	reqFile.close();
-        std::ofstream resFile(RESPONSE_FILE_PATH, std::ofstream::out | std::ofstream::trunc);
+	std::ofstream resFile(RESPONSE_FILE_PATH, std::ofstream::out | std::ofstream::trunc);
 	resFile.close();
-        std::ofstream dbFile("tmp_files/db/users", std::ofstream::out | std::ofstream::trunc);
+	std::ofstream dbFile("tmp_files/db/users", std::ofstream::out | std::ofstream::trunc);
 	dbFile.close();
-	std::string reqPath = "tmp_files/req";
-	std::vector<std::string> reqFiles = getUnlockedFiles(reqPath);
-	if (reqFiles.back() != "req_master") {
-	    std::remove(("tmp_files/req/" + reqFiles.back()).c_str());
-	}
-	reqFiles.pop_back();
-	std::string resPath = "tmp_files/res";
-	std::vector<std::string> resFiles = getUnlockedFiles(resPath);
-	while ( ! resFiles.empty() ) {
-	    if (resFiles.back() != "res_master") {
-		std::remove(("tmp_files/res/" + resFiles.back()).c_str());
-	    }
-	    resFiles.pop_back();
-	}
-
 }
 
 /**

@@ -4,44 +4,37 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <map>
-#include <vector>
-#include <string>
-#include <utility>
-#include <memory>
-#include <iostream>
+#include "message.pb.h"
+#include "../utils/constants.hpp"
+#include "../utils/functions.hpp"
+#include "../utils/mess.pb.h"
+#include "../utils/userAcc.pb.h"
+#include "../utils/util.hpp"
+
+#include <arpa/inet.h>    //close
+#include <cstdio>
+#include <cstring>
+#include <dirent.h>
+#include <dlfcn.h>
+#include <errno.h>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <netinet/in.h>
 #include <ostream>
 #include <set>
-#include <dlfcn.h>
-#include <iomanip>
-
-#include "../utils/util.hpp"
 #include <sstream>
-#include <cstring>
-#include "message.pb.h"
-#include <dirent.h>
-#include <sys/types.h>
-#include <cstdio>
-
-#include "../utils/userAcc.pb.h"
-#include "../utils/mess.pb.h"
-
-#include "../utils/functions.hpp"
-#include "../utils/constants.hpp"
-
 #include <stdio.h>
-#include <string.h>   //strlen
 #include <stdlib.h>
-#include <iostream>
-#include <errno.h>
-#include <unistd.h>   //close
-#include <arpa/inet.h>    //close
-#include <sys/types.h>
+#include <string>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <vector>
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros
+#include <sys/types.h>
+#include <unistd.h>   //close
+#include <utility>
+#include <vector>
 
 
 class Account
@@ -149,6 +142,8 @@ private:
 	std::vector<std::string> responses_ = {};
 
 	std::vector<userAcc> users_ = {};
+
+	std::vector<int> sockets_ = {};
 
 public:
 	/**
@@ -265,8 +260,6 @@ public:
 
 	void writeUsers();
 
-	int tryCreateAccount(int socketDescriptor, const std::string &request);
-
 	const std::pair<std::string, std::string> getRequesterAndCommand(const std::string &request);
 
 	void performSendMessage(int socketDescriptor, const std::string &req);
@@ -280,6 +273,8 @@ public:
 	void performSendInitialMsg(int socketDescriptor, const std::string &req);
 
 	void readRequest(const std::string &req);
+
+	void runServer();
 
 	void performCreateAccount(int socketDescriptor, const std::string &req);
 };

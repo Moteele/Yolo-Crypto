@@ -79,10 +79,10 @@ const char descriptor_table_protodef_userAcc_2eproto[] PROTOBUF_SECTION_VARIABLE
   "\n\ruserAcc.proto\"\346\001\n\007userAcc\022\n\n\002id\030\001 \002(\005\022"
   "\014\n\004name\030\002 \002(\t\022\023\n\013displayName\030\003 \001(\t\022\017\n\007pw"
   "dhash\030\004 \002(\t\022\020\n\010messages\030\005 \003(\t\022\020\n\010publici"
-  "k\030\006 \001(\t\022\021\n\tprivateik\030\007 \001(\t\022\020\n\010publicpk\030\010"
-  " \001(\t\022\021\n\tprivatepk\030\t \001(\t\022\020\n\010signedpk\030\n \001("
-  "\t\022\025\n\ronetimepublic\030\013 \003(\t\022\026\n\016onetimepriva"
-  "te\030\014 \003(\t"
+  "k\030\006 \001(\014\022\021\n\tprivateik\030\007 \001(\014\022\020\n\010publicpk\030\010"
+  " \001(\014\022\021\n\tprivatepk\030\t \001(\014\022\020\n\010signedpk\030\n \001("
+  "\014\022\025\n\ronetimepublic\030\013 \003(\014\022\026\n\016onetimepriva"
+  "te\030\014 \003(\014"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_userAcc_2eproto_deps[1] = {
 };
@@ -330,62 +330,47 @@ const char* userAcc::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
         } else goto handle_unusual;
         continue;
-      // optional string publicik = 6;
+      // optional bytes publicik = 6;
       case 6:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           auto str = _internal_mutable_publicik();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.publicik");
-          #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string privateik = 7;
+      // optional bytes privateik = 7;
       case 7:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           auto str = _internal_mutable_privateik();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.privateik");
-          #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string publicpk = 8;
+      // optional bytes publicpk = 8;
       case 8:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
           auto str = _internal_mutable_publicpk();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.publicpk");
-          #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string privatepk = 9;
+      // optional bytes privatepk = 9;
       case 9:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
           auto str = _internal_mutable_privatepk();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.privatepk");
-          #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string signedpk = 10;
+      // optional bytes signedpk = 10;
       case 10:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
           auto str = _internal_mutable_signedpk();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.signedpk");
-          #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // repeated string onetimepublic = 11;
+      // repeated bytes onetimepublic = 11;
       case 11:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
           ptr -= 1;
@@ -393,15 +378,12 @@ const char* userAcc::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
             ptr += 1;
             auto str = _internal_add_onetimepublic();
             ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            #ifndef NDEBUG
-            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.onetimepublic");
-            #endif  // !NDEBUG
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<90>(ptr));
         } else goto handle_unusual;
         continue;
-      // repeated string onetimeprivate = 12;
+      // repeated bytes onetimeprivate = 12;
       case 12:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
           ptr -= 1;
@@ -409,9 +391,6 @@ const char* userAcc::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::in
             ptr += 1;
             auto str = _internal_add_onetimeprivate();
             ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            #ifndef NDEBUG
-            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "userAcc.onetimeprivate");
-            #endif  // !NDEBUG
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<98>(ptr));
@@ -491,74 +470,46 @@ failure:
     target = stream->WriteString(5, s, target);
   }
 
-  // optional string publicik = 6;
+  // optional bytes publicik = 6;
   if (cached_has_bits & 0x00000008u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_publicik().data(), static_cast<int>(this->_internal_publicik().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.publicik");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         6, this->_internal_publicik(), target);
   }
 
-  // optional string privateik = 7;
+  // optional bytes privateik = 7;
   if (cached_has_bits & 0x00000010u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_privateik().data(), static_cast<int>(this->_internal_privateik().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.privateik");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         7, this->_internal_privateik(), target);
   }
 
-  // optional string publicpk = 8;
+  // optional bytes publicpk = 8;
   if (cached_has_bits & 0x00000020u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_publicpk().data(), static_cast<int>(this->_internal_publicpk().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.publicpk");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         8, this->_internal_publicpk(), target);
   }
 
-  // optional string privatepk = 9;
+  // optional bytes privatepk = 9;
   if (cached_has_bits & 0x00000040u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_privatepk().data(), static_cast<int>(this->_internal_privatepk().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.privatepk");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         9, this->_internal_privatepk(), target);
   }
 
-  // optional string signedpk = 10;
+  // optional bytes signedpk = 10;
   if (cached_has_bits & 0x00000080u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_signedpk().data(), static_cast<int>(this->_internal_signedpk().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.signedpk");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         10, this->_internal_signedpk(), target);
   }
 
-  // repeated string onetimepublic = 11;
+  // repeated bytes onetimepublic = 11;
   for (int i = 0, n = this->_internal_onetimepublic_size(); i < n; i++) {
     const auto& s = this->_internal_onetimepublic(i);
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      s.data(), static_cast<int>(s.length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.onetimepublic");
-    target = stream->WriteString(11, s, target);
+    target = stream->WriteBytes(11, s, target);
   }
 
-  // repeated string onetimeprivate = 12;
+  // repeated bytes onetimeprivate = 12;
   for (int i = 0, n = this->_internal_onetimeprivate_size(); i < n; i++) {
     const auto& s = this->_internal_onetimeprivate(i);
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      s.data(), static_cast<int>(s.length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "userAcc.onetimeprivate");
-    target = stream->WriteString(12, s, target);
+    target = stream->WriteBytes(12, s, target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -631,19 +582,19 @@ size_t userAcc::ByteSizeLong() const {
       messages_.Get(i));
   }
 
-  // repeated string onetimepublic = 11;
+  // repeated bytes onetimepublic = 11;
   total_size += 1 *
       ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(onetimepublic_.size());
   for (int i = 0, n = onetimepublic_.size(); i < n; i++) {
-    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
       onetimepublic_.Get(i));
   }
 
-  // repeated string onetimeprivate = 12;
+  // repeated bytes onetimeprivate = 12;
   total_size += 1 *
       ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(onetimeprivate_.size());
   for (int i = 0, n = onetimeprivate_.size(); i < n; i++) {
-    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
       onetimeprivate_.Get(i));
   }
 
@@ -656,38 +607,38 @@ size_t userAcc::ByteSizeLong() const {
   }
 
   if (cached_has_bits & 0x000000f8u) {
-    // optional string publicik = 6;
+    // optional bytes publicik = 6;
     if (cached_has_bits & 0x00000008u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
           this->_internal_publicik());
     }
 
-    // optional string privateik = 7;
+    // optional bytes privateik = 7;
     if (cached_has_bits & 0x00000010u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
           this->_internal_privateik());
     }
 
-    // optional string publicpk = 8;
+    // optional bytes publicpk = 8;
     if (cached_has_bits & 0x00000020u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
           this->_internal_publicpk());
     }
 
-    // optional string privatepk = 9;
+    // optional bytes privatepk = 9;
     if (cached_has_bits & 0x00000040u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
           this->_internal_privatepk());
     }
 
-    // optional string signedpk = 10;
+    // optional bytes signedpk = 10;
     if (cached_has_bits & 0x00000080u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
           this->_internal_signedpk());
     }
 
