@@ -367,9 +367,10 @@ void Server::loadUsers() {
 		std::string parsedFromHex = hexToString(line);
 		userAcc user;
 		user.ParseFromString(parsedFromHex);
-		std::cout << "load user with signature:" << user.signedpk() << std::endl;
+		std::cout << "load user with name:" << user.name() << std::endl;
 		users_.push_back(user);
 	}
+	std::cout << "current number of users: " << users_.size() << std::endl;
 	usersFile.close();
 }
 
@@ -383,22 +384,14 @@ void Server::writeUsers() {
 			continue;
 		}
 
-		std::cout << "writting user with signature:" << users_[i].signedpk() << std::endl;
+		std::cout << "writting user with name:" << users_[i].name() << std::endl;
 
 		users_[i].SerializeToString(&line);
 
 		usersFile << stringToHex(line);
+		usersFile << '\n';
 	}
 	usersFile.close();
-}
-
-const std::pair<std::string, std::string> Server::getRequesterAndCommand(const std::string &request) {
-	int delim = request.find_first_of(';');
-	const std::string requester = request.substr(0, delim);
-	std::string rest = request.substr(delim + 1);
-	delim = rest.find_first_of(';');
-	const std::string command = rest.substr(0, delim);
-	return std::make_pair(requester, command);
 }
 
 void Server::runServer() {
@@ -549,6 +542,8 @@ void Server::runServer() {
 					}
 					readRequest(req.str());
 					processRequests(socketDescriptor);
+					writeUsers();
+					loadUsers();
                 }
             }
         }
