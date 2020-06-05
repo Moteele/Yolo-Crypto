@@ -123,7 +123,7 @@ int Util::kdf(unsigned char *secret, size_t ssize, unsigned char *key, size_t *k
 	if (EVP_KDF_CTX_set_params(kctx, params) <= 0)
 		goto error;
 
-	if (EVP_KDF_derive(kctx, key, 64) <= 0)
+	if (EVP_KDF_derive(kctx, key, *keylen) <= 0)
 		goto error;
 
 	EVP_KDF_free(kdf);
@@ -473,9 +473,9 @@ KeyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
     KeyPair keypair;
     size_t len = 64;
     unsigned char output[64];
-    Util::kdf(dh_out, 32, output, &len, RK, sizeof RK);
-    std:: memcpy(output, keypair.key1, 32);
-    std:: memcpy(output, keypair.key2, 32);
+    Util::kdf(dh_out, 32, output, &len, RK, 32);
+    std:: memcpy(keypair.key1, output, 32);
+    std:: memcpy(keypair.key2, output + 32, 32);
     return keypair;
 
 }
@@ -499,70 +499,98 @@ void Ratchet::InitB (unsigned char* SK, unsigned char* BprivKey) {
     std::memcpy(RK, SK, 32);
 }
 
-void Ratchet::RatchetEncrypt(unsigned char *message, unsigned char *AD) {
+Ratchet_mess Ratchet::RatchetEncrypt(unsigned char *message, unsigned int mess_len, unsigned char *AD) {
     unsigned char mk[32];
     // TODO: should use HMAC in the future instead of HKDF
     unsigned char constant[32];
     std::memset(constant, 0, 32);
-    KeyPair pair = kdf_rk(constant, *CKs);
+    KeyPair pair = kdf_rk(constant, CKs);
     std::memcpy(CKs, pair.key1, 32);
     std::memcpy(mk, pair.key2, 32);
 
-    size_t len = sizeof *message + (16 - sizeof *message % 16);
-    unsigned char ciphertext[len];
-    Header header = {DHs.getPublicKey(), PN, Ns};
-    Ratchet::Encrypt(mk, message, AD, ciphertext);
+    unsigned int ct_len = mess_len + (16 - mess_len % 16);
+    unsigned char ciphertext[ct_len];
+    Header header;
+    std::memcpy(header.pubKey, DHs.getPublicKey().data(), 32);
+    header.pn = PN;
+    header.n = Ns;
+    Ratchet::Encrypt(mk, message, mess_len, AD, ciphertext);
+
     Ratchet_mess encMess;
+    std::memcpy(encMess.ad, AD, 64);
+    encMess.header = header;
+    encMess.message.insert(encMess.message.end(), ciphertext, &ciphertext[ct_len]);
 
     Ns++;
+    return encMess;
 
 
 }
 
-void Ratchet::Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned char *ad, unsigned char *ciphertext) {
+void Ratchet::Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned int pt_size, unsigned char *ad, unsigned char *ciphertext) {
 
     unsigned char constant[32];
     unsigned char encKey[32];
     unsigned char authKey[32];
 
     std::memset(constant, 0, 32);
-    KeyPair pair = kdf_rk(constant, *CKs);
+    KeyPair pair = kdf_rk(constant, CKs);
     std::memcpy(encKey, pair.key1, 32);
     std::memcpy(authKey, pair.key2, 32);
     unsigned char iv[16];
     std::memset(iv, 0, 16);
     // TODO: derive iv from kdf too
 
-    Util::aes256encrypt(plaintext, sizeof *plaintext, encKey, iv, ciphertext);
+    Util::aes256encrypt(plaintext, pt_size, encKey, iv, ciphertext);
 
 }
 
-void Ratchet:: RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned char* AD, unsigned char *plaintext) {
-    unsigned char *mk;
+void Ratchet:: RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned int ct_len, unsigned char* AD, unsigned char *plaintext) {
+    DHRatchet(header);
+    unsigned char mk[32];
     unsigned char constant[32];
     std::memset(constant, 0, 32);
-    KeyPair pair = kdf_rk(constant, *CKs);
-    std::memcpy(CKs, pair.key1, 32);
+    KeyPair pair = kdf_rk(constant, CKr);
+    std::memcpy(CKr, pair.key1, 32);
     std::memcpy(mk, pair.key2, 32);
 
-    Ratchet::Decrypt(mk, ciphertext, AD, header, plaintext);
+    Ratchet::Decrypt(mk, ciphertext, ct_len, AD, header, plaintext);
     Nr++;
 
 }
 
-void Ratchet:: Decrypt(unsigned char* mk, unsigned char *ciphertext, unsigned char *AD, Header header, unsigned char *plaintext) {
+void Ratchet:: Decrypt(unsigned char* mk, unsigned char *ciphertext, unsigned int ct_len, unsigned char *AD, Header header, unsigned char *plaintext) {
     unsigned char constant[32];
     unsigned char encKey[32];
     unsigned char authKey[32];
 
     std::memset(constant, 0, 32);
-    KeyPair pair = kdf_rk(constant, *CKs);
+    KeyPair pair = kdf_rk(constant, CKr);
     std::memcpy(encKey, pair.key1, 32);
     std::memcpy(authKey, pair.key2, 32);
     unsigned char iv[16];
     std::memset(iv, 0, 16);
 
-    Util::aes256decrypt(ciphertext, sizeof *ciphertext, encKey, iv, plaintext);
+    Util::aes256decrypt(ciphertext, ct_len, encKey, iv, plaintext);
 }
 
+void Ratchet::DHRatchet(Header header) {
+    PN = Ns;
+    Ns = 0;
+    Nr = 0;
+    DHr.setPublic(header.pubKey);
+
+    unsigned char secret[32];
+    size_t ssize = 32;
+    Util::ecdh(DHs, DHr, secret, &ssize );
+    KeyPair pair = kdf_rk(RK, secret);
+    std:: memcpy(RK, pair.key1, 32);
+    std:: memcpy(CKr, pair.key2, 32);
+
+    DHs.generate();
+    Util::ecdh(DHs, DHr, secret, &ssize );
+    pair = kdf_rk(RK, secret);
+    std:: memcpy(RK, pair.key1, 32);
+    std:: memcpy(CKs, pair.key2, 32);
+}
 

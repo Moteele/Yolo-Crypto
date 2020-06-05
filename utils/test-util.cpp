@@ -431,10 +431,46 @@ TEST_CASE("kdf")
 	SECTION("kdf basic")
 	{
 		unsigned char secret[32] = "123456789qwertyuiopasdfghjklzxc";
-		unsigned char key[64];
-		size_t len = 64;
+		std::vector<unsigned char> key(512);
+		std::memset(&key[0], 0, 512);
+		size_t len = 0;
 
-		REQUIRE(Util::kdf(secret, 32, key, &len) == 0);
+		for (int i = 0; i < 512; ++i) {
+			std::memset(&key[0], 0, 512);
+			REQUIRE(Util::kdf(secret, 32, &key[0], &len) == 0);
+			REQUIRE(key[len] == 0);
+			++len;
+		}
+	}
+
+	SECTION("kdf secret length")
+	{
+		unsigned char secret[32] = "123456789qwertyuiopasdfghjklzxc";
+		std::vector<unsigned char> key(32);
+		std::memset(&key[0], 0, 32);
+		size_t len = 32;
+
+		for (int i = 0; i < 32; ++i) {
+			std::memset(&key[0], 0, 32);
+			REQUIRE(Util::kdf(secret, i, &key[0], &len) == 0);
+		}
+	}
+
+	SECTION("kdf determinism")
+	{
+		unsigned char secret[32] = "123456789qwertyuiopasdfghjklzxc";
+		std::vector<unsigned char> key(128);
+		std::vector<unsigned char> tmp(128);
+		std::memset(&key[0], 0, 128);
+		std::memset(&tmp[0], 0, 128);
+		size_t len = 128;
+		REQUIRE(Util::kdf(secret, 32, &key[0], &len) == 0);
+
+		for (int i = 0; i < 32; ++i) {
+			REQUIRE(Util::kdf(secret, 32, &tmp[0], &len) == 0);
+			REQUIRE(memcmp(&key[0], &tmp[0], 128) == 0);
+			std::memcpy(&key[0], &tmp[0], 128);
+		}
 	}
 }
 
@@ -460,22 +496,37 @@ TEST_CASE("ratchet")
     }
     SECTION("ratchet encrypt")
     {
-	unsigned char bPrivKey[32];
-	std::memset(bPrivKey, 1, 32);
+	Key bkey;
+	bkey.generate();
 	unsigned char SK[32];
 	std::memset(SK, 2, 32);
 	Ratchet bob;
 	Ratchet alice;
 
-	bob.InitB(SK, bPrivKey);
-	alice.InitA(SK, &bob.DHs.getPublicKey()[0]);
+	bob.InitB(SK, bkey.getPrivateKey().data());
+	alice.InitA(SK, bkey.getPublicKey().data());
 
 	unsigned char AD[64];
 	std::memset(AD, 3, 64);
-	unsigned char message[32] = "123456789qwertyuiopasdfghjklzxc";
-	// alice.RatchetEncrypt(message, AD);
+	unsigned char testString1[] = "123456789qwertyuiopasdfghjklzxc";
+	unsigned char testString2[] = "x";
+	unsigned char testString3[] = "brown fox jumps over the lazy dog\nbrown fox jumps over the lazy dog\nbrown fox jumps over the lazy dog\nbrown fox jumps over the lazy dog";
+	unsigned char decrypted[64];
+	unsigned char decrypted2[64];
+	unsigned char decrypted3[1024];
 
-	REQUIRE(1==1);
+	Ratchet_mess encrypted = alice.RatchetEncrypt(testString1, sizeof(testString1) / sizeof(*testString1), AD);
+	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted);
+
+	encrypted = bob.RatchetEncrypt(testString2, sizeof(testString2) / sizeof(*testString2), AD);
+	alice.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted2);
+
+	encrypted = alice.RatchetEncrypt(testString3, sizeof(testString3) / sizeof(*testString3), AD);
+	bob.RatchetDecrypt(encrypted.header, &encrypted.message[0], encrypted.message.size(), encrypted.ad, decrypted3);
+
+	REQUIRE(!memcmp(decrypted, testString1, sizeof(testString1) / sizeof(*testString1)));
+	REQUIRE(!memcmp(decrypted2, testString2, sizeof(testString2) / sizeof(*testString2)));
+	REQUIRE(!memcmp(decrypted3, testString3, sizeof(testString3) / sizeof(*testString3)));
     }
 
 

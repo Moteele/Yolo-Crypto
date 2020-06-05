@@ -60,6 +60,9 @@ ui_*.h
 Makefile*
 *build-*
 
+# vim swap files
+*.swp
+
 # QtCreator
 
 *.autosave
@@ -126,6 +129,11 @@ ipch/
 # Visual Studio code coverage results
 *.coverage
 *.coveragexml
+
+# gcc coverage files
+*.gcov
+*.gcda
+*.gcno
 
 # NuGet Packages
 *.nupkg

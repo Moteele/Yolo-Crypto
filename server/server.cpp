@@ -110,26 +110,6 @@ void Server::test()
 
 /*void Server::checkRequests()
 {
-	std::string path = "tmp_files/req";
-	std::vector<std::string> requestFiles = getUnlockedFiles(path);
-
-	// process createAcc requests
-	for (int i = 0; i < requestFiles.size(); ++i) {
-		if (requestFiles[i] == "req_master") {
-			continue;
-		}
-		int accCreation = tryCreateAccount(requestFiles[i]);
-		lockFile("tmp_files/res/" + requestFiles[i]);
-		std::ofstream resFile("tmp_files/res/" + requestFiles[i], std::ofstream::out | std::ofstream::trunc);
-		if (accCreation == -1) {
-			resFile << "Error while creating account" << std::endl;
-		} else {
-			resFile << "Success" << std::endl;
-		}
-		resFile.close();
-		unlockFile("tmp_files/res/" + requestFiles[i]);
-	}
-
 	while (isFileLocked(REQEST_FILE_PATH)) {
 		// waiting
 	}
@@ -180,79 +160,157 @@ int Server::tryCreateAccount(int socketDescriptor, const std::string &request) {
 	std::string tmp = request;
 	delim = request.find_first_of(del);
 	std::string name = request.substr(0, delim);
-
-	userAcc newUser;
-	newUser.set_id(users_.size());
-	newUser.set_name(name);
-	for (int i = 0; i < 14; ++i) {
-		delim = tmp.find_first_of(del);
-		std::string currentLine = tmp.substr(0, delim);
-
-		int split = -1;
-		split = currentLine.find_first_of(':');
-		std::cout << "currentLine: " << currentLine << std::endl;
-		if (split == -1) {
-			std::cout << "continue" << std::endl;
-			tmp = tmp.substr(delim + 1);
-			continue;
-		}
-		std::string command = currentLine.substr(0, split);
-		std::string value = currentLine.substr(split + 1);
-		std::cout << "command: " << command << " value: " << value << std::endl;
-		if (command == "createAccount") {
-			newUser.set_name(value);
-		}
-		if (command == "password") {
-			newUser.set_pwdhash(value);
-		}
-		if (command == "privateId") {
-			newUser.set_privateik(value);
-		}
-		if (command == "publicId") {
-			newUser.set_publicik(value);
-		}
-		if (command == "privateSignedPrekey") {
-			newUser.set_privatepk(value);
-		}
-		if (command == "publicSignedPrekey") {
-			newUser.set_publicpk(value);
-		}
-		if (command == "prekeySignature") {
-			newUser.set_signedpk(value);
-		}
-		if (command == "privateOnetime") {
-			newUser.add_onetimeprivate(value);
-		}
-		if (command == "publicOnetime") {
-			newUser.add_onetimepublic(value);
-		}
-		tmp = tmp.substr(delim + 1);
-	}
-	std::string result = name + ";auth;Success";
-	users_.push_back(newUser);
-
-	int socketIndex = findSocketIndexFromSocket(socketDescriptor);
-	// sockets_[socketIndex].second = name;
-
-	send(socketDescriptor, result.c_str(), result.size(), 0);
-}
+//<<<<<<< HEAD
+//int Server::tryCreateAccount(int socketDescriptor, const std::string &request) {
+//	int delim = 0;
+//	char del = ';';
+//	std::string tmp = request;
+//	delim = request.find_first_of(del);
+//	std::string name = request.substr(0, delim);
+//
+//	userAcc newUser;
+//	newUser.set_id(users_.size());
+//	newUser.set_name(name);
+//	for (int i = 0; i < 14; ++i) {
+//		delim = tmp.find_first_of(del);
+//		std::string currentLine = tmp.substr(0, delim);
+//
+//		int split = -1;
+//		split = currentLine.find_first_of(':');
+//		std::cout << "currentLine: " << currentLine << std::endl;
+//		if (split == -1) {
+//			std::cout << "continue" << std::endl;
+//			tmp = tmp.substr(delim + 1);
+//			continue;
+//		}
+//		std::string command = currentLine.substr(0, split);
+//		std::string value = currentLine.substr(split + 1);
+//		std::cout << "command: " << command << " value: " << value << std::endl;
+//		if (command == "createAccount") {
+//			newUser.set_name(value);
+//		}
+//		if (command == "password") {
+//			newUser.set_pwdhash(value);
+//		}
+//		if (command == "privateId") {
+//			newUser.set_privateik(value);
+//		}
+//		if (command == "publicId") {
+//			newUser.set_publicik(value);
+//		}
+//		if (command == "privateSignedPrekey") {
+//			newUser.set_privatepk(value);
+//		}
+//		if (command == "publicSignedPrekey") {
+//			newUser.set_publicpk(value);
+//		}
+//		if (command == "prekeySignature") {
+//			newUser.set_signedpk(value);
+//		}
+//		if (command == "privateOnetime") {
+//			newUser.add_onetimeprivate(value);
+//		}
+//		if (command == "publicOnetime") {
+//			newUser.add_onetimepublic(value);
+//		}
+//		tmp = tmp.substr(delim + 1);
+//	}
+//	std::string result = name + ";auth;Success";
+//	users_.push_back(newUser);
+//	send(socketDescriptor, result.c_str(), result.size(), 0);
+//
+//	/*for (int i = 0; i < users_.size(); ++i) {
+//		if (users_[i].name() == name) {
+//			// duplicit name
+//			return -1;
+//		}
+//	}*/
+//	/*std::string path = "tmp_files/req/" + name;
+//	std::ifstream req(path);*/
+//	/*std::stringstream req;
+//	req << request;
+//
+//	userAcc newUser;
+//	std::string line;
+//	//newUser.set_name(name);
+//	newUser.set_id(users_.size());
+//	while (std::getline(req, line)) {
+//		int delim = line.find_first_of(':');
+//		std::string command = line.substr(0, delim);
+//		std::string value = line.substr(delim + 1);
+//		if (command == "createAccount") {
+//			newUser.set_name(value);
+//		}
+//		if (command == "password") {
+//			newUser.set_pwdhash(value);
+//			continue;
+//		}
+//		if (command == "privateId") {
+//			newUser.set_privateik(value);
+//			continue;
+//		}
+//		if (command == "publicId") {
+//			newUser.set_publicik(value);
+//			continue;
+//		}
+//		if (command == "privateSignedPrekey") {
+//			newUser.set_privatepk(value);
+//			continue;
+//		}
+//		if (command == "publicSignedPrekey") {
+//			newUser.set_publicpk(value);
+//			continue;
+//		}
+//		if (command == "prekeySignature") {
+//			newUser.set_signedpk(value);
+//			continue;
+//		}
+//		if (command == "privateOnetime") {
+//			newUser.add_onetimeprivate(value);
+//			continue;
+//		}
+//		if (command == "publicOnetime") {
+//			newUser.add_onetimepublic(value);
+//			continue;
+//		}
+//	}
+//	users_.push_back(newUser);
+//	// req.close();
+//	// std::remove(path.c_str());
+//	return 0;*/
+//}
 
 void Server::processRequests(int socketDescriptor)
 {
+	Mess message;
 	for (int i = 0; i < requests_.size(); ++i) {
-		const std::pair<std::string, std::string> requesterAndCommand = getRequesterAndCommand(requests_[i]);
-		if (requesterAndCommand.second == "sendMessage") {
+		if (requests_[i] == "") {
+			continue;
+		}
+
+		message.ParseFromString(hexToString(requests_[i]));
+
+		switch (message.type()) {
+		case Mess::MESSAGE:
 			performSendMessage(socketDescriptor, requests_[i]);
-		} else if (requesterAndCommand.second == "auth") {
+			break;
+		case Mess::AUTH:
 			performAuth(socketDescriptor, requests_[i]);
-		} else if (requesterAndCommand.second == "fetchMessages") {
+			break;
+		case Mess::FETCH_MESSAGES:
 			performFetchMessages(socketDescriptor, requests_[i]);
-		} else if (requesterAndCommand.second == "fetchKeys") {
+			break;
+		case Mess::FETCH_KEYS:
 			performFetchKeys(socketDescriptor, requests_[i]);
-		} else if (requesterAndCommand.second == "initialMessage") {
+			break;
+		case Mess::INIT_MESSAGE:
 			performSendInitialMsg(socketDescriptor, requests_[i]);
-		} else if (requesterAndCommand.second == "createAccount") {
-			tryCreateAccount(socketDescriptor, requests_[i]);
+			break;
+		case Mess::CREATE_ACCOUNT:
+			performCreateAccount(socketDescriptor, requests_[i]);
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -275,165 +333,210 @@ void Server::processRequests(int socketDescriptor)
 }
 
 void Server::performSendMessage(int socketDescriptor, const std::string &req) {
-	int delim = req.find_first_of(';');
-	std::string sender = req.substr(0, delim);
-	std::string tmp = req.substr(delim + 1);
-	delim = tmp.find_first_of(';');
-	std::string command = tmp.substr(0, delim);
-	tmp = tmp.substr(delim + 1);
-	delim = tmp.find_first_of(';');
-	std::string reciever = tmp.substr(0, delim);
-	std::string text = tmp.substr(delim + 1);
+	std::string serialized;
+	Mess message;
+	Mess response;
+	message.ParseFromString(hexToString(req));
+	response.set_type(Mess::MESSAGE);
+	response.set_reciever(message.sender());
 
+
+	// find sender
 	int sendIndex = -1;
 	for (int i = 0; i < users_.size(); ++i) {
-		if (users_[i].name() == sender) {
+		if (users_[i].name() == message.sender()) {
 			sendIndex = i;
 			break;
 		}
 	}
+
+	// sender not found :D
 	if (sendIndex == -1) {
 		throw std::runtime_error("what the fuck did just happen?!");
 	}
+
+	// find reciever
 	int recIndex = -1;
 	for (int i = 0; i < users_.size(); ++i) {
-		if (users_[i].name() == reciever) {
+		if (users_[i].name() == message.reciever()) {
 			recIndex = i;
 			break;
 		}
 	}
+	// reciever not found
 	if (recIndex == -1) {
-		responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Reciever does not exist");
+		response.set_error(true);
+		response.SerializeToString(&serialized);
+		//responses_.emplace_back(stringToHex(serialized));
+		send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
 		return;
 	}
+	message.set_error(false);
 
-	Mess theMessage;
-	theMessage.set_sender(sender);
-	theMessage.set_reciever(reciever);
-	theMessage.set_text(text);
+	message.SerializeToString(&serialized);
 
-	std::string stringified;
-	theMessage.SerializeToString(&stringified);
+	// add messages to corresponding users
+	users_[recIndex].add_messages(stringToHex(serialized));
+	users_[sendIndex].add_messages(stringToHex(serialized));
 
-	users_[recIndex].add_messages(stringToHex(stringified));
-	users_[sendIndex].add_messages(stringToHex(stringified));
-
-	std::string response = users_[sendIndex].name() + ";sendMessage;Message sent";
-	send(socketDescriptor, response.c_str(), response.size(), 0);
-	//responses_.emplace_back(users_[sendIndex].name() + ";sendMessage;Message sent");
+	response.SerializeToString(&serialized);
+	send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
 }
 
 void Server::performAuth(int socketDescriptor, const std::string &req) {
-	int delim = req.find_first_of(';');
-	std::string login = req.substr(0, delim);
-	std::string tmp = req.substr(delim + 1);
-	delim = tmp.find_first_of(';');
-	std::string command = tmp.substr(0, delim);
-	std::string pwd = tmp.substr(delim + 1);
+	//std::cout << "performing auth ... ";
 
-	int index = -1;
+	Mess message;
+	Mess response;
+	std::string serialized;
+	message.ParseFromString(hexToString(req));
+	response.set_type(Mess::AUTH);
+	response.set_reciever(message.username());
+	response.set_error(true);
+
+
+	// find user
 	for (int i = 0; i < users_.size(); ++i) {
-		if (users_[i].name() == login) {
-			if (users_[i].pwdhash() == pwd) {
-				std::string line;
-				users_[i].SerializeToString(&line);
-				std::stringstream usr;
-				usr << stringToHex(line);
-				std::string response = users_[i].name() + ";auth;" + usr.str();
-				int socketIndex = findSocketIndexFromSocket(socketDescriptor);
-				//sockets_[socketIndex].second = users_[i].name();
-				send(socketDescriptor, response.c_str(), response.size(), 0);
-			} else {
-				std::string response = users_[i].name() + ";auth;Wrong password";
-				send(socketDescriptor, response.c_str(), response.size(), 0);
+		if (users_[i].name() == message.username()) {
+			if (users_[i].pwdhash() == message.password()) {
+				response.set_error(false);
+				//std::cout << "DEBUG: auth success";
 			}
-			index = i;
+			break;
 		}
 	}
-	if (index == -1) {
-		// easy in http, hard in file-based communication
-	}
+
+
+	// write response for sender
+	response.SerializeToString(&serialized);
+	//responses_.push_back(stringToHex(serialized));
+	send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
+
+
+	//std::cout << "OK" << std::endl;
 }
 
 void Server::performFetchMessages(int socketDescriptor, const std::string &req) {
-	int delim = req.find_first_of(';');
-	std::string name = req.substr(0, delim);
+	//std::cout << "DEBUG: fetching messages" << std::endl;
+	std::string serialized;
+	Mess message;
+	message.ParseFromString(hexToString(req));
 
 	int index = -1;
 	for (int i = 0; i < users_.size(); ++i) {
-		if (users_[i].name() == name) {
+		if (users_[i].name() == message.sender()) {
 			index = i;
 			break;
 		}
 	}
 
+	Mess fetched;
 	auto messages = users_[index].messages();
+	// parse message, change the type and write it to responses
 	for (const auto &it : messages) {
-		std::string response = users_[index].name() + ";fetchMessages;" + it;
-		send(socketDescriptor, response.c_str(), response.size(), 0);
-		//responses_.push_back(response);
+		fetched.ParseFromString(hexToString(it));
+		fetched.set_type(Mess::FETCH_MESSAGES);
+		fetched.SerializeToString(&serialized);
+		//responses_.push_back(stringToHex(serialized));
+		send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
+		fetched.clear_textcontent();
 	}
+
+	//std::cout << "DEBUG: messages fetched" << std::endl;
 }
 
 void Server::performSendInitialMsg(int socketDescriptor, const std::string &req) {
-	int delim = req.find_first_of(';');
-	std::string name = req.substr(0, delim);
-	std::string tmp = req.substr(delim + 1);
-	delim = tmp.find_first_of(';');
-	tmp = tmp.substr(delim + 1);
-	delim = tmp.find_first_of(';');
-	std::string rec = tmp.substr(0, delim);
-	std::string text = tmp.substr(delim + 1);
-	std::string response = rec + ";initialMessage;" + name + ";" + text;
-
-	int recieverSocketIndex = findSocketIndexFromName(rec);
-	if (recieverSocketIndex == -1) {
-		std::cerr << "Reciever does not exist" << std::endl;
-		return;
-	}
-
-	//int recieverSocket = sockets_[recieverSocketIndex].first;
-	int recieverSocket = 0;
-
-	send(recieverSocket, response.c_str(), response.size(), 0);
-	//responses_.push_back(response);
+	//responses_.push_back(req);
+	send(socketDescriptor, req.c_str(), req.size(), 0);
 }
 
 void Server::performFetchKeys(int socketDescriptor, const std::string &req) {
-	int delim = req.find_first_of(';');
-	std::string name = req.substr(0, delim);
-	std::string tmp = req.substr(delim + 1);
-	delim = tmp.find_first_of(';');
-	std::string keysOwner = tmp.substr(delim + 1);
+	std::string serialized;
+	Mess response;
+	Mess message;
+	message.ParseFromString(hexToString(req));
+	response.set_type(Mess::FETCH_KEYS);
+	response.set_reciever(message.sender());
+	response.set_username(message.username());
+
+
+	// find user
 	int index = -1;
 	for (int i = 0; i < users_.size(); ++i) {
-		if (users_[i].name() == keysOwner) {
+		if (users_[i].name() == message.username()) {
 			index = i;
 			break;
 		}
 	}
+	// user not found, can't fetch key bundle
 	if (index == -1) {
-		std::string response = name + ";fetchKeys;Error";
-		send(socketDescriptor, response.c_str(), response.size(), 0);
-		//responses_.push_back(response);
+		response.set_error(true);
+		response.SerializeToString(&serialized);
+		//responses_.push_back(stringToHex(serialized));
+		send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
+		//std::cout << "failed!" << std::endl;
 		return;
 	}
-	std::stringstream response;
-	response << name + ";fetchKeys;" + keysOwner + ";";
-	response << users_[index].publicik() << ";";
-	response << users_[index].publicpk() << ";";
-	response << users_[index].signedpk() << ";";
 
-	//TODO: take only one and delete it from server
-	auto oneTimes = users_[index].onetimepublic();
-	for (const auto &it : oneTimes) {
-		response << it;
-		break;
+	// fill out necessery values
+	response.set_reqidkey(users_[index].publicik());
+	response.set_reqprekey(users_[index].publicpk());
+	response.set_reqprekeysig(users_[index].signedpk());
+
+	////TODO: take only one and delete it from server
+	response.add_senotp(users_[index].onetimepublic()[0]);
+
+	response.SerializeToString(&serialized);
+	//responses_.push_back(stringToHex(serialized));
+	send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
+	//std::cout << "OK" << std::endl;
+}
+
+void Server::performCreateAccount(int socketDescriptor, const std::string &req) {
+	//std::cout << "creating account ... ";
+	Mess message;
+	Mess response;
+	message.ParseFromString(hexToString(req));
+	std::string serialized;
+
+	response.set_type(Mess::CREATE_ACCOUNT);
+	response.set_reciever(message.username());
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == message.username()) {
+			// duplicit name
+			response.set_error(true);
+			response.SerializeToString(&serialized);
+			responses_.push_back(stringToHex(serialized));
+			//std::cout << "failed!" << std::endl;
+			return;
+		}
 	}
-	std::string responseStr = response.str();
-	std::cout << "sending keys: " << responseStr << std::endl;
-	send(socketDescriptor, responseStr.c_str(), responseStr.size(), 0);
-	//responses_.push_back(response.str());
+
+	// save user
+	userAcc newUser;
+	newUser.set_name(message.username());
+	newUser.set_id(users_.size());
+	newUser.set_pwdhash(message.password());
+	newUser.set_publicik(message.senidkey());
+	newUser.set_publicpk(message.senprekey());
+	newUser.set_signedpk(message.senprekeysig());
+	for (auto &el : message.senotp()) {
+		newUser.add_onetimepublic(el);
+
+	}
+
+	users_.push_back(newUser);
+
+	response.set_error(false);
+	response.set_senid(newUser.id());
+
+
+	// write response
+	response.SerializeToString(&serialized);
+	//responses_.push_back(stringToHex(serialized));
+	send(socketDescriptor, stringToHex(serialized).c_str(), stringToHex(serialized).size(), 0);
+
+	//std::cout << "OK" << std::endl;
 }
 
 void Server::loadUsers() {

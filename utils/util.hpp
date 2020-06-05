@@ -211,23 +211,23 @@ struct KeyPair {
 };
 
 struct Header {
-    std::vector<unsigned char> pubKey;
+    unsigned char pubKey[32];
     int pn, n;
 };
 
 struct Ratchet_mess {
-    unsigned char *ad;
+    unsigned char ad[64];
     Header header;
-    unsigned char *message;
+    std::vector<unsigned char> message;
 };
 
 class Ratchet {
     public:
 	Key DHs; // DH Ratchet key pair (self)
 	Key DHr; /// DH Ratchet public key (remote)
-	unsigned char *RK[32] = { nullptr }; // Root key
-	unsigned char *CKs[32] = { nullptr }; // sending chain key
-	unsigned char *CKr[32] = { nullptr }; // receiving chain key
+	unsigned char RK[32]; // Root key
+	unsigned char CKs[32]; // sending chain key
+	unsigned char CKr[32]; // receiving chain key
 	int Ns = 0, Nr = 0; // message numbers
 	int PN = 0; // no. of messages in previous sending chain
 	std::vector<unsigned char[32]> MKSKIPPED; // stored skipped-over message keys
@@ -241,13 +241,15 @@ class Ratchet {
 
 	KeyPair kdf_ck(unsigned char* CK);
 
-	void RatchetEncrypt(unsigned char *message, unsigned char *AD);
+	Ratchet_mess RatchetEncrypt(unsigned char *message, unsigned int mess_len, unsigned char *AD);
 
-	void Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned char *ad, unsigned char *ciphertext);
+	void Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned int pt_size, unsigned char *ad, unsigned char *ciphertext);
 
-	void RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned char *AD, unsigned char *plaintext);
+	void RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned int ct_len, unsigned char *AD, unsigned char *plaintext);
 
-	void Decrypt(unsigned char *mk, unsigned char *cipertext, unsigned char* AD, Header header, unsigned char *plaintext);
+	void Decrypt(unsigned char *mk, unsigned char *cipertext, unsigned int ct_len, unsigned char* AD, Header header, unsigned char *plaintext);
+
+	void DHRatchet(Header header);
 };
 
 #endif // UTIL_HPP
