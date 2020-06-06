@@ -514,7 +514,7 @@ void Server::runServer() {
                     //Somebody disconnected , get his details and print
                     getpeername(socketDescriptor , (struct sockaddr*)&address , \
                         (socklen_t*)&addrlen);
-                    std::cout << "Host disconnected " << inet_ntoa(address.sin_addr) << ":" << ntohs(address.sin_port); << std::endl;
+                    std::cout << "Host disconnected " << inet_ntoa(address.sin_addr) << ":" << ntohs(address.sin_port) << std::endl;
 
                     //Close the socket and mark as 0 in list for reuse
                     close( socketDescriptor );
