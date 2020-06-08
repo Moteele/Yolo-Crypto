@@ -213,7 +213,7 @@ class userAcc :
   std::string* _internal_add_messages();
   public:
 
-  // repeated string onetimepublic = 11;
+  // repeated bytes onetimepublic = 11;
   int onetimepublic_size() const;
   private:
   int _internal_onetimepublic_size() const;
@@ -224,12 +224,12 @@ class userAcc :
   void set_onetimepublic(int index, const std::string& value);
   void set_onetimepublic(int index, std::string&& value);
   void set_onetimepublic(int index, const char* value);
-  void set_onetimepublic(int index, const char* value, size_t size);
+  void set_onetimepublic(int index, const void* value, size_t size);
   std::string* add_onetimepublic();
   void add_onetimepublic(const std::string& value);
   void add_onetimepublic(std::string&& value);
   void add_onetimepublic(const char* value);
-  void add_onetimepublic(const char* value, size_t size);
+  void add_onetimepublic(const void* value, size_t size);
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& onetimepublic() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_onetimepublic();
   private:
@@ -237,7 +237,7 @@ class userAcc :
   std::string* _internal_add_onetimepublic();
   public:
 
-  // repeated string onetimeprivate = 12;
+  // repeated bytes onetimeprivate = 12;
   int onetimeprivate_size() const;
   private:
   int _internal_onetimeprivate_size() const;
@@ -248,12 +248,12 @@ class userAcc :
   void set_onetimeprivate(int index, const std::string& value);
   void set_onetimeprivate(int index, std::string&& value);
   void set_onetimeprivate(int index, const char* value);
-  void set_onetimeprivate(int index, const char* value, size_t size);
+  void set_onetimeprivate(int index, const void* value, size_t size);
   std::string* add_onetimeprivate();
   void add_onetimeprivate(const std::string& value);
   void add_onetimeprivate(std::string&& value);
   void add_onetimeprivate(const char* value);
-  void add_onetimeprivate(const char* value, size_t size);
+  void add_onetimeprivate(const void* value, size_t size);
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& onetimeprivate() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_onetimeprivate();
   private:
@@ -321,7 +321,7 @@ class userAcc :
   std::string* _internal_mutable_pwdhash();
   public:
 
-  // optional string publicik = 6;
+  // optional bytes publicik = 6;
   bool has_publicik() const;
   private:
   bool _internal_has_publicik() const;
@@ -331,7 +331,7 @@ class userAcc :
   void set_publicik(const std::string& value);
   void set_publicik(std::string&& value);
   void set_publicik(const char* value);
-  void set_publicik(const char* value, size_t size);
+  void set_publicik(const void* value, size_t size);
   std::string* mutable_publicik();
   std::string* release_publicik();
   void set_allocated_publicik(std::string* publicik);
@@ -341,7 +341,7 @@ class userAcc :
   std::string* _internal_mutable_publicik();
   public:
 
-  // optional string privateik = 7;
+  // optional bytes privateik = 7;
   bool has_privateik() const;
   private:
   bool _internal_has_privateik() const;
@@ -351,7 +351,7 @@ class userAcc :
   void set_privateik(const std::string& value);
   void set_privateik(std::string&& value);
   void set_privateik(const char* value);
-  void set_privateik(const char* value, size_t size);
+  void set_privateik(const void* value, size_t size);
   std::string* mutable_privateik();
   std::string* release_privateik();
   void set_allocated_privateik(std::string* privateik);
@@ -361,7 +361,7 @@ class userAcc :
   std::string* _internal_mutable_privateik();
   public:
 
-  // optional string publicpk = 8;
+  // optional bytes publicpk = 8;
   bool has_publicpk() const;
   private:
   bool _internal_has_publicpk() const;
@@ -371,7 +371,7 @@ class userAcc :
   void set_publicpk(const std::string& value);
   void set_publicpk(std::string&& value);
   void set_publicpk(const char* value);
-  void set_publicpk(const char* value, size_t size);
+  void set_publicpk(const void* value, size_t size);
   std::string* mutable_publicpk();
   std::string* release_publicpk();
   void set_allocated_publicpk(std::string* publicpk);
@@ -381,7 +381,7 @@ class userAcc :
   std::string* _internal_mutable_publicpk();
   public:
 
-  // optional string privatepk = 9;
+  // optional bytes privatepk = 9;
   bool has_privatepk() const;
   private:
   bool _internal_has_privatepk() const;
@@ -391,7 +391,7 @@ class userAcc :
   void set_privatepk(const std::string& value);
   void set_privatepk(std::string&& value);
   void set_privatepk(const char* value);
-  void set_privatepk(const char* value, size_t size);
+  void set_privatepk(const void* value, size_t size);
   std::string* mutable_privatepk();
   std::string* release_privatepk();
   void set_allocated_privatepk(std::string* privatepk);
@@ -401,7 +401,7 @@ class userAcc :
   std::string* _internal_mutable_privatepk();
   public:
 
-  // optional string signedpk = 10;
+  // optional bytes signedpk = 10;
   bool has_signedpk() const;
   private:
   bool _internal_has_signedpk() const;
@@ -411,7 +411,7 @@ class userAcc :
   void set_signedpk(const std::string& value);
   void set_signedpk(std::string&& value);
   void set_signedpk(const char* value);
-  void set_signedpk(const char* value, size_t size);
+  void set_signedpk(const void* value, size_t size);
   std::string* mutable_signedpk();
   std::string* release_signedpk();
   void set_allocated_signedpk(std::string* signedpk);
@@ -784,7 +784,7 @@ userAcc::mutable_messages() {
   return &messages_;
 }
 
-// optional string publicik = 6;
+// optional bytes publicik = 6;
 inline bool userAcc::_internal_has_publicik() const {
   bool value = (_has_bits_[0] & 0x00000008u) != 0;
   return value;
@@ -827,7 +827,7 @@ inline void userAcc::set_publicik(const char* value) {
   publicik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:userAcc.publicik)
 }
-inline void userAcc::set_publicik(const char* value, size_t size) {
+inline void userAcc::set_publicik(const void* value, size_t size) {
   _has_bits_[0] |= 0x00000008u;
   publicik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
@@ -855,7 +855,7 @@ inline void userAcc::set_allocated_publicik(std::string* publicik) {
   // @@protoc_insertion_point(field_set_allocated:userAcc.publicik)
 }
 
-// optional string privateik = 7;
+// optional bytes privateik = 7;
 inline bool userAcc::_internal_has_privateik() const {
   bool value = (_has_bits_[0] & 0x00000010u) != 0;
   return value;
@@ -898,7 +898,7 @@ inline void userAcc::set_privateik(const char* value) {
   privateik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:userAcc.privateik)
 }
-inline void userAcc::set_privateik(const char* value, size_t size) {
+inline void userAcc::set_privateik(const void* value, size_t size) {
   _has_bits_[0] |= 0x00000010u;
   privateik_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
@@ -926,7 +926,7 @@ inline void userAcc::set_allocated_privateik(std::string* privateik) {
   // @@protoc_insertion_point(field_set_allocated:userAcc.privateik)
 }
 
-// optional string publicpk = 8;
+// optional bytes publicpk = 8;
 inline bool userAcc::_internal_has_publicpk() const {
   bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
@@ -969,7 +969,7 @@ inline void userAcc::set_publicpk(const char* value) {
   publicpk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:userAcc.publicpk)
 }
-inline void userAcc::set_publicpk(const char* value, size_t size) {
+inline void userAcc::set_publicpk(const void* value, size_t size) {
   _has_bits_[0] |= 0x00000020u;
   publicpk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
@@ -997,7 +997,7 @@ inline void userAcc::set_allocated_publicpk(std::string* publicpk) {
   // @@protoc_insertion_point(field_set_allocated:userAcc.publicpk)
 }
 
-// optional string privatepk = 9;
+// optional bytes privatepk = 9;
 inline bool userAcc::_internal_has_privatepk() const {
   bool value = (_has_bits_[0] & 0x00000040u) != 0;
   return value;
@@ -1040,7 +1040,7 @@ inline void userAcc::set_privatepk(const char* value) {
   privatepk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:userAcc.privatepk)
 }
-inline void userAcc::set_privatepk(const char* value, size_t size) {
+inline void userAcc::set_privatepk(const void* value, size_t size) {
   _has_bits_[0] |= 0x00000040u;
   privatepk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
@@ -1068,7 +1068,7 @@ inline void userAcc::set_allocated_privatepk(std::string* privatepk) {
   // @@protoc_insertion_point(field_set_allocated:userAcc.privatepk)
 }
 
-// optional string signedpk = 10;
+// optional bytes signedpk = 10;
 inline bool userAcc::_internal_has_signedpk() const {
   bool value = (_has_bits_[0] & 0x00000080u) != 0;
   return value;
@@ -1111,7 +1111,7 @@ inline void userAcc::set_signedpk(const char* value) {
   signedpk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
   // @@protoc_insertion_point(field_set_char:userAcc.signedpk)
 }
-inline void userAcc::set_signedpk(const char* value, size_t size) {
+inline void userAcc::set_signedpk(const void* value, size_t size) {
   _has_bits_[0] |= 0x00000080u;
   signedpk_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
@@ -1139,7 +1139,7 @@ inline void userAcc::set_allocated_signedpk(std::string* signedpk) {
   // @@protoc_insertion_point(field_set_allocated:userAcc.signedpk)
 }
 
-// repeated string onetimepublic = 11;
+// repeated bytes onetimepublic = 11;
 inline int userAcc::_internal_onetimepublic_size() const {
   return onetimepublic_.size();
 }
@@ -1177,7 +1177,7 @@ inline void userAcc::set_onetimepublic(int index, const char* value) {
   onetimepublic_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:userAcc.onetimepublic)
 }
-inline void userAcc::set_onetimepublic(int index, const char* value, size_t size) {
+inline void userAcc::set_onetimepublic(int index, const void* value, size_t size) {
   onetimepublic_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_set_pointer:userAcc.onetimepublic)
@@ -1198,7 +1198,7 @@ inline void userAcc::add_onetimepublic(const char* value) {
   onetimepublic_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:userAcc.onetimepublic)
 }
-inline void userAcc::add_onetimepublic(const char* value, size_t size) {
+inline void userAcc::add_onetimepublic(const void* value, size_t size) {
   onetimepublic_.Add()->assign(reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_add_pointer:userAcc.onetimepublic)
 }
@@ -1213,7 +1213,7 @@ userAcc::mutable_onetimepublic() {
   return &onetimepublic_;
 }
 
-// repeated string onetimeprivate = 12;
+// repeated bytes onetimeprivate = 12;
 inline int userAcc::_internal_onetimeprivate_size() const {
   return onetimeprivate_.size();
 }
@@ -1251,7 +1251,7 @@ inline void userAcc::set_onetimeprivate(int index, const char* value) {
   onetimeprivate_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:userAcc.onetimeprivate)
 }
-inline void userAcc::set_onetimeprivate(int index, const char* value, size_t size) {
+inline void userAcc::set_onetimeprivate(int index, const void* value, size_t size) {
   onetimeprivate_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_set_pointer:userAcc.onetimeprivate)
@@ -1272,7 +1272,7 @@ inline void userAcc::add_onetimeprivate(const char* value) {
   onetimeprivate_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:userAcc.onetimeprivate)
 }
-inline void userAcc::add_onetimeprivate(const char* value, size_t size) {
+inline void userAcc::add_onetimeprivate(const void* value, size_t size) {
   onetimeprivate_.Add()->assign(reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_add_pointer:userAcc.onetimeprivate)
 }

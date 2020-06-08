@@ -226,10 +226,12 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 
     // store shared secret
-    std::pair<std::string, std::string> newPair = std::make_pair(message.username(), "");
+    std::pair<Ratchet, std::string> newPair;
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
+    std::strcpy(newPair.first.username, message.username().data());
+    newPair.first.InitA(sharedSecret, hisSignedPrekey.getPublicKey().data());
     sharedSecrets_.push_back(newPair);
 
     // clear the DHs from memory
@@ -243,7 +245,7 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 int Client::getIndexOfSharedSecret(const std::string &name) {
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        if (sharedSecrets_[i].first == name) {
+        if (sharedSecrets_[i].first.username == name) {
             return i;
         }
     }
@@ -288,9 +290,11 @@ void Client::develSendMessage()
     // AD
     sharedSecretIndex = getIndexOfSharedSecret(reciever);
     unsigned char key[32];
+    /*
     for (int i = 0; i < 32; ++i) {
         key[i] = sharedSecrets_[sharedSecretIndex].second[i];
     }
+    */
     unsigned char iv[16];
     memset(iv, 0, 16);
     unsigned char ciphered[64];
@@ -458,16 +462,18 @@ void Client::readInitial(const std::string &req) {
     std::cout << "Authentication successful" << std::endl;
 
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        if (sharedSecrets_[i].first == message.username()) {
+        if (sharedSecrets_[i].first.username == message.username()) {
             std::cout << "Weird stuff happening, already have shared secret with this person" << std::endl;
             std::cout << "Possible error, do not use this app anymore" << std::endl;
             return;
         }
     }
-    std::pair<std::string, std::string> newPair = std::make_pair(message.username(), "");
+    std::pair<Ratchet, std::string> newPair;
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
+    std::strcpy(newPair.first.username, message.username().data());
+    newPair.first.InitB(sharedSecret, signedPrekey.getPrivateKey().data());
     sharedSecrets_.push_back(newPair);
 
     // clear DHs from memory
@@ -519,9 +525,12 @@ void Client::printMessages()
 void Client::printSharedSecrets() {
     std::cout << "sharedSecrets len " << sharedSecrets_.size() << std::endl;
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        std::cout << "Shared secret with " + sharedSecrets_[i].first << ":" << std::endl;
+        std::cout << "Shared secret with ";
+	for(size_t i = 0; i < 32; i++)
+	    std::cout << sharedSecrets_[i].first.username[i];
+	std::cout << ":" << std::endl;
         for (int j = 0; j < 32; ++j) {
-            std::cout << sharedSecrets_[i].second[j];
+            std::cout << sharedSecrets_[i].first.RK[j];
         }
         std::cout << std::endl;
     }
