@@ -70,7 +70,7 @@ debug-%: clean
 # WARNING: for generating html files, 'lcov' is required
 coverage-%: clean
 	$(MAKE) $* $(MAKEFILE) CXX="g++" OPTIONAL="$(OPTIONAL) --coverage"
-	#./utils/generate_lcov.sh
+	./utils/generate_lcov.sh
 
 # builds a target with profiling flags
 # generates file 'gmon.out', which can be processed with 'gprof'
