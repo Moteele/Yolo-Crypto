@@ -64,19 +64,22 @@ test-valgrind: test-base
 # builds a target with debugging flags
 # example: make debug-test ... builds target test with debugging flags -DDEBUG -Og -ggdb
 debug-%: clean
-	$(MAKE) $* $(MAKEFILE) OPTIONAL="-DDEBUG -Og -ggdb"
+	$(MAKE) $* $(MAKEFILE) OPTIONAL="$(OPTIONAL) -DDEBUG -Og -ggdb"
 
 # builds a target with coverage flags
 # WARNING: for generating html files, 'lcov' is required
 coverage-%: clean
-	$(MAKE) $* $(MAKEFILE) CXX="g++" OPTIONAL="--coverage"
-	./utils/generate_lcov.sh
+	$(MAKE) $* $(MAKEFILE) CXX="g++" OPTIONAL="$(OPTIONAL) --coverage"
+	#./utils/generate_lcov.sh
 
 # builds a target with profiling flags
 # generates file 'gmon.out', which can be processed with 'gprof'
 profile-%: clean
-	$(MAKE) $* $(MAKEFILE) OPTIONAL="-pg"
+	$(MAKE) $* $(MAKEFILE) OPTIONAL="$(OPTIONAL) -pg"
 
+# prints said variable
+print-%:
+	@echo '$*=$($*)'
 
 server-build: serverApp
 
@@ -88,7 +91,6 @@ valgrind: server-build
 flags:
 	@echo $(CXXFLAGS)
 	@echo $(LDFLAGS)
-	@echo $(SOURCES_ALL)
 
 test-util: $(OBJECTS_UTIL_TEST)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
@@ -118,11 +120,11 @@ clientApp: $(OBJECTS_CLIENT_MAIN)
 .PHONY: clean clean-coverage
 
 clean: clean-coverage
-	rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN) $(OBJECTS_UTIL_TEST) $(DEPS)
+	@rm -rf $(OBJECTS_SERVER_TEST) $(OBJECTS_CLIENT) $(OBJECTS_CLIENT_MAIN) $(OBJECTS_UTIL_TEST) $(DEPS)
 
 clean-coverage:
-	rm -rf `find './' -name "*.gcov"`
-	rm -rf `find './' -name "*.gcda"`
-	rm -rf `find './' -name "*.gcno"`
+	@rm -rf `find './' -name "*.gcov"`
+	@rm -rf `find './' -name "*.gcda"`
+	@rm -rf `find './' -name "*.gcno"`
 
 -include $(DEPS)
