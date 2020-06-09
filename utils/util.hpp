@@ -234,6 +234,7 @@ class Ratchet {
 	int PN = 0; // no. of messages in previous sending chain
 	//std::vector<unsigned char[32]> MKSKIPPED; // stored skipped-over message keys
 
+
 	void InitA(unsigned char* SK, unsigned char* BpubKey);
 
 	// BprivKey is Bob;s signed prekey from X3DH

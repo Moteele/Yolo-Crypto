@@ -481,6 +481,7 @@ KeyPair Ratchet::kdf_rk(unsigned char* RK, unsigned char* dh_out) {
 }
 
 
+
 void Ratchet::InitA (unsigned char* SK, unsigned char* BpubKey) {
     DHs.generate();
     DHr.setPublic(BpubKey);

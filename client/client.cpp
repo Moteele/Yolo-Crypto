@@ -82,9 +82,8 @@ void Client::readResponse() {
     Mess message;
     // go through all responses
     while (std::getline(response, line)) {
-        if (line == "") {
+        if (line == "")
             continue;
-        }
 
         message.ParseFromString(hexToString(line));
     #ifdef DEBUG
@@ -245,7 +244,7 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 int Client::getIndexOfSharedSecret(const std::string &name) {
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        if (sharedSecrets_[i].first.username == name) {
+        if (! strcmp(sharedSecrets_[i].first.username, name.data())) {
             return i;
         }
     }
@@ -317,6 +316,7 @@ void Client::develSendMessage()
     message.SerializeToString(&serialized);
     // write init key bundle
     writeToReq(stringToHex(serialized));
+    std::this_thread::sleep_for(1s);
 
     // the message itself
     message.Clear();
@@ -337,7 +337,7 @@ void Client::develSendMessage()
 
     message.SerializeToString(&serialized);
     //std::cout << "DEBUG: sending message" << std::endl;
-    //writeToReq(stringToHex(serialized));
+    writeToReq(stringToHex(serialized));
 }
 
 
@@ -477,7 +477,10 @@ void Client::readInitial(const std::string &req) {
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
-    std::strcpy(newPair.first.username, message.username().data());
+
+    std::cout << "sender: " << message.sender() << std::endl;
+    std::copy( message.sender().begin(), message.sender().end(), newPair.first.username );
+    newPair.first.username[message.username().length()] = 0;
     newPair.first.InitB(sharedSecret, signedPrekey.getPrivateKey().data());
     sharedSecrets_.push_back(newPair);
 
@@ -518,9 +521,9 @@ void Client::printMessages()
 {
     for (const auto & message : messages_) {
         std::cout << "\nMessage from: " << message.sender() << " to: " << message.reciever() << std::endl;
-	int sharedSecretIndex = getIndexOfSharedSecret(message.sender());
+	int sharedSecretIndex = getIndexOfSharedSecret(message.reciever());
 	if (sharedSecretIndex == -1) {
-	    std::cout << "user \'" << message.reciever() << "\' not found" << std::endl;
+	    std::cout << "user \'" << message.sender() << "\' not found" << std::endl;
 	    return;
 	}
 	unsigned char encryptedAdArr[64];
@@ -543,10 +546,11 @@ void Client::printMessages()
 	    std::cout << pt[i];
     }
 
+    messages_.clear();
     // this is weird, messages_.clear() was giving me segfaults
-    for (int i = 0; i <= messages_.size(); ++i) {
-	    messages_.pop_back();
-    }
+    // for (int i = 0; i <= messages_.size(); ++i) {
+	//    messages_.pop_back();
+    //}
 }
 
 void Client::printSharedSecrets() {
@@ -661,7 +665,9 @@ void Client::develRunClient()
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
+		readResponse();
 		if (gotResponse_) {
+			std::cout << "Reading messages" << std::endl;
 			printMessages();
 		} else {
 			std::cout << "No messages found" << std::endl;
