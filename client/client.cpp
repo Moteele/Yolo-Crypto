@@ -288,13 +288,13 @@ void Client::develSendMessage()
     message.set_senepkey(&ephemeral.getPublicKey()[0], 32);
 
     // AD
-    sharedSecretIndex = getIndexOfSharedSecret(reciever);
+    //sharedSecretIndex = getIndexOfSharedSecret(reciever);
     unsigned char key[32];
-    /*
+    
     for (int i = 0; i < 32; ++i) {
         key[i] = sharedSecrets_[sharedSecretIndex].second[i];
     }
-    */
+    
     unsigned char iv[16];
     memset(iv, 0, 16);
     unsigned char ciphered[64];
@@ -326,13 +326,18 @@ void Client::develSendMessage()
     std::getline(std::cin, msg);
     std::cout << std::endl;
 
+    // encrypt the message
+    Ratchet_mess encMess= sharedSecrets_[sharedSecretIndex].first.RatchetEncrypt(const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(msg.c_str())), msg.length(), ad);
+
     message.set_sender(name_);
     message.set_reciever(reciever);
-    message.set_textcontent(msg);
+    message.set_textcontent(std::string (reinterpret_cast<char*>(encMess.message.data()), encMess.message.size()));
+    message.set_prevnum(encMess.header.pn);
+    message.set_messnum(encMess.header.n);
 
     message.SerializeToString(&serialized);
     //std::cout << "DEBUG: sending message" << std::endl;
-    writeToReq(stringToHex(serialized));
+    //writeToReq(stringToHex(serialized));
 }
 
 
@@ -513,7 +518,29 @@ void Client::printMessages()
 {
     for (const auto & message : messages_) {
         std::cout << "\nMessage from: " << message.sender() << " to: " << message.reciever() << std::endl;
-        std::cout << message.textcontent() << "\n" << std::endl;
+	int sharedSecretIndex = getIndexOfSharedSecret(message.sender());
+	if (sharedSecretIndex == -1) {
+	    std::cout << "user \'" << message.reciever() << "\' not found" << std::endl;
+	    return;
+	}
+	unsigned char encryptedAdArr[64];
+	unsigned char decryptedAd[64];
+	unsigned char iv[16];
+	unsigned char pt[message.textcontent().size()];
+	Header header;
+	memcpy(header.pubKey, message.senrkey().data(), 32);
+	header.pn = message.prevnum();
+	header.n = message.messnum();
+	memset(iv, 0, 16);
+	memcpy(encryptedAdArr, message.cipherad().data(), 64);
+	int len = Util::aes256decrypt(encryptedAdArr, 64, const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>
+		(sharedSecrets_[sharedSecretIndex].second.data())), iv, decryptedAd, 0);
+	sharedSecrets_[sharedSecretIndex].first.RatchetDecrypt
+	    (header, const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>
+	    (message.textcontent().data())), message.textcontent().size(), decryptedAd, pt);
+
+	for(size_t i = 0; pt[i] != '\0' && i < message.textcontent().size(); i++)
+	    std::cout << pt[i];
     }
 
     // this is weird, messages_.clear() was giving me segfaults
@@ -643,8 +670,8 @@ void Client::develRunClient()
             case 3:
                 printSharedSecrets();
                 break;
-	        default:
-		        std::cout << "Invalid choice" << std::endl;
+	    default:
+		    std::cout << "Invalid choice" << std::endl;
             }
         }
     }

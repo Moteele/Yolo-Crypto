@@ -261,6 +261,18 @@ void Server::performFetchMessages(int socketDescriptor, const std::string &req) 
 }
 
 void Server::performSendInitialMsg(int socketDescriptor, const std::string &req) {
+	// find reciever
+	std::string serialized;
+	Mess message;
+	message.ParseFromString(hexToString(req));
+	int recIndex = -1;
+	for (int i = 0; i < users_.size(); ++i) {
+		if (users_[i].name() == message.reciever()) {
+			recIndex = i;
+			break;
+		}
+	}
+	users_[recIndex].add_messages(stringToHex(serialized));
 	send(socketDescriptor, req.c_str(), req.size(), 0);
 }
 
