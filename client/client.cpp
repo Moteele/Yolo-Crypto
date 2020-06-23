@@ -121,7 +121,6 @@ void Client::readResponse() {
                 }
                 break;
             case Mess::INIT_MESSAGE:
-		std::cout << "reading initial" << std::endl;
                 readInitial(line);
                 break;
             case Mess::CREATE_ACCOUNT:
@@ -229,12 +228,14 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 
     // store shared secret
-    std::pair<Ratchet, std::string> newPair;
+    Ratchet* ratchet = new Ratchet();
+    std::pair<Ratchet*, std::string> newPair;
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
-    std::strcpy(newPair.first.username, message.username().data());
-    newPair.first.InitA(sharedSecret, hisSignedPrekey.getPublicKey().data());
+    newPair.first = ratchet;
+    std::strcpy(newPair.first->username, message.username().data());
+    newPair.first->InitA(sharedSecret, hisSignedPrekey.getPublicKey().data());
     sharedSecrets_.push_back(newPair);
 
     // clear the DHs from memory
@@ -248,8 +249,7 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 int Client::getIndexOfSharedSecret(const std::string &name) {
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-	std::cout << "finding " << name.data() << " in " << sharedSecrets_[i].first.username << std::endl;
-        if (! strcmp(sharedSecrets_[i].first.username, name.data())) {
+        if (! strcmp(sharedSecrets_[i].first->username, name.data())) {
             return i;
         }
     }
@@ -332,7 +332,7 @@ void Client::develSendMessage()
     std::cout << std::endl;
 
     // encrypt the message
-    Ratchet_mess encMess= sharedSecrets_[sharedSecretIndex].first.RatchetEncrypt(const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(msg.c_str())), msg.length(), ad);
+    Ratchet_mess encMess= sharedSecrets_[sharedSecretIndex].first->RatchetEncrypt(const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(msg.c_str())), msg.length(), ad);
 
     message.set_sender(name_);
     message.set_reciever(reciever);
@@ -349,6 +349,9 @@ void Client::develSendMessage()
 
 void Client::createKeys(Mess &message)
 {
+
+    // daniel added this, is is okay? otherwise its uninitialized
+    ephemeral.generate();
     identityKey.generate();
     signedPrekey.generate();
 
@@ -473,24 +476,23 @@ void Client::readInitial(const std::string &req) {
     std::cout << "Authentication successful" << std::endl;
 
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        if (sharedSecrets_[i].first.username == message.username()) {
+        if (sharedSecrets_[i].first->username == message.username()) {
             std::cout << "Weird stuff happening, already have shared secret with this person" << std::endl;
             std::cout << "Possible error, do not use this app anymore" << std::endl;
             return;
         }
     }
-    std::pair<Ratchet, std::string> newPair;
+    Ratchet* ratchet = new Ratchet();
+    std::pair<Ratchet*, std::string> newPair;
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
+    newPair.first = ratchet;
 
-    std::cout << "sender: " << message.sender() << std::endl;
-    std::copy( message.sender().begin(), message.sender().end(), newPair.first.username );
-    std::cout << "sender2: " << newPair.first.username << std::endl;
-    newPair.first.username[message.sender().length()] = 0;
-    newPair.first.InitB(sharedSecret, signedPrekey.getPrivateKey().data());
+    std::copy( message.sender().begin(), message.sender().end(), newPair.first->username );
+    newPair.first->username[message.sender().length()] = 0;
+    newPair.first->InitB(sharedSecret, signedPrekey.getPrivateKey().data());
     sharedSecrets_.push_back(newPair);
-    std::cout << "sender3: " << sharedSecrets_.back().first.username << std::endl;
 
     // clear DHs from memory
     for (int i = 0; i < 32; ++i) {
@@ -546,12 +548,11 @@ void Client::printMessages()
 	memcpy(encryptedAdArr, message.cipherad().data(), 64);
 	int len = Util::aes256decrypt(encryptedAdArr, 64, const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>
 		(sharedSecrets_[sharedSecretIndex].second.data())), iv, decryptedAd, 0);
-	sharedSecrets_[sharedSecretIndex].first.RatchetDecrypt
+	sharedSecrets_[sharedSecretIndex].first->RatchetDecrypt
 	    (header, const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>
 	    (message.textcontent().data())), message.textcontent().size(), decryptedAd, pt);
 
-	for(size_t i = 0; pt[i] != '\0' && i < message.textcontent().size(); i++)
-	    std::cout << pt[i];
+	std::cout << "Message: " << pt << std::endl;
     }
 
     messages_.clear();
@@ -567,10 +568,10 @@ void Client::printSharedSecrets()
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
         std::cout << "Shared secret with ";
 	for(size_t i = 0; i < 32; i++)
-	    std::cout << sharedSecrets_[i].first.username[i];
+	    std::cout << sharedSecrets_[i].first->username[i];
 	std::cout << ":" << std::endl;
         for (int j = 0; j < 32; ++j) {
-            std::cout << sharedSecrets_[i].first.RK[j];
+            std::cout << sharedSecrets_[i].first->RK[j];
         }
         std::cout << std::endl;
     }

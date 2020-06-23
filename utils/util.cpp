@@ -547,10 +547,10 @@ void Ratchet::Encrypt(unsigned char *mk, unsigned char *plaintext, unsigned int 
 }
 
 void Ratchet:: RatchetDecrypt(Header header, unsigned char *ciphertext, unsigned int ct_len, unsigned char* AD, unsigned char *plaintext) {
-    DHRatchet(header);
     unsigned char mk[32];
     unsigned char constant[32];
     std::memset(constant, 0, 32);
+    DHRatchet(header);
     KeyPair pair = kdf_rk(constant, CKr);
     std::memcpy(CKr, pair.key1, 32);
     std::memcpy(mk, pair.key2, 32);
