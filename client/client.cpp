@@ -16,7 +16,8 @@ void Client::writeToReq(const std::string &req) {
     gotResponse_ = false;
 }
 
-void Client::develAuth() {
+void Client::develAuth()
+{
     Mess message;
     message.set_type(Mess::AUTH);
     std::cout << "Login:" << std::endl;
@@ -39,7 +40,8 @@ void Client::develAuth() {
     writeToReq(stringToHex(serialized));
 }
 
-void Client::develCreateAcc() {
+void Client::develCreateAcc()
+{
     Mess message;
     message.set_type(Mess::CREATE_ACCOUNT);
 
@@ -119,6 +121,7 @@ void Client::readResponse() {
                 }
                 break;
             case Mess::INIT_MESSAGE:
+		std::cout << "reading initial" << std::endl;
                 readInitial(line);
                 break;
             case Mess::CREATE_ACCOUNT:
@@ -141,7 +144,8 @@ void Client::readResponse() {
     }
 }
 
-Key Client::createKeyFromHex(std::string &hexKey, bool isPublic) {
+Key Client::createKeyFromHex(std::string &hexKey, bool isPublic)
+{
     unsigned char keyArr[32];
     auto keyVec = hexToKey(hexKey);
     for (int i = 0; i < 32; ++i) {
@@ -244,6 +248,7 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 int Client::getIndexOfSharedSecret(const std::string &name) {
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
+	std::cout << "finding " << name.data() << " in " << sharedSecrets_[i].first.username << std::endl;
         if (! strcmp(sharedSecrets_[i].first.username, name.data())) {
             return i;
         }
@@ -334,6 +339,7 @@ void Client::develSendMessage()
     message.set_textcontent(std::string (reinterpret_cast<char*>(encMess.message.data()), encMess.message.size()));
     message.set_prevnum(encMess.header.pn);
     message.set_messnum(encMess.header.n);
+    message.set_senrkey(std::string (reinterpret_cast<char*>(encMess.header.pubKey), 32));
 
     message.SerializeToString(&serialized);
     //std::cout << "DEBUG: sending message" << std::endl;
@@ -370,7 +376,7 @@ void Client::createKeys(Mess &message)
 
 void Client::readInitial(const std::string &req) {
 
-    //std::cout << "DEBUG: reading initial message" << std::endl;
+    std::cout << "DEBUG: reading initial message" << std::endl;
     Mess message;
     message.ParseFromString(hexToString(req));
 
@@ -480,9 +486,11 @@ void Client::readInitial(const std::string &req) {
 
     std::cout << "sender: " << message.sender() << std::endl;
     std::copy( message.sender().begin(), message.sender().end(), newPair.first.username );
-    newPair.first.username[message.username().length()] = 0;
+    std::cout << "sender2: " << newPair.first.username << std::endl;
+    newPair.first.username[message.sender().length()] = 0;
     newPair.first.InitB(sharedSecret, signedPrekey.getPrivateKey().data());
     sharedSecrets_.push_back(newPair);
+    std::cout << "sender3: " << sharedSecrets_.back().first.username << std::endl;
 
     // clear DHs from memory
     for (int i = 0; i < 32; ++i) {
@@ -521,9 +529,9 @@ void Client::printMessages()
 {
     for (const auto & message : messages_) {
         std::cout << "\nMessage from: " << message.sender() << " to: " << message.reciever() << std::endl;
-	int sharedSecretIndex = getIndexOfSharedSecret(message.reciever());
+	int sharedSecretIndex = getIndexOfSharedSecret(message.sender());
 	if (sharedSecretIndex == -1) {
-	    std::cout << "user \'" << message.sender() << "\' not found" << std::endl;
+	    std::cout << "User \'" << message.sender() << "\' not found" << std::endl;
 	    return;
 	}
 	unsigned char encryptedAdArr[64];
@@ -553,7 +561,8 @@ void Client::printMessages()
     //}
 }
 
-void Client::printSharedSecrets() {
+void Client::printSharedSecrets()
+{
     std::cout << "sharedSecrets len " << sharedSecrets_.size() << std::endl;
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
         std::cout << "Shared secret with ";
@@ -567,7 +576,8 @@ void Client::printSharedSecrets() {
     }
 }
 
-void Client::initConnection() {
+void Client::initConnection()
+{
     int port = 8080;
     struct sockaddr_in serv_addr;
     char buffer[2048] = {0};
