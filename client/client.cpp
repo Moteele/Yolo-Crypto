@@ -16,7 +16,8 @@ void Client::writeToReq(const std::string &req) {
     gotResponse_ = false;
 }
 
-void Client::develAuth() {
+void Client::develAuth()
+{
     Mess message;
     message.set_type(Mess::AUTH);
     std::cout << "Login:" << std::endl;
@@ -39,7 +40,8 @@ void Client::develAuth() {
     writeToReq(stringToHex(serialized));
 }
 
-void Client::develCreateAcc() {
+void Client::develCreateAcc()
+{
     Mess message;
     message.set_type(Mess::CREATE_ACCOUNT);
 
@@ -82,9 +84,8 @@ void Client::readResponse() {
     Mess message;
     // go through all responses
     while (std::getline(response, line)) {
-        if (line == "") {
+        if (line == "")
             continue;
-        }
 
         message.ParseFromString(hexToString(line));
     #ifdef DEBUG
@@ -142,7 +143,8 @@ void Client::readResponse() {
     }
 }
 
-Key Client::createKeyFromHex(std::string &hexKey, bool isPublic) {
+Key Client::createKeyFromHex(std::string &hexKey, bool isPublic)
+{
     unsigned char keyArr[32];
     auto keyVec = hexToKey(hexKey);
     for (int i = 0; i < 32; ++i) {
@@ -226,10 +228,14 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 
     // store shared secret
-    std::pair<std::string, std::string> newPair = std::make_pair(message.username(), "");
+    Ratchet* ratchet = new Ratchet();
+    std::pair<Ratchet*, std::string> newPair;
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
+    newPair.first = ratchet;
+    std::strcpy(newPair.first->username, message.username().data());
+    newPair.first->InitA(sharedSecret, hisSignedPrekey.getPublicKey().data());
     sharedSecrets_.push_back(newPair);
 
     // clear the DHs from memory
@@ -243,7 +249,7 @@ void Client::createSecretFromKeys(const std::string &keys)
 
 int Client::getIndexOfSharedSecret(const std::string &name) {
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        if (sharedSecrets_[i].first == name) {
+        if (! strcmp(sharedSecrets_[i].first->username, name.data())) {
             return i;
         }
     }
@@ -286,11 +292,13 @@ void Client::develSendMessage()
     message.set_senepkey(&ephemeral.getPublicKey()[0], 32);
 
     // AD
-    sharedSecretIndex = getIndexOfSharedSecret(reciever);
+    //sharedSecretIndex = getIndexOfSharedSecret(reciever);
     unsigned char key[32];
+    
     for (int i = 0; i < 32; ++i) {
         key[i] = sharedSecrets_[sharedSecretIndex].second[i];
     }
+    
     unsigned char iv[16];
     memset(iv, 0, 16);
     unsigned char ciphered[64];
@@ -313,6 +321,7 @@ void Client::develSendMessage()
     message.SerializeToString(&serialized);
     // write init key bundle
     writeToReq(stringToHex(serialized));
+    std::this_thread::sleep_for(1s);
 
     // the message itself
     message.Clear();
@@ -322,9 +331,15 @@ void Client::develSendMessage()
     std::getline(std::cin, msg);
     std::cout << std::endl;
 
+    // encrypt the message
+    Ratchet_mess encMess= sharedSecrets_[sharedSecretIndex].first->RatchetEncrypt(const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(msg.c_str())), msg.length(), ad);
+
     message.set_sender(name_);
     message.set_reciever(reciever);
-    message.set_textcontent(msg);
+    message.set_textcontent(std::string (reinterpret_cast<char*>(encMess.message.data()), encMess.message.size()));
+    message.set_prevnum(encMess.header.pn);
+    message.set_messnum(encMess.header.n);
+    message.set_senrkey(std::string (reinterpret_cast<char*>(encMess.header.pubKey), 32));
 
     message.SerializeToString(&serialized);
     //std::cout << "DEBUG: sending message" << std::endl;
@@ -334,6 +349,9 @@ void Client::develSendMessage()
 
 void Client::createKeys(Mess &message)
 {
+
+    // daniel added this, is is okay? otherwise its uninitialized
+    ephemeral.generate();
     identityKey.generate();
     signedPrekey.generate();
 
@@ -361,7 +379,7 @@ void Client::createKeys(Mess &message)
 
 void Client::readInitial(const std::string &req) {
 
-    //std::cout << "DEBUG: reading initial message" << std::endl;
+    std::cout << "DEBUG: reading initial message" << std::endl;
     Mess message;
     message.ParseFromString(hexToString(req));
 
@@ -458,16 +476,22 @@ void Client::readInitial(const std::string &req) {
     std::cout << "Authentication successful" << std::endl;
 
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        if (sharedSecrets_[i].first == message.username()) {
+        if (sharedSecrets_[i].first->username == message.username()) {
             std::cout << "Weird stuff happening, already have shared secret with this person" << std::endl;
             std::cout << "Possible error, do not use this app anymore" << std::endl;
             return;
         }
     }
-    std::pair<std::string, std::string> newPair = std::make_pair(message.username(), "");
+    Ratchet* ratchet = new Ratchet();
+    std::pair<Ratchet*, std::string> newPair;
     for (int i = 0; i < 32; ++i) {
         newPair.second += sharedSecret[i];
     }
+    newPair.first = ratchet;
+
+    std::copy( message.sender().begin(), message.sender().end(), newPair.first->username );
+    newPair.first->username[message.sender().length()] = 0;
+    newPair.first->InitB(sharedSecret, signedPrekey.getPrivateKey().data());
     sharedSecrets_.push_back(newPair);
 
     // clear DHs from memory
@@ -507,27 +531,54 @@ void Client::printMessages()
 {
     for (const auto & message : messages_) {
         std::cout << "\nMessage from: " << message.sender() << " to: " << message.reciever() << std::endl;
-        std::cout << message.textcontent() << "\n" << std::endl;
+	int sharedSecretIndex = getIndexOfSharedSecret(message.sender());
+	if (sharedSecretIndex == -1) {
+	    std::cout << "User \'" << message.sender() << "\' not found" << std::endl;
+	    return;
+	}
+	unsigned char encryptedAdArr[64];
+	unsigned char decryptedAd[64];
+	unsigned char iv[16];
+	unsigned char pt[message.textcontent().size()];
+	Header header;
+	memcpy(header.pubKey, message.senrkey().data(), 32);
+	header.pn = message.prevnum();
+	header.n = message.messnum();
+	memset(iv, 0, 16);
+	memcpy(encryptedAdArr, message.cipherad().data(), 64);
+	int len = Util::aes256decrypt(encryptedAdArr, 64, const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>
+		(sharedSecrets_[sharedSecretIndex].second.data())), iv, decryptedAd, 0);
+	sharedSecrets_[sharedSecretIndex].first->RatchetDecrypt
+	    (header, const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>
+	    (message.textcontent().data())), message.textcontent().size(), decryptedAd, pt);
+
+	std::cout << "Message: " << pt << std::endl;
     }
 
+    messages_.clear();
     // this is weird, messages_.clear() was giving me segfaults
-    for (int i = 0; i <= messages_.size(); ++i) {
-	    messages_.pop_back();
-    }
+    // for (int i = 0; i <= messages_.size(); ++i) {
+	//    messages_.pop_back();
+    //}
 }
 
-void Client::printSharedSecrets() {
+void Client::printSharedSecrets()
+{
     std::cout << "sharedSecrets len " << sharedSecrets_.size() << std::endl;
     for (int i = 0; i < sharedSecrets_.size(); ++i) {
-        std::cout << "Shared secret with " + sharedSecrets_[i].first << ":" << std::endl;
+        std::cout << "Shared secret with ";
+	for(size_t i = 0; i < 32; i++)
+	    std::cout << sharedSecrets_[i].first->username[i];
+	std::cout << ":" << std::endl;
         for (int j = 0; j < 32; ++j) {
-            std::cout << sharedSecrets_[i].second[j];
+            std::cout << sharedSecrets_[i].first->RK[j];
         }
         std::cout << std::endl;
     }
 }
 
-void Client::initConnection() {
+void Client::initConnection()
+{
     int port = 8080;
     struct sockaddr_in serv_addr;
     char buffer[2048] = {0};
@@ -625,7 +676,9 @@ void Client::develRunClient()
                     readResponse();
                     std::this_thread::sleep_for(1s);
                 }
+		readResponse();
 		if (gotResponse_) {
+			std::cout << "Reading messages" << std::endl;
 			printMessages();
 		} else {
 			std::cout << "No messages found" << std::endl;
@@ -634,8 +687,8 @@ void Client::develRunClient()
             case 3:
                 printSharedSecrets();
                 break;
-	        default:
-		        std::cout << "Invalid choice" << std::endl;
+	    default:
+		    std::cout << "Invalid choice" << std::endl;
             }
         }
     }

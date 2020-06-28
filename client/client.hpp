@@ -33,7 +33,7 @@ class Client
     Key ephemeral = {};
 
     // !!! the second string is a shared secret and it's a BINARY string !!!
-    std::vector<std::pair<std::string, std::string>> sharedSecrets_ = {};
+    std::vector<std::pair<Ratchet*, std::string>> sharedSecrets_;
 
     unsigned char helperKey[32];
 

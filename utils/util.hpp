@@ -223,6 +223,8 @@ struct Ratchet_mess {
 
 class Ratchet {
     public:
+	Ratchet() = default;
+	char username[32];
 	Key DHs; // DH Ratchet key pair (self)
 	Key DHr; /// DH Ratchet public key (remote)
 	unsigned char RK[32]; // Root key
@@ -230,7 +232,8 @@ class Ratchet {
 	unsigned char CKr[32]; // receiving chain key
 	int Ns = 0, Nr = 0; // message numbers
 	int PN = 0; // no. of messages in previous sending chain
-	std::vector<unsigned char[32]> MKSKIPPED; // stored skipped-over message keys
+	//std::vector<unsigned char[32]> MKSKIPPED; // stored skipped-over message keys
+
 
 	void InitA(unsigned char* SK, unsigned char* BpubKey);
 
