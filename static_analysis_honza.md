@@ -9,7 +9,7 @@ Using this method, I have found mainly four types of errors:
 * unused function
 * comparision of integers with different sign
 
-The unused fuctions are mainly low level curve/point arithmetic functions. The unused parameter/variable are usually in the X3DH, XEdDSA and Double ratchet functions. And the integer comparision errors are mainly in the for loop statement. 
+The unused fuctions are generally low level curve/point arithmetic functions. The unused parameter/variable are usually in the X3DH, XEdDSA and Double ratchet functions. And the integer comparision errors are mainly in the for loop statement. 
 
 ## cppcheck
 Cppcheck found many of the same errors (unused functions), but added a few new ones:

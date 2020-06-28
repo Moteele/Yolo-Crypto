@@ -4,6 +4,70 @@ This document shows some performance numbers of core functions.
 * compiler used: g++ 9.2.0
 * standard flags: -std=c++14 -pg
 
+## Create account
+Result after 10000 iterations. -O2 flag is useful. As expected, account creation is slower than authentication. 
+
+### standard flags
+* total time: 0.71s
+
+| % time | time/s | function                                                      |
+|--------|--------|---------------------------------------------------------------|
+|  21.13 |  0.15  | Server::performCreateAccount(int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+|  12.68 |  0.09  | __gnu_cxx::__enable_if<std::__is_char<char>::__value, bool>::__type std::operator==<char>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)|
+|  11.27 |  0.08  | std::vector<userAcc, std::allocator<userAcc> >::operator[](unsigned long)|
+|   9.86 |  0.07  | google::protobuf::internal::ArenaStringPtr::GetNoArena[abi:cxx11]() const|
+|   9.86 |  0.07  | Mess::username[abi:cxx11]() const|
+
+### with -O2 flag
+* total time: 0.11s
+
+| % time | time/s | function                                                      |
+|--------|--------|---------------------------------------------------------------|
+| 54.55  |  0.06  |  Server::performCreateAccount(int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+| 27.27  |  0.03  |  hexToString(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+|  9.09  |  0.01  |  ____C_A_T_C_H____T_E_S_T____0() |
+|  9.09  |  0.01  |  Mess::_InternalSerialize(unsigned char*, google::protobuf::io::EpsCopyOutputStream*) const |
+
+## Authentication
+Result after 100000 iterations. -O2 flag is useful. As expected, authentication is faster than registration.
+
+### standard flags
+* total time: 0.25s
+
+| % time | time/s | function                                                      |
+|--------|--------|---------------------------------------------------------------|
+| 16.00  |  0.04  |   std::ios_base::setf(std::_Ios_Fmtflags, std::_Ios_Fmtflags) |
+| 12.00  |  0.03  |   Mess::ByteSizeLong() const |
+| 12.00  |  0.03  |   Mess::_InternalSerialize(unsigned char*, google::protobuf::io::EpsCopyOutputStream*) const |
+|  8.00  |  0.02  |   google::protobuf::io::CodedOutputStream::VarintSize32(unsigned int) |
+|  8.00  |  0.02  |   stringToHex(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+|  4.00  |  0.01  |   std::operator&(std::_Ios_Fmtflags, std::_Ios_Fmtflags) |
+|  4.00  |  0.01  |   std::operator~(std::_Ios_Fmtflags) |
+|  4.00  |  0.01  |   std::operator|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags) |
+|  4.00  |  0.01  |   std::setw(int) |
+|  4.00  |  0.01  |   google::protobuf::internal::ArenaStringPtr::CreateInstanceNoArena(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*) |
+|  4.00  |  0.01  |   Mess_MsgType_IsValid(int) |
+|  4.00  |  0.01  |   google::protobuf::internal::ArenaStringPtr::SetNoArena(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+|  4.00  |  0.01  |   google::protobuf::internal::InternalMetadataWithArena::~InternalMetadataWithArena() |
+|  4.00  |  0.01  |   Mess::Mess() |
+|  4.00  |  0.01  |   hexToString(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+|  4.00  |  0.01  |   Mess::_InternalParse(char const*, google::protobuf::internal::ParseContext*) |
+
+
+### with -O2 flag
+* total time: 0.13s
+
+| % time | time/s | function                                                      |
+|--------|--------|---------------------------------------------------------------|
+| 30.77  |  0.04  |  stringToHex(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+| 15.38  |  0.02  |  void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) |
+| 15.38  |  0.02  |  hexToString(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+| 15.38  |  0.02  |  Server::performAuth(int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) |
+|  7.69  |  0.01  |  Mess::~Mess() |
+|  7.69  |  0.01  |  Mess::ByteSizeLong() const |
+|  7.69  |  0.01  |  Mess::_InternalSerialize(unsigned char*, google::protobuf::io::EpsCopyOutputStream*) const |
+
+
 ## String to hex
 Result after 1000 iterations. -O2 flag is useful.
 
