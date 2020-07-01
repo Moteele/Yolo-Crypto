@@ -44,7 +44,7 @@ Result after 100000 iterations. -O2 flag is useful. As expected, authentication 
 |  8.00  |  0.02  |   ``stringToHex(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) ``|
 |  4.00  |  0.01  |   ``std::operator&(std::_Ios_Fmtflags, std::_Ios_Fmtflags) ``|
 |  4.00  |  0.01  |   ``std::operator~(std::_Ios_Fmtflags) ``|
-|  4.00  |  0.01  |   ``std::operator|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags) ``|
+|  4.00  |  0.01  |   ``std::operator\|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags) ``|
 |  4.00  |  0.01  |   ``std::setw(int) ``|
 |  4.00  |  0.01  |   ``google::protobuf::internal::ArenaStringPtr::CreateInstanceNoArena(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*) ``|
 |  4.00  |  0.01  |   ``Mess_MsgType_IsValid(int) ``|
@@ -191,7 +191,7 @@ Result after 1000 iterations. -O2 flag is useful.
 |-------:|-------:|---------------------------------------------------------------|
 | 23.67  |  0.40  | ``std::ios_base::setf(std::_Ios_Fmtflags, std::_Ios_Fmtflags)   ``|
 | 20.71  |  0.35  | ``std::hex(std::ios_base&)                                      ``|
-| 12.13  |  0.21  | ``std::operator|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags)      ``|
+| 12.13  |  0.21  | ``std::operator\|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags)      ``|
 |  5.62  |  0.10  | ``std::operator&=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags)      ``|
 
 ### with -O2 flag
@@ -213,9 +213,9 @@ Result after 100000 iterations. It is much faster than the reverse. Interestingl
 | 45.71  | 0.16   | ``hexToString(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)``|
 | 14.29  | 0.05   | ``std::ios_base::setf(std::_Ios_Fmtflags, std::_Ios_Fmtflags)``|
 | 11.43  | 0.04   | ``std::hex(std::ios_base&)``|
-|  8.57  | 0.03   | ``std::operator|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags)``|
+|  8.57  | 0.03   | ``std::operator\|=(std::_Ios_Fmtflags&, std::_Ios_Fmtflags)``|
 |  5.71  | 0.02   | ``std::operator&(std::_Ios_Fmtflags, std::_Ios_Fmtflags)``|
-|  5.71  | 0.02   | ``std::operator|(std::_Ios_Fmtflags, std::_Ios_Fmtflags)``|
+|  5.71  | 0.02   | ``std::operator\|(std::_Ios_Fmtflags, std::_Ios_Fmtflags)``|
 
 \newpage
 ### with -O2 flag
